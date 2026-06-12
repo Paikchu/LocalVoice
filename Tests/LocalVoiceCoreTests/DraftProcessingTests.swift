@@ -2,6 +2,52 @@ import Foundation
 import Testing
 @testable import LocalVoiceCore
 
+@Test func spokenStructureNormalizerCreatesNumberedList() {
+    let output = SpokenStructureNormalizer.normalize(
+        "第一点确认需求第二点完成开发第三点安排测试"
+    )
+
+    #expect(output == "1. 确认需求\n2. 完成开发\n3. 安排测试")
+}
+
+@Test func spokenStructureNormalizerSupportsCommonListMarkers() {
+    #expect(
+        SpokenStructureNormalizer.normalize(
+            "第一个检查日志第二个修复问题第三个发布版本"
+        ) == "1. 检查日志\n2. 修复问题\n3. 发布版本"
+    )
+    #expect(
+        SpokenStructureNormalizer.normalize(
+            "一是确认范围二是实现功能三是完成验证"
+        ) == "1. 确认范围\n2. 实现功能\n3. 完成验证"
+    )
+}
+
+@Test func spokenStructureNormalizerDoesNotConvertOrdinalContent() {
+    let source = "这是第一版，计划第二季度发布，并交给第三方测试。"
+
+    #expect(SpokenStructureNormalizer.normalize(source) == source)
+}
+
+@Test func spokenStructureNormalizerConvertsExplicitPunctuationCommands() {
+    let output = SpokenStructureNormalizer.normalize(
+        "今天完成开发逗号明天开始测试句号是否按计划发布问号换行请及时回复感叹号"
+    )
+
+    #expect(output == "今天完成开发，明天开始测试。是否按计划发布？\n请及时回复！")
+}
+
+@Test func spokenStructureNormalizerPreservesPunctuationTermsAsContent() {
+    #expect(
+        SpokenStructureNormalizer.normalize("逗号是中文标点")
+            == "逗号是中文标点"
+    )
+    #expect(
+        SpokenStructureNormalizer.normalize("这个字段叫句号状态")
+            == "这个字段叫句号状态"
+    )
+}
+
 @Test func sessionProcessesAndInsertsFinalTranscriptBeforeCompleting() {
     var machine = SessionStateMachine()
 
@@ -297,6 +343,8 @@ import Testing
 
     #expect(prompt.contains("\"intent\""))
     #expect(prompt.contains("Max"))
+    #expect(prompt.contains("逗号、句号、问号和感叹号"))
+    #expect(prompt.contains("1.、2.、3."))
     #expect(!prompt.contains("当前应用正文"))
     #expect(!prompt.contains("屏幕内容"))
 }
@@ -383,6 +431,59 @@ import Testing
     #expect(outcome.usedFallback)
     #expect(outcome.result.intent == .plainText)
     #expect(outcome.result.outputText == "今天下午我们开始测试")
+}
+
+@Test func draftProcessorKeepsNumberedListWhenModelFails() async {
+    let model = FakeLanguageModelService(error: TestModelError.failed)
+    let processor = DraftProcessingService(
+        languageModel: model,
+        timeout: .seconds(1)
+    )
+
+    let outcome = await processor.process(
+        transcript: "第一点确认需求第二点完成开发第三点安排测试",
+        mode: .dictation,
+        signature: ""
+    )
+
+    #expect(outcome.usedFallback)
+    #expect(
+        outcome.result.outputText
+            == "1. 确认需求\n2. 完成开发\n3. 安排测试"
+    )
+}
+
+@Test func draftProcessorRejectsModelOutputThatFlattensNumberedList() async {
+    let flattened = ModelGenerationOutput(
+        text: """
+        {
+          "intent": "plainText",
+          "confidence": 0.99,
+          "outputText": "确认需求，完成开发，安排测试。",
+          "email": null
+        }
+        """
+    )
+    let model = FakeLanguageModelService(
+        responses: [flattened, flattened]
+    )
+    let processor = DraftProcessingService(
+        languageModel: model,
+        timeout: .seconds(1)
+    )
+
+    let outcome = await processor.process(
+        transcript: "第一点确认需求第二点完成开发第三点安排测试",
+        mode: .dictation,
+        signature: ""
+    )
+
+    #expect(outcome.usedFallback)
+    #expect(
+        outcome.result.outputText
+            == "1. 确认需求\n2. 完成开发\n3. 安排测试"
+    )
+    #expect(await model.requestCount == 2)
 }
 
 @Test func longDictationRejectsASeverelyTruncatedModelResult() async {

@@ -286,6 +286,153 @@ public enum DocumentFormatter {
     }
 }
 
+public enum SpokenStructureNormalizer {
+    public static func normalize(_ input: String) -> String {
+        let normalized = input
+            .replacingOccurrences(of: "\r\n", with: "\n")
+            .replacingOccurrences(of: "\r", with: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty else { return normalized }
+
+        let punctuated = replaceSpokenPunctuation(in: normalized)
+        return numberedList(from: punctuated) ?? punctuated
+    }
+
+    private static func replaceSpokenPunctuation(in input: String) -> String {
+        let commands: [(word: String, symbol: String, needsSuffix: Bool)] = [
+            ("另起一段", "\n\n", true),
+            ("感叹号", "！", false),
+            ("问号", "？", false),
+            ("句号", "。", false),
+            ("逗号", "，", true),
+            ("换行", "\n", true)
+        ]
+        var value = input
+        for command in commands {
+            value = replace(
+                command.word,
+                with: command.symbol,
+                needsSuffix: command.needsSuffix,
+                in: value
+            )
+        }
+        return value
+    }
+
+    private static func replace(
+        _ command: String,
+        with symbol: String,
+        needsSuffix: Bool,
+        in input: String
+    ) -> String {
+        var value = input
+        var searchStart = value.startIndex
+
+        while searchStart < value.endIndex,
+              let range = value.range(
+                  of: command,
+                  range: searchStart..<value.endIndex
+              ) {
+            let prefix = String(value[..<range.lowerBound])
+            let suffix = String(value[range.upperBound...])
+            let hasPrefix = prefix.contains {
+                !$0.isWhitespace && !$0.isPunctuation
+            }
+            let hasSuffix = suffix.contains {
+                !$0.isWhitespace && !$0.isPunctuation
+            }
+            let isLiteralTerm = literalPrefixes.contains {
+                prefix.hasSuffix($0)
+            } || literalSuffixes.contains {
+                suffix.hasPrefix($0)
+            }
+
+            if hasPrefix,
+               (!needsSuffix || hasSuffix),
+               !isLiteralTerm {
+                value.replaceSubrange(range, with: symbol)
+                searchStart = value.index(
+                    range.lowerBound,
+                    offsetBy: symbol.count
+                )
+            } else {
+                searchStart = range.upperBound
+            }
+        }
+        return value
+    }
+
+    private static func numberedList(from input: String) -> String? {
+        let pattern = #"第([一二三四五六七八九十])(?:点|个)|([一二三四五六七八九十])是"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else {
+            return nil
+        }
+        let matches = regex.matches(
+            in: input,
+            range: NSRange(input.startIndex..., in: input)
+        )
+        guard matches.count >= 2 else { return nil }
+
+        let numberedMatches = matches.compactMap { match -> (Int, Range<String.Index>)? in
+            let numeralRange = match.range(at: 1).location != NSNotFound
+                ? match.range(at: 1)
+                : match.range(at: 2)
+            guard let swiftNumeralRange = Range(numeralRange, in: input),
+                  let markerRange = Range(match.range, in: input),
+                  let number = chineseNumber(
+                      String(input[swiftNumeralRange])
+                  ) else {
+                return nil
+            }
+            return (number, markerRange)
+        }
+        guard numberedMatches.count == matches.count,
+              numberedMatches.first?.0 == 1,
+              numberedMatches.enumerated().allSatisfy({
+                  $0.element.0 == $0.offset + 1
+              }) else {
+            return nil
+        }
+
+        var items: [String] = []
+        for (index, match) in numberedMatches.enumerated() {
+            let contentStart = match.1.upperBound
+            let contentEnd = index + 1 < numberedMatches.count
+                ? numberedMatches[index + 1].1.lowerBound
+                : input.endIndex
+            let content = input[contentStart..<contentEnd]
+                .trimmingCharacters(in: listBoundaryCharacters)
+            guard !content.isEmpty else { return nil }
+            items.append("\(match.0). \(content)")
+        }
+
+        let prefix = input[..<numberedMatches[0].1.lowerBound]
+            .trimmingCharacters(in: listBoundaryCharacters)
+        return prefix.isEmpty
+            ? items.joined(separator: "\n")
+            : "\(prefix)\n\(items.joined(separator: "\n"))"
+    }
+
+    private static func chineseNumber(_ value: String) -> Int? {
+        [
+            "一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
+            "六": 6, "七": 7, "八": 8, "九": 9, "十": 10
+        ][value]
+    }
+
+    private static let literalPrefixes = [
+        "叫", "称为", "名为", "输入", "说出", "读作"
+    ]
+
+    private static let literalSuffixes = [
+        "是中文标点", "是标点", "这个词", "状态", "字符", "符号"
+    ]
+
+    private static let listBoundaryCharacters = CharacterSet(
+        charactersIn: " \t\n，,、：:"
+    )
+}
+
 public struct ProcessingBenchmarkSample: Codable, Equatable, Sendable {
     public let modelID: String
     public let inputCharacters: Int
@@ -486,6 +633,9 @@ public enum PromptBuilder {
         - 意图提示为 \(intentHint.rawValue)，但必须根据完整原文判断。
         - 输出语言：\(targetLanguage)。
         - 删除口语填充和重复，保留原文事实。
+        - 根据语义补全逗号、句号、问号和感叹号。
+        - 已有的 1.、2.、3. 编号列表必须逐项换行并保持编号顺序。
+        - 不得在 URL、邮箱、时间、金额或产品编号内部插入标点。
         - 完整保留原文信息，不得总结、缩写、截断或省略后半段。
         - 不得虚构姓名、日期、金额、URL、编号、附件或承诺。
         - 人名、产品名、URL、编号必须逐字保留，不得翻译或转写拼音。
@@ -593,7 +743,11 @@ public actor DraftProcessingService {
             of: #"\p{Han}"#,
             options: .regularExpression
         ) == nil ? .english : .chinese
-        let normalized = TextCorrector.correct(transcript, language: language)
+        let corrected = TextCorrector.correct(
+            transcript,
+            language: language
+        )
+        let normalized = SpokenStructureNormalizer.normalize(corrected)
         if mode == .english {
             let chunks = Self.translationChunks(normalized)
             if chunks.count > 1 {
@@ -814,6 +968,12 @@ public actor DraftProcessingService {
         ) else {
             return nil
         }
+        guard preservesNumberedListStructure(
+            result.outputText,
+            source: source
+        ) else {
+            return nil
+        }
         guard isTranslatedWhenRequired(
             result.outputText,
             source: source,
@@ -835,6 +995,32 @@ public actor DraftProcessingService {
         let outputCount = contentCharacterCount(output)
         let minimumRatio = mode == .english ? 0.45 : 0.55
         return outputCount >= Int(Double(sourceCount) * minimumRatio)
+    }
+
+    private static func preservesNumberedListStructure(
+        _ output: String,
+        source: String
+    ) -> Bool {
+        let sourceNumbers = numberedListMarkers(in: source)
+        guard !sourceNumbers.isEmpty else { return true }
+        return numberedListMarkers(in: output) == sourceNumbers
+    }
+
+    private static func numberedListMarkers(in text: String) -> [Int] {
+        guard let regex = try? NSRegularExpression(
+            pattern: #"(?m)^(\d+)\.\s+\S"#
+        ) else {
+            return []
+        }
+        return regex.matches(
+            in: text,
+            range: NSRange(text.startIndex..., in: text)
+        ).compactMap { match in
+            guard let range = Range(match.range(at: 1), in: text) else {
+                return nil
+            }
+            return Int(text[range])
+        }
     }
 
     private static func contentCharacterCount(_ text: String) -> Int {

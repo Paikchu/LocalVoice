@@ -41,6 +41,7 @@ final class SpeechRecognitionService {
         let request = SFSpeechAudioBufferRecognitionRequest()
         request.shouldReportPartialResults = true
         request.requiresOnDeviceRecognition = true
+        request.addsPunctuation = true
         request.taskHint = .dictation
         self.request = request
 

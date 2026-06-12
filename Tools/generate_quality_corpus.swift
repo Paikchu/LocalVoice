@@ -66,7 +66,12 @@ let plainTemplates: [(String, [[String]])] = [
     ("不用发邮件，记一下{name}会在{deadline}前{action}", []),
     ("那个今天下午我们开始测试{project}，编号是{code}", [["今天下午", "this afternoon", "today afternoon", "today in the afternoon"], ["开始测试", "start testing"]]),
     ("请记录会议结论，{project}第一版已经完成", [["会议结论", "meeting conclusion"], ["第一版已经完成", "第一版已完成", "first version is complete", "first version is completed"]]),
-    ("邮件这个词只是在笔记里出现，不是发送命令", [["不是发送命令", "not a send command", "not as a send command"], ["笔记", "note"]])
+    ("邮件这个词只是在笔记里出现，不是发送命令", [["不是发送命令", "not a send command", "not as a send command"], ["笔记", "note"]]),
+    ("第一点确认需求第二点完成开发第三点安排测试", [["1. 确认需求"], ["2. 完成开发"], ["3. 安排测试"]]),
+    ("今天完成开发逗号明天开始测试句号是否按计划发布问号", [["今天完成开发"], ["明天开始测试"], ["是否按计划发布"]]),
+    ("这是{project}第一版，计划第二季度发布，并交给第三方测试", [["第一版", "first version"], ["第二季度", "second quarter"], ["第三方", "third party"]]),
+    ("请记录{project}的地址https://local.voice/{code}，编号{code}，时间15:30，预算¥1200.50", [["地址", "address"], ["时间", "time"], ["预算", "budget"]]),
+    ("逗号是中文标点，这个字段叫句号状态", [["逗号", "comma"], ["句号状态", "period status"]])
 ]
 
 for index in 0..<100 {

@@ -2877,22 +2877,21 @@
     "id" : "plain-006",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
@@ -2904,69 +2903,69 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
       ],
       [
-        "王芳",
-        "Wang Fang"
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-008",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3007"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3007"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-009",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3008"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3008，编号LV-3008，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -2978,16 +2977,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -3107,92 +3105,95 @@
     "id" : "plain-016",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-017",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-018",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3017"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3017"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-019",
     "mode" : "english",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3018"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3018，编号LV-3018，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -3204,16 +3205,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -3333,92 +3333,95 @@
     "id" : "plain-026",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-027",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-028",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3027"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3027"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-029",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3028"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3028，编号LV-3028，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -3430,16 +3433,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -3559,22 +3561,21 @@
     "id" : "plain-036",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
@@ -3586,69 +3587,69 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
       ],
       [
-        "王芳",
-        "Wang Fang"
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-038",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3037"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3037"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-039",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3038"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3038，编号LV-3038，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -3660,16 +3661,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -3789,92 +3789,95 @@
     "id" : "plain-046",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-047",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-048",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3047"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3047"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-049",
     "mode" : "english",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3048"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3048，编号LV-3048，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -3886,16 +3889,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -4015,92 +4017,95 @@
     "id" : "plain-056",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-057",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-058",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3057"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3057"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-059",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3058"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3058，编号LV-3058，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -4112,16 +4117,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -4241,22 +4245,21 @@
     "id" : "plain-066",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
@@ -4268,69 +4271,69 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
       ],
       [
-        "王芳",
-        "Wang Fang"
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-068",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3067"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3067"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-069",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3068"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3068，编号LV-3068，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -4342,16 +4345,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -4471,92 +4473,95 @@
     "id" : "plain-076",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-077",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-078",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3077"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3077"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-079",
     "mode" : "english",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3078"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3078，编号LV-3078，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -4568,16 +4573,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -4697,92 +4701,95 @@
     "id" : "plain-086",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-087",
     "mode" : "dictation",
     "requiredFacts" : [
-      "王芳"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
+      ],
+      [
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-088",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3087"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3087"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-089",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3088"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3088，编号LV-3088，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -4794,16 +4801,15 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   },
   {
     "expectedIntent" : "plainText",
@@ -4923,22 +4929,21 @@
     "id" : "plain-096",
     "mode" : "dictation",
     "requiredFacts" : [
-      "LocalVoice"
+
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "收到一封邮件",
-        "received an email"
+        "1. 确认需求"
       ],
       [
-        "测试安排",
-        "test schedule",
-        "testing schedule",
-        "test scheduling"
+        "2. 完成开发"
+      ],
+      [
+        "3. 安排测试"
       ]
     ],
-    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+    "transcript" : "第一点确认需求第二点完成开发第三点安排测试"
   },
   {
     "expectedIntent" : "plainText",
@@ -4950,69 +4955,69 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "6 月 15 日",
-        "June 15",
-        "15 June"
+        "今天完成开发"
       ],
       [
-        "确认",
-        "confirm"
+        "明天开始测试"
       ],
       [
-        "王芳",
-        "Wang Fang"
+        "是否按计划发布"
       ]
     ],
-    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+    "transcript" : "今天完成开发逗号明天开始测试句号是否按计划发布问号"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-098",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Nova",
-      "LV-3097"
+      "Nova"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "今天下午",
-        "this afternoon",
-        "today afternoon",
-        "today in the afternoon"
+        "第一版",
+        "first version"
       ],
       [
-        "开始测试",
-        "start testing"
+        "第二季度",
+        "second quarter"
+      ],
+      [
+        "第三方",
+        "third party"
       ],
       [
         "测试",
         "test"
       ]
     ],
-    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3097"
+    "transcript" : "这是Nova第一版，计划第二季度发布，并交给第三方测试"
   },
   {
     "expectedIntent" : "plainText",
     "id" : "plain-099",
     "mode" : "dictation",
     "requiredFacts" : [
-      "Orion"
+      "Orion",
+      "LV-3098"
     ],
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "会议结论",
-        "meeting conclusion"
+        "地址",
+        "address"
       ],
       [
-        "第一版已经完成",
-        "第一版已完成",
-        "first version is complete",
-        "first version is completed"
+        "时间",
+        "time"
+      ],
+      [
+        "预算",
+        "budget"
       ]
     ],
-    "transcript" : "请记录会议结论，Orion第一版已经完成"
+    "transcript" : "请记录Orion的地址https:\/\/local.voice\/LV-3098，编号LV-3098，时间15:30，预算¥1200.50"
   },
   {
     "expectedIntent" : "plainText",
@@ -5024,15 +5029,14 @@
     "requiresEmailStructure" : false,
     "semanticGroups" : [
       [
-        "不是发送命令",
-        "not a send command",
-        "not as a send command"
+        "逗号",
+        "comma"
       ],
       [
-        "笔记",
-        "note"
+        "句号状态",
+        "period status"
       ]
     ],
-    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+    "transcript" : "逗号是中文标点，这个字段叫句号状态"
   }
 ]
