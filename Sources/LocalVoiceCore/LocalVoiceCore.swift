@@ -9,35 +9,109 @@ public enum MenuLayout {
 }
 
 public enum FloatingBarLayout {
-    public static let width: CGFloat = 360
-    public static let height: CGFloat = 118
-    public static let controlsHeight: CGFloat = 46
-    public static let previewHeight: CGFloat = 64
-    public static let buttonDiameter: CGFloat = 34
+    public static let width: CGFloat = 330
+    public static let height: CGFloat = 184
+    public static let contentWidth: CGFloat = 314
+    public static let glowPadding: CGFloat = 8
+    public static let controlsHeight: CGFloat = 38
+    public static let capsuleWidth: CGFloat = 168
+    public static let buttonDiameter: CGFloat = 28
     public static let barCount = 13
+
+    public static let statusFontSize: CGFloat = 9
+    public static let previewFontSize: CGFloat = 12.5
+    public static let previewLineSpacing: CGFloat = 2
+    public static let previewLineHeight: CGFloat = 17
+    public static let previewMinLines = 2
+    public static let previewMaxLines = 5
+    public static let previewHorizontalPadding: CGFloat = 14
+    public static let previewVerticalPadding: CGFloat = 10
+    public static let statusTextHeight: CGFloat = 12
+    public static let statusSpacing: CGFloat = 3
+    public static let cornerRadius: CGFloat = 14
+
+    public static var previewTextWidth: CGFloat {
+        contentWidth - previewHorizontalPadding * 2
+    }
+
+    public static func textAreaHeight(forLines lines: Int) -> CGFloat {
+        CGFloat(lines) * previewLineHeight
+    }
+
+    /// Clamp a measured text height into the allowed 2…5 line range.
+    public static func clampedTextAreaHeight(_ measured: CGFloat) -> CGFloat {
+        let minHeight = textAreaHeight(forLines: previewMinLines)
+        let maxHeight = textAreaHeight(forLines: previewMaxLines)
+        return min(max(measured, minHeight), maxHeight)
+    }
 }
 
+/// Geometry for the Siri-style glowing waveform: several lines that stay
+/// nearly flat when idle and weave up and down — interleaving because each
+/// line carries its own frequency, speed and phase — as the voice level rises.
 public enum WaveformDynamics {
-    public static func heights(
+    public struct LineParameters: Sendable, Equatable {
+        public let frequency: Double
+        public let speed: Double
+        public let phase: Double
+        public let amplitude: Double
+        public let width: Double
+
+        public init(
+            frequency: Double,
+            speed: Double,
+            phase: Double,
+            amplitude: Double,
+            width: Double
+        ) {
+            self.frequency = frequency
+            self.speed = speed
+            self.phase = phase
+            self.amplitude = amplitude
+            self.width = width
+        }
+    }
+
+    public static let lines: [LineParameters] = [
+        LineParameters(frequency: 1.1, speed: 1.6, phase: 0.0, amplitude: 1.00, width: 2.0),
+        LineParameters(frequency: 1.7, speed: -2.1, phase: 1.8, amplitude: 0.78, width: 1.6),
+        LineParameters(frequency: 2.3, speed: 2.7, phase: 3.4, amplitude: 0.58, width: 1.4),
+        LineParameters(frequency: 0.7, speed: -1.2, phase: 5.0, amplitude: 0.42, width: 1.3)
+    ]
+
+    /// Small idle shimmer so the line reads as alive while staying near-flat.
+    public static let idleAmplitude: CGFloat = 1.0
+
+    /// Peak vertical swing the lines reach for the current voice level.
+    public static func activeAmplitude(level: Float, height: CGFloat) -> CGFloat {
+        let clamped = CGFloat(min(max(level, 0), 1))
+        return clamped * height * 0.40
+    }
+
+    /// Vertical offset (relative to the vertical center) of one line at the
+    /// normalized horizontal position `p` in 0...1. A `sin` envelope pulls the
+    /// lines back to the center line at both ends, like a voice waveform.
+    public static func lineOffset(
+        lineIndex: Int,
+        p: Double,
+        time: Double,
         level: Float,
-        phase: Double
-    ) -> [CGFloat] {
-        let normalized = CGFloat(min(max(level, 0), 1))
-        guard normalized >= 0.035 else {
-            return Array(repeating: 4, count: FloatingBarLayout.barCount)
-        }
-
-        let amplitude = 5 + normalized * 19
-        let center = CGFloat(FloatingBarLayout.barCount - 1) / 2
-
-        return (0..<FloatingBarLayout.barCount).map { index in
-            let distance = abs(CGFloat(index) - center) / center
-            let envelope = 0.42 + (1 - distance) * 0.58
-            let oscillation = 0.68 + 0.32 * abs(
-                sin(phase * 3.2 + Double(index) * 0.82)
-            )
-            return max(4, amplitude * envelope * CGFloat(oscillation))
-        }
+        height: CGFloat
+    ) -> CGFloat {
+        let line = lines[lineIndex]
+        let envelope = sin(Double.pi * p)
+        let wobble = sin(
+            p * Double.pi * 2 * line.frequency + time * line.speed + line.phase
+        )
+        let harmonic = 0.4 * sin(
+            p * Double.pi * 3.1 * line.frequency - time * line.speed * 0.7 + line.phase
+        )
+        let idle = Double(idleAmplitude)
+            * sin(p * 9 + time * 1.2 + Double(lineIndex))
+            * envelope
+        let active = Double(activeAmplitude(level: level, height: height))
+        let wave = (wobble + harmonic) * envelope * active * line.amplitude
+        return CGFloat(idle + wave)
     }
 }
 
