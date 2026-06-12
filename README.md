@@ -1,0 +1,8 @@
+- 要求：macOS 26、Xcode 26、XcodeGen。
+- 构建可运行应用：`./scripts/build-app.sh`
+- 运行测试：`swift test`
+- 启动应用：`open build/LocalVoice.app`
+- 默认听写快捷键：`⌘⇧D`
+- 默认中译英快捷键：`⌘⇧E`
+- 首次运行需要麦克风、语音识别、辅助功能权限。
+- 实现报告：[docs/plans/2026-06-12-localvoice-product-implementation-report.md](docs/plans/2026-06-12-localvoice-product-implementation-report.md)

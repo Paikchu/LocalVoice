@@ -1,0 +1,66 @@
+name: LocalVoice
+options:
+  bundleIdPrefix: com.localvoice
+  deploymentTarget:
+    macOS: "26.0"
+  xcodeVersion: "26.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    MACOSX_DEPLOYMENT_TARGET: "26.0"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: YES
+targets:
+  LocalVoiceCore:
+    type: framework
+    platform: macOS
+    sources:
+      - Sources/LocalVoiceCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.core
+        GENERATE_INFOPLIST_FILE: YES
+  LocalVoice:
+    type: application
+    platform: macOS
+    sources:
+      - Sources/LocalVoiceApp
+    dependencies:
+      - target: LocalVoiceCore
+    info:
+      path: Sources/LocalVoiceApp/Info.plist
+      properties:
+        CFBundleDisplayName: LocalVoice
+        LSUIElement: true
+        NSMicrophoneUsageDescription: LocalVoice 需要麦克风权限来进行本地语音识别。
+        NSSpeechRecognitionUsageDescription: LocalVoice 需要语音识别权限来实时转换你的语音。
+    entitlements:
+      path: Sources/LocalVoiceApp/LocalVoice.entitlements
+      properties:
+        com.apple.security.app-sandbox: false
+        com.apple.security.device.audio-input: true
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.app
+        PRODUCT_NAME: LocalVoice
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+  LocalVoiceCoreTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - Tests/LocalVoiceCoreTests
+    dependencies:
+      - target: LocalVoiceCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.core-tests
+schemes:
+  LocalVoice:
+    build:
+      targets:
+        LocalVoice: all
+        LocalVoiceCoreTests: [test]
+    test:
+      targets:
+        - LocalVoiceCoreTests

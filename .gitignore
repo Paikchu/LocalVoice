@@ -1,0 +1,10 @@
+.build/
+.derived/
+build/
+.DS_Store
+DerivedData/
+*.xcuserstate
+xcuserdata/
+artifacts/*
+!artifacts/localvoice-menu-v2.png
+!artifacts/localvoice-listening.png
