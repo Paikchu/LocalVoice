@@ -1,0 +1,5038 @@
+[
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-001",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2000"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2000，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-002",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2001"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2001，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-003",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2002"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2002，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-004",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2003"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2003，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-005",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2004"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2004，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-006",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2005"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2005，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-007",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2006"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2006，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-008",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2007"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2007，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-009",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2008"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2008，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-010",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2009"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2009，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-011",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2010"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2010，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-012",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2011"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2011，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-013",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2012"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2012，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-014",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2013"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2013，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-015",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2014"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2014，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-016",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2015"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2015，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-017",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2016"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2016，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-018",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2017"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2017，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-019",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2018"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2018，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-020",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2019"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2019，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-021",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2020"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2020，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-022",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2021"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2021，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-023",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2022"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2022，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-024",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2023"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2023，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-025",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2024"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2024，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-026",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2025"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2025，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-027",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2026"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2026，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-028",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2027"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2027，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-029",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2028"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2028，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-030",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2029"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2029，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-031",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2030"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2030，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-032",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2031"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2031，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-033",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2032"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2032，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-034",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2033"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2033，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-035",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2034"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2034，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-036",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2035"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2035，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-037",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2036"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2036，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-038",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2037"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2037，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-039",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2038"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2038，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-040",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2039"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2039，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-041",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2040"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2040，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-042",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2041"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2041，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-043",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2042"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2042，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-044",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2043"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2043，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-045",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2044"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2044，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-046",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2045"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2045，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-047",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2046"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2046，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-048",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2047"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2047，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-049",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2048"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2048，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-050",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2049"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2049，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-051",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2050"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2050，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-052",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2051"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2051，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-053",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2052"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2052，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-054",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2053"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2053，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-055",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2054"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2054，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-056",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2055"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2055，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-057",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2056"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2056，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-058",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2057"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2057，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-059",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2058"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2058，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-060",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2059"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2059，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-061",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2060"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2060，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-062",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2061"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2061，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-063",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2062"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2062，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-064",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2063"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2063，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-065",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2064"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2064，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-066",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2065"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2065，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-067",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2066"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2066，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-068",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2067"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2067，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-069",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2068"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2068，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-070",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2069"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2069，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-071",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2070"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2070，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-072",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2071"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2071，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-073",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2072"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2072，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-074",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2073"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2073，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-075",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2074"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2074，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-076",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2075"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2075，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-077",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2076"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2076，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-078",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2077"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2077，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-079",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2078"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2078，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-080",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2079"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2079，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-081",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2080"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2080，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-082",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2081"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2081，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-083",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2082"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2082，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-084",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2083"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2083，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-085",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2084"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2084，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-086",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2085"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2085，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-087",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2086"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2086，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-088",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2087"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2087，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-089",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2088"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2088，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-090",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2089"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2089，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-091",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2090"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2090，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-092",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2091"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2091，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-093",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2092"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2092，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-094",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2093"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2093，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-095",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2094"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2094，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-096",
+    "mode" : "english",
+    "requiredFacts" : [
+      "李明",
+      "LocalVoice",
+      "LV-2095"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "周五",
+        "Friday"
+      ],
+      [
+        "反馈",
+        "reply",
+        "provide feedback"
+      ]
+    ],
+    "transcript" : "嗯，帮我给李明发一封邮件，说LocalVoice第一版已经完成，编号LV-2095，请他在周五前反馈，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-097",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳",
+      "Atlas",
+      "LV-2096"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "嗯，帮我给王芳发一封邮件，说Atlas第一版已经完成，编号LV-2096，请他在6 月 15 日前确认，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-098",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "陈晨",
+      "Nova",
+      "LV-2097"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "明天下午",
+        "tomorrow afternoon"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "嗯，帮我给陈晨发一封邮件，说Nova第一版已经完成，编号LV-2097，请他在明天下午前测试，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-099",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "赵敏",
+      "Orion",
+      "LV-2098"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "本周三",
+        "this Wednesday"
+      ],
+      [
+        "回复",
+        "reply",
+        "respond"
+      ]
+    ],
+    "transcript" : "嗯，帮我给赵敏发一封邮件，说Orion第一版已经完成，编号LV-2098，请他在本周三前回复，谢谢"
+  },
+  {
+    "expectedIntent" : "composeEmail",
+    "id" : "email-100",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Alex",
+      "Pixel",
+      "LV-2099"
+    ],
+    "requiresEmailStructure" : true,
+    "semanticGroups" : [
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete"
+      ],
+      [
+        "下周一",
+        "next Monday"
+      ],
+      [
+        "审核",
+        "review"
+      ]
+    ],
+    "transcript" : "嗯，帮我给Alex发一封邮件，说Pixel第一版已经完成，编号LV-2099，请他在下周一前审核，谢谢"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-001",
+    "mode" : "english",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-002",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-003",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3002"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3002"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-004",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-005",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-006",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-007",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ],
+      [
+        "王芳",
+        "Wang Fang"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-008",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3007"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3007"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-009",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-010",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-011",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-012",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-013",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3012"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3012"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-014",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-015",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-016",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-017",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-018",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3017"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3017"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-019",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-020",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-021",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-022",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-023",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3022"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3022"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-024",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-025",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-026",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-027",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-028",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3027"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3027"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-029",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-030",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-031",
+    "mode" : "english",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-032",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-033",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3032"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3032"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-034",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-035",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-036",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-037",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ],
+      [
+        "王芳",
+        "Wang Fang"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-038",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3037"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3037"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-039",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-040",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-041",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-042",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-043",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3042"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3042"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-044",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-045",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-046",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-047",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-048",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3047"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3047"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-049",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-050",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-051",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-052",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-053",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3052"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3052"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-054",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-055",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-056",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-057",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-058",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3057"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3057"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-059",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-060",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-061",
+    "mode" : "english",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-062",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-063",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3062"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3062"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-064",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-065",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-066",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-067",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ],
+      [
+        "王芳",
+        "Wang Fang"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-068",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3067"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3067"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-069",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-070",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-071",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-072",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-073",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3072"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3072"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-074",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-075",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-076",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-077",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-078",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3077"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3077"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-079",
+    "mode" : "english",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-080",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-081",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-082",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-083",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3082"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3082"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-084",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-085",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-086",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-087",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-088",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3087"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3087"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-089",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-090",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-091",
+    "mode" : "english",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-092",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "王芳"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-093",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3092"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3092"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-094",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-095",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-096",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "LocalVoice"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "收到一封邮件",
+        "received an email"
+      ],
+      [
+        "测试安排",
+        "test schedule",
+        "testing schedule",
+        "test scheduling"
+      ]
+    ],
+    "transcript" : "我收到一封邮件，里面提到了LocalVoice的测试安排"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-097",
+    "mode" : "english",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "6 月 15 日",
+        "June 15",
+        "15 June"
+      ],
+      [
+        "确认",
+        "confirm"
+      ],
+      [
+        "王芳",
+        "Wang Fang"
+      ]
+    ],
+    "transcript" : "不用发邮件，记一下王芳会在6 月 15 日前确认"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-098",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Nova",
+      "LV-3097"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "今天下午",
+        "this afternoon",
+        "today afternoon",
+        "today in the afternoon"
+      ],
+      [
+        "开始测试",
+        "start testing"
+      ],
+      [
+        "测试",
+        "test"
+      ]
+    ],
+    "transcript" : "那个今天下午我们开始测试Nova，编号是LV-3097"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-099",
+    "mode" : "dictation",
+    "requiredFacts" : [
+      "Orion"
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "会议结论",
+        "meeting conclusion"
+      ],
+      [
+        "第一版已经完成",
+        "第一版已完成",
+        "first version is complete",
+        "first version is completed"
+      ]
+    ],
+    "transcript" : "请记录会议结论，Orion第一版已经完成"
+  },
+  {
+    "expectedIntent" : "plainText",
+    "id" : "plain-100",
+    "mode" : "dictation",
+    "requiredFacts" : [
+
+    ],
+    "requiresEmailStructure" : false,
+    "semanticGroups" : [
+      [
+        "不是发送命令",
+        "not a send command",
+        "not as a send command"
+      ],
+      [
+        "笔记",
+        "note"
+      ]
+    ],
+    "transcript" : "邮件这个词只是在笔记里出现，不是发送命令"
+  }
+]

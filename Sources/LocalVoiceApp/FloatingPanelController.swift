@@ -139,22 +139,27 @@ private struct FloatingBarView: View {
     }
 
     private var preview: some View {
-        Text(model.transcript.isEmpty ? "正在聆听…" : model.transcript)
-            .font(.system(size: 15, weight: .medium))
-            .foregroundStyle(
-                model.transcript.isEmpty
-                    ? Color.white.opacity(0.55)
-                    : Color.white.opacity(0.96)
-            )
-            .lineLimit(3)
-            .multilineTextAlignment(.leading)
-            .frame(
-                maxWidth: .infinity,
-                minHeight: FloatingBarLayout.previewHeight,
-                maxHeight: FloatingBarLayout.previewHeight,
-                alignment: .leading
-            )
-            .padding(.horizontal, 14)
+        VStack(alignment: .leading, spacing: 3) {
+            Text(model.statusMessage)
+                .font(.system(size: 10, weight: .medium))
+                .foregroundStyle(Color.white.opacity(0.52))
+            Text(model.transcript.isEmpty ? "正在聆听…" : model.transcript)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(
+                    model.transcript.isEmpty
+                        ? Color.white.opacity(0.55)
+                        : Color.white.opacity(0.96)
+                )
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+        }
+        .frame(
+            maxWidth: .infinity,
+            minHeight: FloatingBarLayout.previewHeight,
+            maxHeight: FloatingBarLayout.previewHeight,
+            alignment: .leading
+        )
+        .padding(.horizontal, 14)
             .background(
                 RoundedRectangle(cornerRadius: 14, style: .continuous)
                     .fill(.ultraThinMaterial)
@@ -172,7 +177,10 @@ private struct FloatingBarView: View {
 
     private var activeMode: VoiceMode? {
         switch model.state {
-        case .listening(let mode), .finalizing(let mode):
+        case .listening(let mode),
+             .finalizing(let mode),
+             .processing(let mode),
+             .inserting(let mode):
             return mode
         default:
             return nil

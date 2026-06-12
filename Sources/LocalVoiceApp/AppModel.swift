@@ -3,7 +3,6 @@ import Combine
 import LocalVoiceCore
 import NaturalLanguage
 import OSLog
-@preconcurrency import Translation
 
 @MainActor
 final class AppModel: ObservableObject {
@@ -16,29 +15,38 @@ final class AppModel: ObservableObject {
     @Published var recordingShortcut: VoiceMode?
     @Published var dictationShortcut: KeyboardShortcut
     @Published var englishShortcut: KeyboardShortcut
+    @Published var signature: String {
+        didSet {
+            UserDefaults.standard.set(signature, forKey: "emailSignature")
+        }
+    }
 
     let microphoneName: String
+    let modelManager: LocalModelManager
 
     private var stateMachine = SessionStateMachine()
     private var projection = RealtimeTextProjection()
+    private var recognitionAccumulator = RecognitionTranscriptAccumulator()
     private var draft = DictationDraft()
     private let speechService = SpeechRecognitionService()
     private let hotkeyController = HotkeyController()
     private let insertionService = TextInsertionService()
     private let panelController = FloatingPanelController()
-    private var translator: TranslationSession?
+    private let processingService: DraftProcessingService
     private var latestRawTranscript = ""
     private var peakAudioLevel: Float = 0
     private var receivedTranscript = false
-    private var translationBuffer = LatestTextBuffer<TranslationInput>()
-    private var pendingTranslationTask: Task<Void, Never>?
     private var pendingFinalizationTask: Task<Void, Never>?
+    private var pendingProcessingTask: Task<Void, Never>?
     private let logger = Logger(
         subsystem: "com.localvoice.app",
         category: "session"
     )
 
     init() {
+        let languageModel = MLXLanguageModelService()
+        modelManager = LocalModelManager(service: languageModel)
+        processingService = DraftProcessingService(languageModel: languageModel)
         dictationShortcut = Self.loadShortcut(
             key: "dictationShortcut",
             fallback: KeyboardShortcut(keyCode: 2, modifiers: [.command, .shift])
@@ -47,6 +55,7 @@ final class AppModel: ObservableObject {
             key: "englishShortcut",
             fallback: KeyboardShortcut(keyCode: 14, modifiers: [.command, .shift])
         )
+        signature = UserDefaults.standard.string(forKey: "emailSignature") ?? ""
         microphoneName = SpeechRecognitionService.defaultInputName
         permissionSummary = PermissionCoordinator.summary
     }
@@ -61,6 +70,10 @@ final class AppModel: ObservableObject {
             return "translate"
         case .finalizing:
             return "ellipsis.circle"
+        case .processing:
+            return "sparkles"
+        case .inserting:
+            return "text.cursor"
         case .failed:
             return "exclamationmark.triangle"
         }
@@ -87,15 +100,16 @@ final class AppModel: ObservableObject {
         hotkeyController.start()
         panelController.bind(to: self)
         _ = PermissionCoordinator.requestAccessibilityOnce()
+        modelManager.preloadIfInstalled()
     }
 
     func shutdown() {
-        pendingTranslationTask?.cancel()
-        translationBuffer.reset()
         pendingFinalizationTask?.cancel()
+        pendingProcessingTask?.cancel()
         speechService.stop()
         hotkeyController.stop()
         panelController.hide()
+        modelManager.shutdown()
     }
 
     func toggle(_ mode: VoiceMode) {
@@ -107,17 +121,17 @@ final class AppModel: ObservableObject {
         case .listening(let activeMode):
             state = stateMachine.handle(.start(mode))
             stopAndAwaitFinal(mode: activeMode)
-        case .finalizing:
+        case .finalizing, .processing, .inserting:
             break
         }
     }
 
     func cancel() {
-        pendingTranslationTask?.cancel()
-        translationBuffer.reset()
         pendingFinalizationTask?.cancel()
+        pendingProcessingTask?.cancel()
         speechService.cancel()
         projection.reset()
+        recognitionAccumulator.reset()
         draft.cancel()
         latestRawTranscript = ""
         transcript = ""
@@ -169,9 +183,6 @@ final class AppModel: ObservableObject {
         insertionService.captureTarget()
 
         Task {
-            pendingTranslationTask?.cancel()
-            pendingTranslationTask = nil
-            translationBuffer.reset()
             let recordingGranted =
                 await PermissionCoordinator.requestRecording()
             let insertionGranted = PermissionCoordinator.accessibilityGranted
@@ -196,6 +207,7 @@ final class AppModel: ObservableObject {
             peakAudioLevel = 0
             receivedTranscript = false
             projection.reset()
+            recognitionAccumulator.reset()
             draft = DictationDraft()
             panelController.show(mode: mode)
 
@@ -229,59 +241,22 @@ final class AppModel: ObservableObject {
 
     private func receive(_ text: String, isFinal: Bool, mode: VoiceMode) {
         guard !text.isEmpty else { return }
-        latestRawTranscript = text
+        let accumulated = recognitionAccumulator.consume(
+            text,
+            isFinal: isFinal
+        )
+        latestRawTranscript = accumulated
+        draft.updateRaw(accumulated)
         receivedTranscript = true
         logger.info(
-            "Received transcript final=\(isFinal) text=\(text, privacy: .public)"
+            "Received transcript final=\(isFinal) segmentCharacters=\(text.count) accumulatedCharacters=\(accumulated.count)"
         )
-        if mode == .english {
-            translatePartial(text, isFinal: isFinal)
-            return
-        }
 
         processRecognized(
-            text,
+            accumulated,
             isFinal: isFinal,
-            language: correctionLanguage(for: text)
+            language: correctionLanguage(for: accumulated)
         )
-    }
-
-    private func translatePartial(_ text: String, isFinal: Bool) {
-        translationBuffer.submit(
-            TranslationInput(text: text, isFinal: isFinal)
-        )
-        guard pendingTranslationTask == nil else { return }
-
-        pendingTranslationTask = Task { @MainActor [weak self] in
-            guard let self else { return }
-            defer { pendingTranslationTask = nil }
-
-            while let input = translationBuffer.takeLatest() {
-                do {
-                    let translator = self.translator
-                        ?? TranslationSession(
-                            installedSource: Locale.Language(
-                                identifier: "zh-Hans"
-                            ),
-                            target: Locale.Language(identifier: "en")
-                        )
-                    self.translator = translator
-                    let response = try await translator.translate(input.text)
-                    guard !Task.isCancelled else { return }
-                    processRecognized(
-                        response.targetText,
-                        isFinal: input.isFinal,
-                        language: .english
-                    )
-                } catch {
-                    if input.isFinal {
-                        fail("英文翻译不可用：请在系统设置中下载中文与英语")
-                    } else {
-                        unstableTranscript = input.text
-                    }
-                }
-            }
-        }
     }
 
     private func processRecognized(
@@ -296,7 +271,7 @@ final class AppModel: ObservableObject {
         unstableTranscript = isFinal ? "" : preview
         if isFinal, case .finalizing = state {
             pendingFinalizationTask?.cancel()
-            confirmDraft()
+            beginProcessing()
         }
     }
 
@@ -317,21 +292,18 @@ final class AppModel: ObservableObject {
             return
         }
 
-        if mode == .dictation {
-            processRecognized(
-                latestRawTranscript,
-                isFinal: true,
-                language: .chinese
-            )
-        } else {
-            translatePartial(latestRawTranscript, isFinal: true)
-        }
+        processRecognized(
+            latestRawTranscript,
+            isFinal: true,
+            language: correctionLanguage(for: latestRawTranscript)
+        )
     }
 
     private func completeSession() {
         pendingFinalizationTask?.cancel()
+        pendingProcessingTask?.cancel()
         unstableTranscript = ""
-        state = stateMachine.handle(.completed)
+        state = stateMachine.handle(.insertionCompleted)
         statusMessage = "已完成"
         panelController.hide(after: 0.35)
 
@@ -340,13 +312,47 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func confirmDraft() {
-        guard let text = draft.confirm() else {
+    private func beginProcessing() {
+        guard case .finalizing(let mode) = state,
+              let finalTranscript = draft.finalize(latestRawTranscript) else {
             fail("没有可写入的识别结果")
             return
         }
-        insertionService.insert(text)
-        completeSession()
+        state = stateMachine.handle(.finalTranscriptReady)
+        statusMessage = modelManager.isReady ? "正在本地整理" : "正在基础整理"
+        unstableTranscript = ""
+
+        pendingProcessingTask?.cancel()
+        pendingProcessingTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let outcome = await processingService.process(
+                transcript: finalTranscript,
+                mode: mode,
+                signature: signature
+            )
+            guard !Task.isCancelled else { return }
+
+            let formatted = DocumentFormatter.format(outcome.result.outputText)
+            transcript = formatted.plainText
+            draft.updatePreview(formatted.plainText)
+            _ = draft.confirm()
+            state = stateMachine.handle(
+                outcome.usedFallback
+                    ? .processingFallback
+                    : .processingSucceeded
+            )
+            statusMessage = outcome.usedFallback
+                ? "模型不可用，已使用基础整理"
+                : "正在写入"
+            insertionService.insert(formatted) { [weak self] inserted in
+                guard let self else { return }
+                if inserted {
+                    completeSession()
+                } else {
+                    fail("无法写入目标文本框，请检查辅助功能权限")
+                }
+            }
+        }
     }
 
     private func fail(_ message: String) {
@@ -384,15 +390,6 @@ final class AppModel: ObservableObject {
         guard let mode = pair.mode(matching: shortcut) else { return false }
         toggle(mode)
         return true
-    }
-
-    private func detectedSourceLanguage(for text: String) -> Locale.Language {
-        let recognizer = NLLanguageRecognizer()
-        recognizer.processString(text)
-        if let language = recognizer.dominantLanguage {
-            return Locale.Language(identifier: language.rawValue)
-        }
-        return Locale.current.language
     }
 
     private func correctionLanguage(for text: String) -> CorrectionLanguage {
@@ -438,9 +435,4 @@ final class AppModel: ObservableObject {
         guard let data = try? JSONEncoder().encode(shortcut) else { return }
         UserDefaults.standard.set(data, forKey: key)
     }
-}
-
-private struct TranslationInput: Sendable {
-    let text: String
-    let isFinal: Bool
 }

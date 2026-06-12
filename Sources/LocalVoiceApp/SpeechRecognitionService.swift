@@ -49,7 +49,7 @@ final class SpeechRecognitionService {
             if let result {
                 let text = result.bestTranscription.formattedString
                 self?.logger.info(
-                    "Recognition result final=\(result.isFinal) text=\(text, privacy: .public)"
+                    "Recognition result final=\(result.isFinal) characters=\(text.count)"
                 )
                 onPartial(text, result.isFinal)
             }

@@ -11,6 +11,16 @@ settings:
     CODE_SIGN_STYLE: Automatic
     DEVELOPMENT_TEAM: ""
     ENABLE_HARDENED_RUNTIME: YES
+packages:
+  MLXSwiftLM:
+    url: https://github.com/ml-explore/mlx-swift-lm
+    exactVersion: 3.31.3
+  HuggingFace:
+    url: https://github.com/huggingface/swift-huggingface
+    from: 0.9.0
+  SwiftTransformers:
+    url: https://github.com/huggingface/swift-transformers
+    from: 1.3.0
 targets:
   LocalVoiceCore:
     type: framework
@@ -28,6 +38,14 @@ targets:
       - Sources/LocalVoiceApp
     dependencies:
       - target: LocalVoiceCore
+      - package: MLXSwiftLM
+        product: MLXLLM
+      - package: MLXSwiftLM
+        product: MLXLMCommon
+      - package: HuggingFace
+        product: HuggingFace
+      - package: SwiftTransformers
+        product: Tokenizers
     info:
       path: Sources/LocalVoiceApp/Info.plist
       properties:
@@ -55,6 +73,25 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.core-tests
+  LocalVoiceBenchmark:
+    type: tool
+    platform: macOS
+    sources:
+      - Tools/LocalVoiceBenchmark
+      - Sources/LocalVoiceApp/MLXLanguageModelService.swift
+    dependencies:
+      - target: LocalVoiceCore
+      - package: MLXSwiftLM
+        product: MLXLLM
+      - package: MLXSwiftLM
+        product: MLXLMCommon
+      - package: HuggingFace
+        product: HuggingFace
+      - package: SwiftTransformers
+        product: Tokenizers
+    settings:
+      base:
+        PRODUCT_NAME: LocalVoiceBenchmark
 schemes:
   LocalVoice:
     build:
@@ -64,3 +101,9 @@ schemes:
     test:
       targets:
         - LocalVoiceCoreTests
+  LocalVoiceBenchmark:
+    build:
+      targets:
+        LocalVoiceBenchmark: all
+    run:
+      config: Release

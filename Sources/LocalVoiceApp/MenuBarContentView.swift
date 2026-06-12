@@ -23,6 +23,8 @@ struct MenuBarContentView: View {
                 shortcut: model.englishShortcut
             )
             separator
+            ModelSettingsView(model: model)
+            separator
             footer
         }
         .frame(width: MenuLayout.width)
@@ -104,5 +106,62 @@ struct MenuBarContentView: View {
         }
         .padding(.horizontal, MenuLayout.horizontalPadding)
         .frame(height: MenuLayout.footerHeight)
+    }
+}
+
+private struct ModelSettingsView: View {
+    @ObservedObject var model: AppModel
+    @ObservedObject private var manager: LocalModelManager
+
+    init(model: AppModel) {
+        self.model = model
+        manager = model.modelManager
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("本地整理模型")
+                        .font(.system(size: 14, weight: .medium))
+                    Text(manager.statusText)
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                modelAction
+            }
+
+            TextField("邮件签名，例如 Max", text: $model.signature)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(size: 12))
+
+            Text("Qwen3 4B · 约 2.3 GB · 内容不离开本机")
+                .font(.system(size: 10))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, MenuLayout.horizontalPadding)
+        .padding(.vertical, 12)
+    }
+
+    @ViewBuilder
+    private var modelAction: some View {
+        switch manager.state {
+        case .notInstalled, .failed:
+            Button("下载") {
+                manager.download()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        case .downloading, .loading:
+            ProgressView()
+                .controlSize(.small)
+        case .ready:
+            Button("移除") {
+                manager.remove()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
     }
 }

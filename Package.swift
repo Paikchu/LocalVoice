@@ -12,7 +12,8 @@ let package = Package(
         .target(name: "LocalVoiceCore"),
         .testTarget(
             name: "LocalVoiceCoreTests",
-            dependencies: ["LocalVoiceCore"]
+            dependencies: ["LocalVoiceCore"],
+            resources: [.copy("../Fixtures/processing-quality-corpus.json")]
         )
     ]
 )

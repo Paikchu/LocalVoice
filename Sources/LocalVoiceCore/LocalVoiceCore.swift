@@ -212,25 +212,129 @@ public struct ConfirmedInsertionRequest: Equatable, Sendable {
 }
 
 public struct DictationDraft: Equatable, Sendable {
+    public private(set) var rawTranscript = ""
     public private(set) var previewText = ""
+    public private(set) var finalTranscript: String?
     public private(set) var isConfirmed = false
 
     public init() {}
+
+    public mutating func updateRaw(_ text: String) {
+        guard !isConfirmed else { return }
+        rawTranscript = text
+    }
 
     public mutating func updatePreview(_ text: String) {
         guard !isConfirmed else { return }
         previewText = text
     }
 
+    @discardableResult
+    public mutating func finalize(_ text: String? = nil) -> String? {
+        guard !isConfirmed else { return finalTranscript }
+        let value = (text ?? previewText)
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !value.isEmpty else { return nil }
+        finalTranscript = value
+        previewText = value
+        return value
+    }
+
     public mutating func confirm() -> String? {
         guard !isConfirmed, !previewText.isEmpty else { return nil }
         isConfirmed = true
-        return previewText
+        return finalTranscript ?? previewText
     }
 
     public mutating func cancel() {
+        rawTranscript = ""
         previewText = ""
+        finalTranscript = nil
         isConfirmed = true
+    }
+}
+
+public struct RecognitionTranscriptAccumulator: Sendable {
+    private var committedText = ""
+    private var currentHypothesis = ""
+
+    public init() {}
+
+    public mutating func consume(
+        _ hypothesis: String,
+        isFinal: Bool
+    ) -> String {
+        let value = hypothesis.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+        guard !value.isEmpty else { return transcript }
+
+        if currentHypothesis.isEmpty {
+            currentHypothesis = value
+        } else if isRevision(of: currentHypothesis, candidate: value) {
+            currentHypothesis = value
+        } else {
+            let overlap = suffixPrefixOverlap(
+                currentHypothesis,
+                value
+            )
+            committedText = joined(committedText, currentHypothesis)
+            currentHypothesis = overlap >= 4
+                ? String(value.dropFirst(overlap))
+                : value
+        }
+
+        if isFinal {
+            committedText = joined(committedText, currentHypothesis)
+            currentHypothesis = ""
+        }
+        return transcript
+    }
+
+    public mutating func reset() {
+        committedText = ""
+        currentHypothesis = ""
+    }
+
+    public var transcript: String {
+        joined(committedText, currentHypothesis)
+    }
+
+    private func isRevision(
+        of current: String,
+        candidate: String
+    ) -> Bool {
+        if current.hasPrefix(candidate) || candidate.hasPrefix(current) {
+            return true
+        }
+        let commonPrefix = zip(current, candidate)
+            .prefix { $0 == $1 }
+            .count
+        return commonPrefix >= 3
+    }
+
+    private func suffixPrefixOverlap(
+        _ current: String,
+        _ candidate: String
+    ) -> Int {
+        let maximum = min(current.count, candidate.count)
+        guard maximum >= 4 else { return 0 }
+        for length in stride(from: maximum, through: 4, by: -1) {
+            if current.suffix(length) == candidate.prefix(length) {
+                return length
+            }
+        }
+        return 0
+    }
+
+    private func joined(_ prefix: String, _ suffix: String) -> String {
+        guard !prefix.isEmpty else { return suffix }
+        guard !suffix.isEmpty else { return prefix }
+        let needsSpace = prefix.last?.isASCII == true
+            && prefix.last?.isLetter == true
+            && suffix.first?.isASCII == true
+            && suffix.first?.isLetter == true
+        return needsSpace ? "\(prefix) \(suffix)" : prefix + suffix
     }
 }
 
@@ -451,12 +555,18 @@ public enum SessionState: Equatable, Sendable {
     case ready
     case listening(VoiceMode)
     case finalizing(VoiceMode)
+    case processing(VoiceMode)
+    case inserting(VoiceMode)
     case failed(String)
 }
 
 public enum SessionEvent: Equatable, Sendable {
     case start(VoiceMode)
     case finish
+    case finalTranscriptReady
+    case processingSucceeded
+    case processingFallback
+    case insertionCompleted
     case completed
     case fail(String)
     case cancel
@@ -478,6 +588,18 @@ public struct SessionStateMachine: Sendable {
             state = .finalizing(mode)
         case (.listening(let mode), .finish):
             state = .finalizing(mode)
+        case (.finalizing(let mode), .finalTranscriptReady):
+            state = .processing(mode)
+        case (.processing(let mode), .processingSucceeded),
+             (.processing(let mode), .processingFallback):
+            state = .inserting(mode)
+        case (.inserting, .insertionCompleted):
+            if let pendingMode {
+                self.pendingMode = nil
+                state = .listening(pendingMode)
+            } else {
+                state = .ready
+            }
         case (.finalizing, .completed):
             if let pendingMode {
                 self.pendingMode = nil
@@ -485,6 +607,8 @@ public struct SessionStateMachine: Sendable {
             } else {
                 state = .ready
             }
+        case (.processing, .completed), (.inserting, .completed):
+            state = .ready
         case (_, .cancel):
             pendingMode = nil
             state = .ready

@@ -24,8 +24,15 @@ final class TextInsertionService {
         )
     }
 
-    func insert(_ text: String) {
-        guard !text.isEmpty, let target else { return }
+    func insert(
+        _ document: FormattedDocument,
+        completion: @escaping (Bool) -> Void
+    ) {
+        let text = document.plainText
+        guard !text.isEmpty, let target else {
+            completion(false)
+            return
+        }
         let request = ConfirmedInsertionRequest(text: text, target: target)
         let currentPID = NSWorkspace.shared.frontmostApplication?
             .processIdentifier
@@ -34,6 +41,7 @@ final class TextInsertionService {
             guard let application = NSRunningApplication(
                 processIdentifier: target.applicationPID
             ) else {
+                completion(false)
                 return
             }
             application.activate()
@@ -44,14 +52,17 @@ final class TextInsertionService {
             try? await Task.sleep(for: .milliseconds(100))
             guard !Task.isCancelled else { return }
             self?.logger.info(
-                "Inserting confirmed transcript through pasteboard text=\(text, privacy: .public)"
+                "Inserting confirmed transcript characters=\(text.count)"
             )
-            self?.paste(text)
+            self?.paste(document)
             self?.pendingInsertionTask = nil
+            try? await Task.sleep(for: .milliseconds(120))
+            guard !Task.isCancelled else { return }
+            completion(true)
         }
     }
 
-    private func paste(_ text: String) {
+    private func paste(_ document: FormattedDocument) {
         let pasteboard = NSPasteboard.general
         if pendingPasteboardItems == nil {
             pendingPasteboardItems = pasteboard.pasteboardItems?
@@ -59,7 +70,13 @@ final class TextInsertionService {
         }
         restoreTask?.cancel()
         pasteboard.clearContents()
-        pasteboard.setString(text, forType: .string)
+        let item = NSPasteboardItem()
+        item.setString(document.plainText, forType: .string)
+        item.setData(Data(document.html.utf8), forType: .html)
+        if let rtf = Self.rtfData(for: document.plainText) {
+            item.setData(rtf, forType: .rtf)
+        }
+        pasteboard.writeObjects([item])
         let insertionChangeCount = pasteboard.changeCount
 
         let source = CGEventSource(stateID: .combinedSessionState)
@@ -91,6 +108,27 @@ final class TextInsertionService {
             self?.pendingPasteboardItems = nil
             self?.restoreTask = nil
         }
+    }
+
+    private static func rtfData(for text: String) -> Data? {
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.firstLineHeadIndent = 0
+        paragraphStyle.headIndent = 0
+        paragraphStyle.tailIndent = 0
+        paragraphStyle.paragraphSpacing = 8
+        paragraphStyle.lineSpacing = 2
+
+        let attributed = NSAttributedString(
+            string: text,
+            attributes: [
+                .font: NSFont.systemFont(ofSize: 13),
+                .paragraphStyle: paragraphStyle
+            ]
+        )
+        return try? attributed.data(
+            from: NSRange(location: 0, length: attributed.length),
+            documentAttributes: [.documentType: NSAttributedString.DocumentType.rtf]
+        )
     }
 }
 
