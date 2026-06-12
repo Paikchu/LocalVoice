@@ -9,8 +9,10 @@ public enum MenuLayout {
 }
 
 public enum FloatingBarLayout {
-    public static let width: CGFloat = 196
-    public static let height: CGFloat = 46
+    public static let width: CGFloat = 360
+    public static let height: CGFloat = 118
+    public static let controlsHeight: CGFloat = 46
+    public static let previewHeight: CGFloat = 64
     public static let buttonDiameter: CGFloat = 34
     public static let barCount = 13
 }
@@ -109,6 +111,166 @@ public struct ShortcutPair: Equatable, Sendable {
         if shortcut == dictation { return .dictation }
         if shortcut == english { return .english }
         return nil
+    }
+
+    public func shortcut(for mode: VoiceMode) -> KeyboardShortcut {
+        switch mode {
+        case .dictation:
+            return dictation
+        case .english:
+            return english
+        }
+    }
+}
+
+public struct VoicePermissionState: Equatable, Sendable {
+    public let microphoneGranted: Bool
+    public let speechRecognitionGranted: Bool
+    public let accessibilityGranted: Bool
+
+    public init(
+        microphoneGranted: Bool,
+        speechRecognitionGranted: Bool,
+        accessibilityGranted: Bool
+    ) {
+        self.microphoneGranted = microphoneGranted
+        self.speechRecognitionGranted = speechRecognitionGranted
+        self.accessibilityGranted = accessibilityGranted
+    }
+
+    public var canRecord: Bool {
+        microphoneGranted && speechRecognitionGranted
+    }
+
+    public var canInsertText: Bool {
+        accessibilityGranted
+    }
+}
+
+public enum DictationStartStep: Equatable, Sendable {
+    case targetCapture
+    case permissionRequest
+}
+
+public struct DictationStartSequence: Equatable, Sendable {
+    private var steps: [DictationStartStep] = []
+
+    public init() {}
+
+    public mutating func record(_ step: DictationStartStep) {
+        steps.append(step)
+    }
+
+    public var validationError: String? {
+        guard let targetIndex = steps.firstIndex(of: .targetCapture),
+              let permissionIndex = steps.firstIndex(of: .permissionRequest),
+              targetIndex < permissionIndex else {
+            return "必须在请求权限前捕获文本输入目标"
+        }
+        return nil
+    }
+}
+
+public struct InsertionTarget: Equatable, Sendable {
+    public let applicationPID: Int32
+
+    public init(applicationPID: Int32) {
+        self.applicationPID = applicationPID
+    }
+
+    public func requiresActivation(
+        currentApplicationPID: Int32?
+    ) -> Bool {
+        currentApplicationPID != applicationPID
+    }
+}
+
+public enum TextInsertionRoute: Equatable, Sendable {
+    case pasteboard
+}
+
+public struct ConfirmedInsertionRequest: Equatable, Sendable {
+    public let text: String
+    public let target: InsertionTarget
+
+    public init(text: String, target: InsertionTarget) {
+        self.text = text
+        self.target = target
+    }
+
+    public var route: TextInsertionRoute {
+        .pasteboard
+    }
+
+    public func requiresActivation(
+        currentApplicationPID: Int32?
+    ) -> Bool {
+        target.requiresActivation(
+            currentApplicationPID: currentApplicationPID
+        )
+    }
+}
+
+public struct DictationDraft: Equatable, Sendable {
+    public private(set) var previewText = ""
+    public private(set) var isConfirmed = false
+
+    public init() {}
+
+    public mutating func updatePreview(_ text: String) {
+        guard !isConfirmed else { return }
+        previewText = text
+    }
+
+    public mutating func confirm() -> String? {
+        guard !isConfirmed, !previewText.isEmpty else { return nil }
+        isConfirmed = true
+        return previewText
+    }
+
+    public mutating func cancel() {
+        previewText = ""
+        isConfirmed = true
+    }
+}
+
+public enum PermissionPromptPolicy: Equatable, Sendable {
+    case dictationShortcut
+    case explicitRequest
+
+    public var promptsForAccessibility: Bool {
+        self == .explicitRequest
+    }
+}
+
+public struct AccessibilityPromptHistory: Equatable, Sendable {
+    private var hasPrompted = false
+
+    public init() {}
+
+    public mutating func consumePrompt() -> Bool {
+        guard !hasPrompted else { return false }
+        hasPrompted = true
+        return true
+    }
+}
+
+public struct SpeechCaptureActivity: Equatable, Sendable {
+    public let peakLevel: Float
+    public let receivedTranscript: Bool
+
+    public init(peakLevel: Float, receivedTranscript: Bool) {
+        self.peakLevel = peakLevel
+        self.receivedTranscript = receivedTranscript
+    }
+
+    public var failureMessage: String? {
+        if receivedTranscript {
+            return nil
+        }
+        return peakLevel < 0.03
+            ? "未检测到麦克风声音"
+            : "检测到声音，但未识别到文字"
     }
 }
 

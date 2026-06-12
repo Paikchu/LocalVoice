@@ -10,8 +10,10 @@ import Testing
 }
 
 @Test func floatingBarUsesCompactTranslucentMetrics() {
-    #expect(FloatingBarLayout.width == 196)
-    #expect(FloatingBarLayout.height == 46)
+    #expect(FloatingBarLayout.width == 360)
+    #expect(FloatingBarLayout.height == 118)
+    #expect(FloatingBarLayout.controlsHeight == 46)
+    #expect(FloatingBarLayout.previewHeight == 64)
     #expect(FloatingBarLayout.buttonDiameter == 34)
     #expect(FloatingBarLayout.barCount == 13)
 }

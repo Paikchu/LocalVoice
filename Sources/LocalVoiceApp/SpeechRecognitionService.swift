@@ -1,4 +1,5 @@
 import AVFoundation
+import OSLog
 import Speech
 
 final class SpeechRecognitionService {
@@ -17,6 +18,10 @@ final class SpeechRecognitionService {
     private var task: SFSpeechRecognitionTask?
     private var smoothedLevel: Float = 0
     private var tapInstalled = false
+    private let logger = Logger(
+        subsystem: "com.localvoice.app",
+        category: "speech"
+    )
 
     func start(
         onPartial: @escaping PartialHandler,
@@ -39,8 +44,28 @@ final class SpeechRecognitionService {
         request.taskHint = .dictation
         self.request = request
 
+        task = recognizer.recognitionTask(with: request) {
+            [weak self] result, error in
+            if let result {
+                let text = result.bestTranscription.formattedString
+                self?.logger.info(
+                    "Recognition result final=\(result.isFinal) text=\(text, privacy: .public)"
+                )
+                onPartial(text, result.isFinal)
+            }
+            if let error {
+                self?.logger.error(
+                    "Recognition error: \(error.localizedDescription, privacy: .public)"
+                )
+                onError(error)
+            }
+        }
+
         let input = audioEngine.inputNode
         let format = input.outputFormat(forBus: 0)
+        logger.info(
+            "Starting audio input sampleRate=\(format.sampleRate) channels=\(format.channelCount)"
+        )
         input.installTap(
             onBus: 0,
             bufferSize: 1_024,
@@ -54,18 +79,7 @@ final class SpeechRecognitionService {
 
         audioEngine.prepare()
         try audioEngine.start()
-
-        task = recognizer.recognitionTask(with: request) { result, error in
-            if let result {
-                onPartial(
-                    result.bestTranscription.formattedString,
-                    result.isFinal
-                )
-            }
-            if let error {
-                onError(error)
-            }
-        }
+        logger.info("Audio engine started")
     }
 
     func stop() {

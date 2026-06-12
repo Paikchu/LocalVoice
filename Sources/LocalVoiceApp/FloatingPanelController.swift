@@ -89,45 +89,85 @@ private struct FloatingBarView: View {
     @ObservedObject var model: AppModel
 
     var body: some View {
-        HStack(spacing: 9) {
-            circleButton(
-                icon: "xmark",
-                foreground: .white,
-                background: Color.white.opacity(0.12),
-                action: model.cancel
-            )
+        VStack(spacing: 8) {
+            preview
 
-            WaveformView(
-                level: model.audioLevel,
-                isEnglish: activeMode == .english
-            )
-            .frame(maxWidth: .infinity)
+            HStack(spacing: 9) {
+                circleButton(
+                    icon: "xmark",
+                    foreground: .white,
+                    background: Color.white.opacity(0.12),
+                    action: model.cancel
+                )
 
-            circleButton(
-                icon: "checkmark",
-                foreground: .black,
-                background: Color.white.opacity(0.9),
-                action: model.finish
+                WaveformView(
+                    level: model.audioLevel,
+                    isEnglish: activeMode == .english
+                )
+                .frame(maxWidth: .infinity)
+
+                circleButton(
+                    icon: "checkmark",
+                    foreground: .black,
+                    background: Color.white.opacity(0.9),
+                    action: model.finish
+                )
+            }
+            .padding(6)
+            .background(
+                Capsule()
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .overlay(
+                        Capsule()
+                            .fill(.black.opacity(0.32))
+                    )
+                    .overlay(
+                        Capsule()
+                            .stroke(.white.opacity(0.18), lineWidth: 0.75)
+                    )
+            )
+            .frame(
+                width: 196,
+                height: FloatingBarLayout.controlsHeight
             )
         }
-        .padding(6)
-        .background(
-            Capsule()
-                .fill(.ultraThinMaterial)
-                .environment(\.colorScheme, .dark)
-                .overlay(
-                    Capsule()
-                        .fill(.black.opacity(0.32))
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(.white.opacity(0.18), lineWidth: 0.75)
-                )
-        )
         .frame(
             width: FloatingBarLayout.width,
             height: FloatingBarLayout.height
         )
+    }
+
+    private var preview: some View {
+        Text(model.transcript.isEmpty ? "正在聆听…" : model.transcript)
+            .font(.system(size: 15, weight: .medium))
+            .foregroundStyle(
+                model.transcript.isEmpty
+                    ? Color.white.opacity(0.55)
+                    : Color.white.opacity(0.96)
+            )
+            .lineLimit(3)
+            .multilineTextAlignment(.leading)
+            .frame(
+                maxWidth: .infinity,
+                minHeight: FloatingBarLayout.previewHeight,
+                maxHeight: FloatingBarLayout.previewHeight,
+                alignment: .leading
+            )
+            .padding(.horizontal, 14)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(.ultraThinMaterial)
+                    .environment(\.colorScheme, .dark)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .fill(.black.opacity(0.4))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                            .stroke(.white.opacity(0.16), lineWidth: 0.75)
+                    )
+            )
     }
 
     private var activeMode: VoiceMode? {

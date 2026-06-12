@@ -2,6 +2,7 @@ import AppKit
 import Combine
 import LocalVoiceCore
 import NaturalLanguage
+import OSLog
 @preconcurrency import Translation
 
 @MainActor
@@ -20,15 +21,22 @@ final class AppModel: ObservableObject {
 
     private var stateMachine = SessionStateMachine()
     private var projection = RealtimeTextProjection()
+    private var draft = DictationDraft()
     private let speechService = SpeechRecognitionService()
     private let hotkeyController = HotkeyController()
     private let insertionService = TextInsertionService()
     private let panelController = FloatingPanelController()
     private var translator: TranslationSession?
     private var latestRawTranscript = ""
+    private var peakAudioLevel: Float = 0
+    private var receivedTranscript = false
     private var translationBuffer = LatestTextBuffer<TranslationInput>()
     private var pendingTranslationTask: Task<Void, Never>?
     private var pendingFinalizationTask: Task<Void, Never>?
+    private let logger = Logger(
+        subsystem: "com.localvoice.app",
+        category: "session"
+    )
 
     init() {
         dictationShortcut = Self.loadShortcut(
@@ -70,10 +78,15 @@ final class AppModel: ObservableObject {
                 self.handleShortcut(shortcut)
             }
         }
-        if PermissionCoordinator.accessibilityGranted {
-            hotkeyController.start()
+        hotkeyController.isRecordingShortcut = { [weak self] in
+            MainActor.assumeIsolated {
+                self?.recordingShortcut != nil
+            }
         }
+        hotkeyController.setShortcuts(shortcutPair)
+        hotkeyController.start()
         panelController.bind(to: self)
+        _ = PermissionCoordinator.requestAccessibilityOnce()
     }
 
     func shutdown() {
@@ -105,6 +118,7 @@ final class AppModel: ObservableObject {
         pendingFinalizationTask?.cancel()
         speechService.cancel()
         projection.reset()
+        draft.cancel()
         latestRawTranscript = ""
         transcript = ""
         unstableTranscript = ""
@@ -137,7 +151,8 @@ final class AppModel: ObservableObject {
 
     func requestPermissions() {
         Task {
-            _ = await PermissionCoordinator.requestAll()
+            _ = await PermissionCoordinator.requestRecording()
+            _ = PermissionCoordinator.requestAccessibility()
             permissionSummary = PermissionCoordinator.summary
             hotkeyController.start()
         }
@@ -151,25 +166,37 @@ final class AppModel: ObservableObject {
     }
 
     private func begin(_ mode: VoiceMode) {
+        insertionService.captureTarget()
+
         Task {
             pendingTranslationTask?.cancel()
             pendingTranslationTask = nil
             translationBuffer.reset()
-            let granted = await PermissionCoordinator.requestAll()
+            let recordingGranted =
+                await PermissionCoordinator.requestRecording()
+            let insertionGranted = PermissionCoordinator.accessibilityGranted
             permissionSummary = PermissionCoordinator.summary
             hotkeyController.start()
-            guard granted else {
-                fail("需要麦克风、语音识别和辅助功能权限")
+            guard recordingGranted else {
+                fail("需要麦克风和语音识别权限")
                 return
             }
 
             state = stateMachine.handle(.start(mode))
-            statusMessage = mode == .dictation ? "正在听写" : "正在转为英文"
+            if insertionGranted {
+                statusMessage = mode == .dictation
+                    ? "正在听写"
+                    : "正在转为英文"
+            } else {
+                statusMessage = "正在录音，未授权文本输入"
+            }
             transcript = ""
             unstableTranscript = ""
             latestRawTranscript = ""
+            peakAudioLevel = 0
+            receivedTranscript = false
             projection.reset()
-            insertionService.captureTarget()
+            draft = DictationDraft()
             panelController.show(mode: mode)
 
             do {
@@ -182,6 +209,10 @@ final class AppModel: ObservableObject {
                     onLevel: { [weak self] level in
                         Task { @MainActor in
                             self?.audioLevel = level
+                            self?.peakAudioLevel = max(
+                                self?.peakAudioLevel ?? 0,
+                                level
+                            )
                         }
                     },
                     onError: { [weak self] error in
@@ -197,7 +228,12 @@ final class AppModel: ObservableObject {
     }
 
     private func receive(_ text: String, isFinal: Bool, mode: VoiceMode) {
+        guard !text.isEmpty else { return }
         latestRawTranscript = text
+        receivedTranscript = true
+        logger.info(
+            "Received transcript final=\(isFinal) text=\(text, privacy: .public)"
+        )
         if mode == .english {
             translatePartial(text, isFinal: isFinal)
             return
@@ -254,18 +290,30 @@ final class AppModel: ObservableObject {
         language: CorrectionLanguage
     ) {
         let corrected = TextCorrector.correct(text, language: language)
-        transcript = isFinal ? projection.update(corrected) : ""
-        unstableTranscript = isFinal ? "" : projection.update(corrected)
-        insertionService.update(corrected, isFinal: isFinal)
-        if isFinal {
+        let preview = projection.update(corrected)
+        draft.updatePreview(preview)
+        transcript = preview
+        unstableTranscript = isFinal ? "" : preview
+        if isFinal, case .finalizing = state {
             pendingFinalizationTask?.cancel()
-            completeSession()
+            confirmDraft()
         }
     }
 
     private func finalize(mode: VoiceMode) {
         guard !latestRawTranscript.isEmpty else {
-            completeSession()
+            let activity = SpeechCaptureActivity(
+                peakLevel: peakAudioLevel,
+                receivedTranscript: receivedTranscript
+            )
+            if let message = activity.failureMessage {
+                logger.error(
+                    "Capture failed peakLevel=\(self.peakAudioLevel) reason=\(message, privacy: .public)"
+                )
+                fail(message)
+            } else {
+                completeSession()
+            }
             return
         }
 
@@ -290,6 +338,15 @@ final class AppModel: ObservableObject {
         if case .listening(let pendingMode) = state {
             begin(pendingMode)
         }
+    }
+
+    private func confirmDraft() {
+        guard let text = draft.confirm() else {
+            fail("没有可写入的识别结果")
+            return
+        }
+        insertionService.insert(text)
+        completeSession()
     }
 
     private func fail(_ message: String) {
@@ -353,6 +410,14 @@ final class AppModel: ObservableObject {
             englishShortcut = shortcut
             Self.saveShortcut(shortcut, key: "englishShortcut")
         }
+        hotkeyController.setShortcuts(shortcutPair)
+    }
+
+    private var shortcutPair: ShortcutPair {
+        ShortcutPair(
+            dictation: dictationShortcut,
+            english: englishShortcut
+        )
     }
 
     private static func loadShortcut(

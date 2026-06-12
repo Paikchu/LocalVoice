@@ -1,28 +1,57 @@
 import AppKit
 import AVFoundation
+import LocalVoiceCore
 import Speech
 
 enum PermissionCoordinator {
+    private static let accessibilityPromptedKey =
+        "didPromptForAccessibility"
+
     static var accessibilityGranted: Bool {
         AXIsProcessTrusted()
     }
 
     static var summary: String {
-        let microphone = AVCaptureDevice.authorizationStatus(for: .audio)
-        let speech = SFSpeechRecognizer.authorizationStatus()
-        let accessibility = accessibilityGranted
-        return microphone == .authorized
-            && speech == .authorized
-            && accessibility
-            ? "权限正常"
-            : "需要授权"
+        let state = currentState
+        if state.canRecord && state.canInsertText {
+            return "权限正常"
+        }
+        if state.canRecord {
+            return "可录音，需辅助功能权限"
+        }
+        return "需要麦克风和语音识别权限"
     }
 
-    static func requestAll() async -> Bool {
+    static var currentState: VoicePermissionState {
+        VoicePermissionState(
+            microphoneGranted: AVCaptureDevice.authorizationStatus(
+                for: .audio
+            ) == .authorized,
+            speechRecognitionGranted:
+                SFSpeechRecognizer.authorizationStatus() == .authorized,
+            accessibilityGranted: accessibilityGranted
+        )
+    }
+
+    static func requestRecording() async -> Bool {
         let microphone = await requestMicrophone()
         let speech = await requestSpeech()
-        let accessibility = requestAccessibility()
-        return microphone && speech && accessibility
+        return microphone && speech
+    }
+
+    @discardableResult
+    static func requestAccessibilityOnce() -> Bool {
+        if accessibilityGranted { return true }
+        guard !UserDefaults.standard.bool(
+            forKey: accessibilityPromptedKey
+        ) else {
+            return false
+        }
+        UserDefaults.standard.set(
+            true,
+            forKey: accessibilityPromptedKey
+        )
+        return requestAccessibility()
     }
 
     private static func requestMicrophone() async -> Bool {
@@ -44,7 +73,7 @@ enum PermissionCoordinator {
     }
 
     @discardableResult
-    private static func requestAccessibility() -> Bool {
+    static func requestAccessibility() -> Bool {
         if AXIsProcessTrusted() { return true }
         let options = [
             "AXTrustedCheckOptionPrompt": true

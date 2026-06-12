@@ -1,101 +1,54 @@
 import AppKit
+import LocalVoiceCore
+import OSLog
 
 @MainActor
 final class TextInsertionService {
-    private var targetApplicationPID: pid_t?
-    private var targetElement: AXUIElement?
-    private var insertionLocation: CFIndex?
-    private var insertedUTF16Length = 0
-    private var usedFallback = false
+    private var target: InsertionTarget?
     private var pendingPasteboardItems: [PasteboardItemSnapshot]?
+    private var pendingInsertionTask: Task<Void, Never>?
     private var restoreTask: Task<Void, Never>?
+    private let logger = Logger(
+        subsystem: "com.localvoice.app",
+        category: "insertion"
+    )
 
     func captureTarget() {
-        targetApplicationPID = NSWorkspace.shared.frontmostApplication?
+        pendingInsertionTask?.cancel()
+        pendingInsertionTask = nil
+        target = NSWorkspace.shared.frontmostApplication.map {
+            InsertionTarget(applicationPID: $0.processIdentifier)
+        }
+        logger.info(
+            "Captured insertion target pid=\(self.target?.applicationPID ?? -1)"
+        )
+    }
+
+    func insert(_ text: String) {
+        guard !text.isEmpty, let target else { return }
+        let request = ConfirmedInsertionRequest(text: text, target: target)
+        let currentPID = NSWorkspace.shared.frontmostApplication?
             .processIdentifier
 
-        let systemWide = AXUIElementCreateSystemWide()
-        var value: CFTypeRef?
-        let result = AXUIElementCopyAttributeValue(
-            systemWide,
-            kAXFocusedUIElementAttribute as CFString,
-            &value
-        )
-        if result == .success, let value {
-            targetElement = unsafeDowncast(value, to: AXUIElement.self)
-            insertionLocation = selectedTextRange(of: targetElement)
-        } else {
-            targetElement = nil
-            insertionLocation = nil
-        }
-        insertedUTF16Length = 0
-        usedFallback = false
-    }
-
-    func update(_ text: String, isFinal: Bool) {
-        guard !text.isEmpty,
-              NSWorkspace.shared.frontmostApplication?.processIdentifier
-                == targetApplicationPID else {
-            return
+        if request.requiresActivation(currentApplicationPID: currentPID) {
+            guard let application = NSRunningApplication(
+                processIdentifier: target.applicationPID
+            ) else {
+                return
+            }
+            application.activate()
         }
 
-        if replaceSessionText(text) {
-            return
+        pendingInsertionTask?.cancel()
+        pendingInsertionTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .milliseconds(100))
+            guard !Task.isCancelled else { return }
+            self?.logger.info(
+                "Inserting confirmed transcript through pasteboard text=\(text, privacy: .public)"
+            )
+            self?.paste(text)
+            self?.pendingInsertionTask = nil
         }
-
-        if isFinal, !usedFallback {
-            usedFallback = true
-            paste(text)
-        }
-    }
-
-    private func selectedTextRange(of element: AXUIElement?) -> CFIndex? {
-        guard let element else { return nil }
-        var value: CFTypeRef?
-        guard AXUIElementCopyAttributeValue(
-            element,
-            kAXSelectedTextRangeAttribute as CFString,
-            &value
-        ) == .success,
-        let value,
-        CFGetTypeID(value) == AXValueGetTypeID() else {
-            return nil
-        }
-
-        var range = CFRange()
-        guard AXValueGetValue(
-            unsafeDowncast(value, to: AXValue.self),
-            .cfRange,
-            &range
-        ) else {
-            return nil
-        }
-        return range.location
-    }
-
-    private func replaceSessionText(_ text: String) -> Bool {
-        guard let targetElement, let insertionLocation else { return false }
-
-        var range = CFRange(
-            location: insertionLocation,
-            length: insertedUTF16Length
-        )
-        guard let rangeValue = AXValueCreate(.cfRange, &range),
-              AXUIElementSetAttributeValue(
-                targetElement,
-                kAXSelectedTextRangeAttribute as CFString,
-                rangeValue
-              ) == .success,
-              AXUIElementSetAttributeValue(
-                targetElement,
-                kAXSelectedTextAttribute as CFString,
-                text as CFTypeRef
-              ) == .success else {
-            return false
-        }
-
-        insertedUTF16Length = text.utf16.count
-        return true
     }
 
     private func paste(_ text: String) {
@@ -107,6 +60,7 @@ final class TextInsertionService {
         restoreTask?.cancel()
         pasteboard.clearContents()
         pasteboard.setString(text, forType: .string)
+        let insertionChangeCount = pasteboard.changeCount
 
         let source = CGEventSource(stateID: .combinedSessionState)
         let keyDown = CGEvent(
@@ -121,16 +75,18 @@ final class TextInsertionService {
         )
         keyDown?.flags = .maskCommand
         keyUp?.flags = .maskCommand
-        keyDown?.post(tap: .cgAnnotatedSessionEventTap)
-        keyUp?.post(tap: .cgAnnotatedSessionEventTap)
+        keyDown?.post(tap: .cghidEventTap)
+        keyUp?.post(tap: .cghidEventTap)
 
         restoreTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(180))
+            try? await Task.sleep(for: .milliseconds(700))
             guard !Task.isCancelled else { return }
             let pasteboard = NSPasteboard.general
-            pasteboard.clearContents()
-            if let previousItems = self?.pendingPasteboardItems {
-                pasteboard.writeObjects(previousItems.map(\.pasteboardItem))
+            if pasteboard.changeCount == insertionChangeCount {
+                pasteboard.clearContents()
+                if let previousItems = self?.pendingPasteboardItems {
+                    pasteboard.writeObjects(previousItems.map(\.pasteboardItem))
+                }
             }
             self?.pendingPasteboardItems = nil
             self?.restoreTask = nil

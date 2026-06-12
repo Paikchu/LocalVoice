@@ -43,3 +43,30 @@ import Testing
     #expect(pair.mode(matching: pair.dictation) == .dictation)
     #expect(pair.mode(matching: pair.english) == .english)
 }
+
+@Test func resolvesShortcutForGlobalHotkeyRegistration() {
+    let pair = ShortcutPair(
+        dictation: KeyboardShortcut(
+            keyCode: 2,
+            modifiers: [.command, .shift]
+        ),
+        english: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command, .shift]
+        )
+    )
+
+    #expect(pair.shortcut(for: .dictation) == pair.dictation)
+    #expect(pair.shortcut(for: .english) == pair.english)
+}
+
+@Test func recordingDoesNotDependOnAccessibilityPermission() {
+    let permissions = VoicePermissionState(
+        microphoneGranted: true,
+        speechRecognitionGranted: true,
+        accessibilityGranted: false
+    )
+
+    #expect(permissions.canRecord)
+    #expect(!permissions.canInsertText)
+}
