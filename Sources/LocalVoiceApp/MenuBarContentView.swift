@@ -112,6 +112,7 @@ struct MenuBarContentView: View {
 private struct ModelSettingsView: View {
     @ObservedObject var model: AppModel
     @ObservedObject private var manager: LocalModelManager
+    @State private var showsClearConfirmation = false
 
     init(model: AppModel) {
         self.model = model
@@ -136,12 +137,41 @@ private struct ModelSettingsView: View {
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12))
 
+            Toggle(
+                "允许本地个性化学习",
+                isOn: $model.personalizationEnabled
+            )
+            .font(.system(size: 12))
+
+            Text("开启后会在本机保存常用术语、领域和联系方式。")
+                .font(.system(size: 10))
+                .foregroundStyle(.tertiary)
+
             Text("Qwen3 4B · 约 2.3 GB · 内容不离开本机")
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
+
+            Button("清除全部本地数据", role: .destructive) {
+                showsClearConfirmation = true
+            }
+            .buttonStyle(.plain)
+            .font(.system(size: 11))
+            .foregroundStyle(.red)
         }
         .padding(.horizontal, MenuLayout.horizontalPadding)
         .padding(.vertical, 12)
+        .confirmationDialog(
+            "清除全部本地数据？",
+            isPresented: $showsClearConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("清除", role: .destructive) {
+                model.clearAllLocalData()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("画像、模型、邮件签名和快捷键设置都会被删除。系统权限需在系统设置中单独撤销。")
+        }
     }
 
     @ViewBuilder

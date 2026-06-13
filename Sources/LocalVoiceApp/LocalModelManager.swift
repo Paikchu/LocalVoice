@@ -64,16 +64,29 @@ final class LocalModelManager: ObservableObject {
 
     func remove() {
         task?.cancel()
-        task = nil
-        Task { [weak self] in
+        task = Task { [weak self] in
             guard let self else { return }
             do {
-                try await service.removeFiles()
-                state = .notInstalled
-                lastLoadSeconds = 0
-            } catch {
-                state = .failed(error.localizedDescription)
-            }
+                try await removeFilesAndUpdateState()
+            } catch {}
+            task = nil
+        }
+    }
+
+    func clearFiles() async throws {
+        task?.cancel()
+        task = nil
+        try await removeFilesAndUpdateState()
+    }
+
+    private func removeFilesAndUpdateState() async throws {
+        do {
+            try await service.removeFiles()
+            state = .notInstalled
+            lastLoadSeconds = 0
+        } catch {
+            state = .failed(error.localizedDescription)
+            throw error
         }
     }
 

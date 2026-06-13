@@ -20,6 +20,20 @@ final class AppModel: ObservableObject {
             UserDefaults.standard.set(signature, forKey: "emailSignature")
         }
     }
+    @Published var personalizationEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(
+                personalizationEnabled,
+                forKey: "personalizationEnabled"
+            )
+            Task {
+                await profileStore.setEnabled(personalizationEnabled)
+                if personalizationEnabled {
+                    await profileStore.load()
+                }
+            }
+        }
+    }
 
     let microphoneName: String
     let modelManager: LocalModelManager
@@ -39,7 +53,7 @@ final class AppModel: ObservableObject {
     private var receivedTranscript = false
     private var pendingFinalizationTask: Task<Void, Never>?
     private var pendingProcessingTask: Task<Void, Never>?
-    private let profileStore = UserProfileStore.shared
+    private let profileStore = UserProfileStore()
     private let logger = Logger(
         subsystem: "com.localvoice.app",
         category: "session"
@@ -51,13 +65,16 @@ final class AppModel: ObservableObject {
         processingService = DraftProcessingService(languageModel: languageModel)
         dictationShortcut = Self.loadShortcut(
             key: "dictationShortcut",
-            fallback: KeyboardShortcut(keyCode: 2, modifiers: [.command, .shift])
+            fallback: Self.defaultDictationShortcut
         )
         englishShortcut = Self.loadShortcut(
             key: "englishShortcut",
-            fallback: KeyboardShortcut(keyCode: 14, modifiers: [.command, .shift])
+            fallback: Self.defaultEnglishShortcut
         )
         signature = UserDefaults.standard.string(forKey: "emailSignature") ?? ""
+        personalizationEnabled = UserDefaults.standard.bool(
+            forKey: "personalizationEnabled"
+        )
         microphoneName = SpeechRecognitionService.defaultInputName
         permissionSummary = PermissionCoordinator.summary
     }
@@ -103,7 +120,10 @@ final class AppModel: ObservableObject {
         panelController.bind(to: self)
         _ = PermissionCoordinator.requestAccessibilityOnce()
         modelManager.preloadIfInstalled()
-        Task { await profileStore.load() }
+        Task {
+            await profileStore.setEnabled(personalizationEnabled)
+            await profileStore.load()
+        }
     }
 
     func shutdown() {
@@ -182,6 +202,37 @@ final class AppModel: ObservableObject {
             string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
         ) else { return }
         NSWorkspace.shared.open(url)
+    }
+
+    func clearAllLocalData() {
+        pendingFinalizationTask?.cancel()
+        pendingProcessingTask?.cancel()
+
+        personalizationEnabled = false
+        signature = ""
+        dictationShortcut = Self.defaultDictationShortcut
+        englishShortcut = Self.defaultEnglishShortcut
+        hotkeyController.setShortcuts(shortcutPair)
+        UserDefaults.standard.removePersistentDomain(
+            forName: Bundle.main.bundleIdentifier ?? "com.localvoice.app"
+        )
+
+        Task {
+            var failures: [String] = []
+            do {
+                try await modelManager.clearFiles()
+            } catch {
+                failures.append("模型：\(error.localizedDescription)")
+            }
+            do {
+                try await profileStore.clear()
+            } catch {
+                failures.append("画像：\(error.localizedDescription)")
+            }
+            statusMessage = failures.isEmpty
+                ? "本地数据已清除"
+                : "清除失败：" + failures.joined(separator: "；")
+        }
     }
 
     private func begin(_ mode: VoiceMode) {
@@ -462,4 +513,14 @@ final class AppModel: ObservableObject {
         guard let data = try? JSONEncoder().encode(shortcut) else { return }
         UserDefaults.standard.set(data, forKey: key)
     }
+
+    private static let defaultDictationShortcut = KeyboardShortcut(
+        keyCode: 2,
+        modifiers: [.command, .shift]
+    )
+
+    private static let defaultEnglishShortcut = KeyboardShortcut(
+        keyCode: 14,
+        modifiers: [.command, .shift]
+    )
 }

@@ -6,7 +6,8 @@ import MLXLMCommon
 import Tokenizers
 
 actor MLXLanguageModelService: LocalLanguageModelService {
-    static let modelID = "mlx-community/Qwen3-4B-Instruct-2507-4bit"
+    static let modelID = LocalModelDescriptor.id
+    static let modelRevision = LocalModelDescriptor.revision
 
     private let cache: HubCache
     private let hubClient: HubClient
@@ -22,32 +23,17 @@ actor MLXLanguageModelService: LocalLanguageModelService {
 
     func isInstalled() -> Bool {
         guard let repo = Repo.ID(rawValue: Self.modelID) else { return false }
-        let snapshots = cache.snapshotsDirectory(repo: repo, kind: .model)
-        guard let revisions = try? FileManager.default.contentsOfDirectory(
-            at: snapshots,
-            includingPropertiesForKeys: nil
-        ) else {
-            return false
-        }
-        return revisions.contains { revision in
-            FileManager.default.fileExists(
-                atPath: revision.appendingPathComponent("config.json").path
-            ) && FileManager.default.fileExists(
-                atPath: revision.appendingPathComponent("model.safetensors").path
-            )
-        }
+        let snapshot = cache.snapshotsDirectory(repo: repo, kind: .model)
+            .appendingPathComponent(Self.modelRevision)
+        return FileManager.default.fileExists(
+            atPath: snapshot.appendingPathComponent("config.json").path
+        ) && FileManager.default.fileExists(
+            atPath: snapshot.appendingPathComponent("model.safetensors").path
+        )
     }
 
     func installedRevision() -> String {
-        guard let repo = Repo.ID(rawValue: Self.modelID) else {
-            return "unknown"
-        }
-        let snapshots = cache.snapshotsDirectory(repo: repo, kind: .model)
-        let revisions = try? FileManager.default.contentsOfDirectory(
-            at: snapshots,
-            includingPropertiesForKeys: nil
-        )
-        return revisions?.first?.lastPathComponent ?? "unknown"
+        isInstalled() ? Self.modelRevision : "unknown"
     }
 
     func prepare(
@@ -60,7 +46,10 @@ actor MLXLanguageModelService: LocalLanguageModelService {
 
         let clock = ContinuousClock()
         let start = clock.now
-        let configuration = ModelConfiguration(id: Self.modelID)
+        let configuration = ModelConfiguration(
+            id: Self.modelID,
+            revision: Self.modelRevision
+        )
         container = try await LLMModelFactory.shared.loadContainer(
             from: HuggingFaceDownloader(hubClient),
             using: HuggingFaceTokenizerLoader(),
@@ -185,7 +174,7 @@ private struct HuggingFaceDownloader: Downloader {
 
     func download(
         id: String,
-        revision: String?,
+        revision _: String?,
         matching patterns: [String],
         useLatest: Bool,
         progressHandler: @Sendable @escaping (Progress) -> Void
@@ -195,7 +184,7 @@ private struct HuggingFaceDownloader: Downloader {
         }
         return try await client.downloadSnapshot(
             of: repo,
-            revision: revision ?? "main",
+            revision: LocalModelDescriptor.revision,
             matching: patterns,
             progressHandler: { @MainActor progress in
                 progressHandler(progress)
