@@ -34,6 +34,7 @@
 		6F844A9AE7DD794873C16F07 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 5DFCAF46C7C982642AA8D0D5 /* MLXLLM */; };
 		72B8672C54A24A08887B8FD4 /* PrivacyControlTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59D6FA198F800706E447467A /* PrivacyControlTests.swift */; };
 		753C2C09588EFDF704970D56 /* DraftProcessingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59AAA38C0635A77A41118E7 /* DraftProcessingTests.swift */; };
+		811A80196A808CB546320105 /* SigningConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B12C957BF6C04450C0703E20 /* SigningConfigurationTests.swift */; };
 		84E5F2D8247C63D230916241 /* SpeechCaptureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032DF10A4A1A73C20DA596A8 /* SpeechCaptureTests.swift */; };
 		89DD38C06035997CA575C18E /* DraftProcessing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD5E01F621E2042802939BB /* DraftProcessing.swift */; };
 		8D86D06E06D706496F7950EF /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 6D78AD2AF6375A34A6C02CA3 /* MLXLMCommon */; };
@@ -133,6 +134,7 @@
 		9561C97B9EACC9A12BFEC5F2 /* SpeechSignalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSignalsTests.swift; sourceTree = "<group>"; };
 		A3D7370DB2EBE07647F38035 /* TextInsertionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInsertionService.swift; sourceTree = "<group>"; };
 		A5B66BF2180840BD1E4590ED /* LocalVoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocalVoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B12C957BF6C04450C0703E20 /* SigningConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningConfigurationTests.swift; sourceTree = "<group>"; };
 		B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LocalVoiceCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B59AAA38C0635A77A41118E7 /* DraftProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftProcessingTests.swift; sourceTree = "<group>"; };
 		B6E07DE0E0F231FB1BD9C14C /* LocalVoice.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LocalVoice.entitlements; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 				59D6FA198F800706E447467A /* PrivacyControlTests.swift */,
 				C070E505E9D91EC26AA09A5A /* SessionStateTests.swift */,
 				54794DAEC547E3494825ADE5 /* ShortcutTests.swift */,
+				B12C957BF6C04450C0703E20 /* SigningConfigurationTests.swift */,
 				032DF10A4A1A73C20DA596A8 /* SpeechCaptureTests.swift */,
 				9561C97B9EACC9A12BFEC5F2 /* SpeechSignalsTests.swift */,
 				5AC69C8CEC186AF4BAB1BC64 /* StableTextAssemblerTests.swift */,
@@ -378,19 +381,19 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					4B1FA8561C8A784DC07C5E44 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = FB4M276Q93;
 						ProvisioningStyle = Automatic;
 					};
 					68093F54ED44AC9220FD5B00 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = FB4M276Q93;
 						ProvisioningStyle = Automatic;
 					};
 					7CD0F7D87299E7105FB661D3 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = FB4M276Q93;
 						ProvisioningStyle = Automatic;
 					};
 					CC9F78A182AFAF0182C828B0 = {
-						DevelopmentTeam = "";
+						DevelopmentTeam = FB4M276Q93;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -445,6 +448,7 @@
 				72B8672C54A24A08887B8FD4 /* PrivacyControlTests.swift in Sources */,
 				5232C9777A022AD3FBA9DACF /* SessionStateTests.swift in Sources */,
 				0F0E477A5495FABC84BF683A /* ShortcutTests.swift in Sources */,
+				811A80196A808CB546320105 /* SigningConfigurationTests.swift in Sources */,
 				84E5F2D8247C63D230916241 /* SpeechCaptureTests.swift in Sources */,
 				13DAF6F065AD31A590761B40 /* SpeechSignalsTests.swift in Sources */,
 				F0FD7098A8DBD31C46F1C6E7 /* StableTextAssemblerTests.swift in Sources */,
@@ -637,10 +641,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FB4M276Q93;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -755,10 +760,11 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = FB4M276Q93;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
