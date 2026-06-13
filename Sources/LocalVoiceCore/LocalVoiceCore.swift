@@ -259,6 +259,12 @@ public struct InsertionTarget: Equatable, Sendable {
     }
 }
 
+public enum AccessibilityPromptPolicy {
+    public static func shouldPrompt(isTrusted: Bool) -> Bool {
+        !isTrusted
+    }
+}
+
 public enum TextInsertionRoute: Equatable, Sendable {
     case pasteboard
 }
@@ -274,6 +280,10 @@ public struct ConfirmedInsertionRequest: Equatable, Sendable {
 
     public var route: TextInsertionRoute {
         .pasteboard
+    }
+
+    public func canAttemptInsertion(accessibilityGranted: Bool) -> Bool {
+        accessibilityGranted
     }
 
     public func requiresActivation(

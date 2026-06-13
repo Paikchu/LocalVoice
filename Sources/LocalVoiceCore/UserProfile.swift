@@ -153,7 +153,7 @@ public struct ProfileHint: Sendable {
 
 enum SeedGlossary {
     static let terms: Set<String> = {
-        guard let url = Bundle.module.url(
+        guard let url = resourceBundle.url(
             forResource: "seed-glossary",
             withExtension: "json"
         ),
@@ -164,7 +164,7 @@ enum SeedGlossary {
     }()
 
     static let commonEnglishWords: Set<String> = {
-        guard let url = Bundle.module.url(
+        guard let url = resourceBundle.url(
             forResource: "seed-glossary",
             withExtension: "json"
         ),
@@ -175,7 +175,7 @@ enum SeedGlossary {
     }()
 
     static let domainKeywords: [String: [String]] = {
-        guard let url = Bundle.module.url(
+        guard let url = resourceBundle.url(
             forResource: "seed-glossary",
             withExtension: "json"
         ),
@@ -184,6 +184,14 @@ enum SeedGlossary {
         else { return [:] }
         return decoded.domainKeywords
     }()
+
+    private static var resourceBundle: Bundle {
+        #if SWIFT_PACKAGE
+        Bundle.module
+        #else
+        Bundle(for: SeedGlossaryBundleToken.self)
+        #endif
+    }
 
     private struct SeedGlossaryFile: Decodable {
         let terms: [String]
@@ -197,6 +205,8 @@ enum SeedGlossary {
         }
     }
 }
+
+private final class SeedGlossaryBundleToken: NSObject {}
 
 // MARK: - ProfileExtractor (pure functions, no side effects)
 

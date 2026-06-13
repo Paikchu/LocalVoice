@@ -18,3 +18,18 @@ import Testing
     #expect(request.requiresActivation(currentApplicationPID: 84))
     #expect(!request.requiresActivation(currentApplicationPID: 42))
 }
+
+@Test func rebuiltUntrustedAppRequestsAccessibilityAgain() {
+    #expect(AccessibilityPromptPolicy.shouldPrompt(isTrusted: false))
+    #expect(!AccessibilityPromptPolicy.shouldPrompt(isTrusted: true))
+}
+
+@Test func insertionRequiresCurrentAccessibilityTrust() {
+    let request = ConfirmedInsertionRequest(
+        text: "Claude cursor insertion",
+        target: InsertionTarget(applicationPID: 42)
+    )
+
+    #expect(!request.canAttemptInsertion(accessibilityGranted: false))
+    #expect(request.canAttemptInsertion(accessibilityGranted: true))
+}

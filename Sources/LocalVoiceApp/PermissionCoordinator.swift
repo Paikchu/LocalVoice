@@ -4,9 +4,6 @@ import LocalVoiceCore
 import Speech
 
 enum PermissionCoordinator {
-    private static let accessibilityPromptedKey =
-        "didPromptForAccessibility"
-
     static var accessibilityGranted: Bool {
         AXIsProcessTrusted()
     }
@@ -41,16 +38,9 @@ enum PermissionCoordinator {
 
     @discardableResult
     static func requestAccessibilityOnce() -> Bool {
-        if accessibilityGranted { return true }
-        guard !UserDefaults.standard.bool(
-            forKey: accessibilityPromptedKey
-        ) else {
-            return false
-        }
-        UserDefaults.standard.set(
-            true,
-            forKey: accessibilityPromptedKey
-        )
+        guard AccessibilityPromptPolicy.shouldPrompt(
+            isTrusted: accessibilityGranted
+        ) else { return true }
         return requestAccessibility()
     }
 

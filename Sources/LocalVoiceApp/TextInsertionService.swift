@@ -34,6 +34,14 @@ final class TextInsertionService {
             return
         }
         let request = ConfirmedInsertionRequest(text: text, target: target)
+        guard request.canAttemptInsertion(
+            accessibilityGranted: PermissionCoordinator.accessibilityGranted
+        ) else {
+            logger.error("Insertion blocked: Accessibility permission missing")
+            _ = PermissionCoordinator.requestAccessibility()
+            completion(false)
+            return
+        }
         let currentPID = NSWorkspace.shared.frontmostApplication?
             .processIdentifier
 
