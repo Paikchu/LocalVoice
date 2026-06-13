@@ -99,6 +99,10 @@ private struct FloatingBarView: View {
     private static let bottomAnchor = "preview-bottom-anchor"
 
     var body: some View {
+        // No GlassEffectContainer: the preview and capsule are only 8pt apart,
+        // so the container would merge their glass shapes into one blob and
+        // draw a faint enclosing hull around the preview. Rendering each glass
+        // independently keeps a single, clean border per element.
         VStack(spacing: 8) {
             Spacer(minLength: 0)
             preview
@@ -110,7 +114,7 @@ private struct FloatingBarView: View {
             height: FloatingBarLayout.height,
             alignment: .bottom
         )
-        .opacity(0.97)
+        .opacity(0.88)
     }
 
     private var capsule: some View {
@@ -141,33 +145,39 @@ private struct FloatingBarView: View {
             width: FloatingBarLayout.capsuleWidth,
             height: FloatingBarLayout.controlsHeight
         )
-        .background(
-            Capsule()
-                .fill(.ultraThinMaterial)
-                .environment(\.colorScheme, .dark)
-                .overlay(Capsule().fill(.black.opacity(0.2)))
-                .overlay(Capsule().stroke(.white.opacity(0.16), lineWidth: 0.75))
+        .glassEffect(
+            .clear.tint(.black.opacity(0.08)).interactive(),
+            in: .capsule
         )
+        .overlay(Capsule().stroke(.white.opacity(0.14), lineWidth: 0.75))
     }
 
     private var preview: some View {
-        VStack(alignment: .leading, spacing: FloatingBarLayout.statusSpacing) {
-            Text(model.statusMessage)
-                .font(.system(size: FloatingBarLayout.statusFontSize, weight: .medium))
-                .foregroundStyle(Color.white.opacity(0.52))
-                .lineLimit(1)
-
+        VStack(alignment: .leading, spacing: 0) {
             scrollingText
         }
         .padding(.horizontal, FloatingBarLayout.previewHorizontalPadding)
         .padding(.vertical, FloatingBarLayout.previewVerticalPadding)
         .frame(width: FloatingBarLayout.contentWidth, alignment: .leading)
-        .background(previewBackground)
+        // Frosted-glass material instead of `.glassEffect`: Liquid Glass `.clear`
+        // always paints a bright specular rim around its plate, which read as a
+        // second "white frame" outside the GlowBorder. A material fill is a
+        // translucent blur with no rim, so the GlowBorder is the only edge.
+        .background(
+            RoundedRectangle(cornerRadius: FloatingBarLayout.cornerRadius, style: .continuous)
+                .fill(.ultraThinMaterial)
+                .environment(\.colorScheme, .dark)
+                .overlay(
+                    RoundedRectangle(cornerRadius: FloatingBarLayout.cornerRadius, style: .continuous)
+                        .fill(.black.opacity(0.12))
+                )
+        )
         .background(measuringText)
         .overlay(
-            MarqueeGlowBorder(
+            GlowBorder(
                 cornerRadius: FloatingBarLayout.cornerRadius,
-                isEnglish: activeMode == .english
+                isEnglish: activeMode == .english,
+                isProcessing: isProcessing
             )
         )
         .onPreferenceChange(PreviewHeightKey.self) { height in
@@ -233,20 +243,6 @@ private struct FloatingBarView: View {
             .allowsHitTesting(false)
     }
 
-    private var previewBackground: some View {
-        RoundedRectangle(cornerRadius: FloatingBarLayout.cornerRadius, style: .continuous)
-            .fill(.ultraThinMaterial)
-            .environment(\.colorScheme, .dark)
-            .overlay(
-                RoundedRectangle(cornerRadius: FloatingBarLayout.cornerRadius, style: .continuous)
-                    .fill(.black.opacity(0.26))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: FloatingBarLayout.cornerRadius, style: .continuous)
-                    .stroke(.white.opacity(0.1), lineWidth: 0.75)
-            )
-    }
-
     private var displayText: String {
         model.transcript.isEmpty ? "正在聆听…" : model.transcript
     }
@@ -269,6 +265,17 @@ private struct FloatingBarView: View {
         }
     }
 
+    // The voice capture is finished and the model is organizing the text.
+    private var isProcessing: Bool {
+        switch model.state {
+        case .finalizing, .processing, .inserting:
+            return true
+        default:
+            return false
+        }
+    }
+
+
     private func circleButton(
         icon: String,
         foreground: Color,
@@ -289,54 +296,60 @@ private struct FloatingBarView: View {
     }
 }
 
-private struct MarqueeGlowBorder: View {
+private struct GlowBorder: View {
     let cornerRadius: CGFloat
     let isEnglish: Bool
+    let isProcessing: Bool
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 60)) { context in
-            let elapsed = context.date.timeIntervalSinceReferenceDate
-            let angle = Angle.degrees(
-                (elapsed * 80).truncatingRemainder(dividingBy: 360)
-            )
+        // The angular gradient is fixed in place (no rotation), so the border
+        // reads as a steady rainbow glow rather than a flowing highlight. While
+        // the model is organizing text we gently brighten and breathe the glow.
+        TimelineView(.animation(minimumInterval: 1 / 60, paused: !isProcessing)) { context in
+            let pulse = isProcessing ? breathe(context.date) : 0
             let shape = RoundedRectangle(
                 cornerRadius: cornerRadius,
                 style: .continuous
             )
             let gradient = AngularGradient(
-                gradient: Gradient(stops: stops),
-                center: .center,
-                angle: angle
+                gradient: Gradient(colors: ringColors),
+                center: .center
             )
 
             ZStack {
                 // Soft outer halo that bleeds beyond the border.
                 shape
                     .stroke(gradient, lineWidth: 2.6)
-                    .blur(radius: 7)
-                    .opacity(0.85)
-                // Crisp running highlight on the border itself.
+                    .blur(radius: 7 + pulse * 3)
+                    .opacity(0.78 + pulse * 0.22)
+                // Crisp glow on the border itself.
                 shape
                     .stroke(gradient, lineWidth: 1.3)
+                    .opacity(0.85 + pulse * 0.15)
             }
+            .brightness(isProcessing ? 0.12 + pulse * 0.12 : 0)
         }
     }
 
-    private var stops: [Gradient.Stop] {
-        let accent = isEnglish
+    // Slow 0...1 breathing curve (~2.9s period) used only while processing.
+    private func breathe(_ date: Date) -> Double {
+        let t = date.timeIntervalSinceReferenceDate
+        return (sin(t * 2.2) + 1) / 2
+    }
+
+    // A seamless colorful ring: first and last colors match so the angular
+    // gradient wraps without a visible seam.
+    private var ringColors: [Color] {
+        let primary = isEnglish
             ? Color(red: 0.66, green: 0.55, blue: 0.98)
             : Color(red: 0.36, green: 0.78, blue: 0.99)
-        let accentSecondary = isEnglish
+        let secondary = isEnglish
             ? Color(red: 0.42, green: 0.62, blue: 1.0)
             : Color(red: 0.55, green: 0.64, blue: 0.99)
-        return [
-            .init(color: .white.opacity(0), location: 0.0),
-            .init(color: accent.opacity(0), location: 0.5),
-            .init(color: accent.opacity(0.7), location: 0.7),
-            .init(color: accentSecondary, location: 0.84),
-            .init(color: .white, location: 0.92),
-            .init(color: .white.opacity(0), location: 1.0)
-        ]
+        let tertiary = isEnglish
+            ? Color(red: 0.80, green: 0.55, blue: 1.0)
+            : Color(red: 0.40, green: 0.92, blue: 0.95)
+        return [primary, secondary, tertiary, secondary, primary]
     }
 }
 
