@@ -123,7 +123,7 @@ private struct ModelSettingsView: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("本地整理模型")
+                    Text(manager.descriptor.displayName)
                         .font(.system(size: 14, weight: .medium))
                     Text(manager.statusText)
                         .font(.system(size: 11))
@@ -147,7 +147,7 @@ private struct ModelSettingsView: View {
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 
-            Text("Qwen3 4B · 约 2.3 GB · 内容不离开本机")
+            Text(manager.descriptor.detail)
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 
@@ -176,22 +176,29 @@ private struct ModelSettingsView: View {
 
     @ViewBuilder
     private var modelAction: some View {
-        switch manager.state {
-        case .notInstalled, .failed:
-            Button("下载") {
-                manager.download()
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-        case .downloading, .loading:
-            ProgressView()
+        // The system model is provided by macOS — nothing to download or remove.
+        if manager.usingSystemModel {
+            Image(systemName: "checkmark.seal.fill")
+                .foregroundStyle(.green)
+                .imageScale(.large)
+        } else {
+            switch manager.state {
+            case .notInstalled, .failed:
+                Button("下载") {
+                    manager.download()
+                }
+                .buttonStyle(.bordered)
                 .controlSize(.small)
-        case .ready:
-            Button("移除") {
-                manager.remove()
+            case .downloading, .loading:
+                ProgressView()
+                    .controlSize(.small)
+            case .ready:
+                Button("移除") {
+                    manager.remove()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
         }
     }
 }

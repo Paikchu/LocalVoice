@@ -188,7 +188,7 @@ public enum EmailOutputFormatter {
         recipient: String?,
         signature: String
     ) -> String {
-        let trimmedBody = body
+        var trimmedBody = body
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .replacingOccurrences(
                 of: #"(?i)^(?:hi|hello|dear)\s+[^,，:：\n]{1,30}[,，:：]\s*"#,
@@ -204,22 +204,41 @@ public enum EmailOutputFormatter {
             of: #"\p{Han}"#,
             options: .regularExpression
         ) == nil
-        let addressee = recipient?
+        let trimmedRecipient = recipient?
             .trimmingCharacters(in: .whitespacesAndNewlines)
-        let greeting: String
+        let addressee = (trimmedRecipient?.isEmpty == false)
+            ? trimmedRecipient
+            : nil
+        // When the recipient is known, drop a leading bare "称呼，" the model may
+        // have left in the body so the deterministic salutation is not duplicated
+        // (e.g. recipient「张伟」+ body「张伟，项目…」-> body「项目…」).
+        if let addressee {
+            trimmedBody = trimmedBody.replacingOccurrences(
+                of: "^"
+                    + NSRegularExpression.escapedPattern(for: addressee)
+                    + #"\s*[，,：:]\s*"#,
+                with: "",
+                options: .regularExpression
+            )
+        }
+        // The salutation is only added when we actually know the recipient — with no
+        // recipient we must not invent a 称呼/问候 for an unknown person.
+        let greeting: String?
         let closing: String
         if isEnglish {
-            greeting = addressee.map { "Dear \($0)," } ?? "Hello,"
+            greeting = addressee.map { "Dear \($0)," }
             closing = signature.isEmpty
                 ? "Best regards"
                 : "Best regards,\n\(signature)"
         } else {
-            greeting = addressee.map { "\($0)，您好：" } ?? "您好："
+            greeting = addressee.map { "\($0)，您好：" }
             closing = signature.isEmpty ? "祝好" : "祝好\n\(signature)"
         }
-        return DocumentFormatter.format(
-            "\(greeting)\n\n\(trimmedBody)\n\n\(closing)"
-        ).plainText
+        let assembled = [greeting, trimmedBody, closing]
+            .compactMap { $0 }
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n\n")
+        return DocumentFormatter.format(assembled).plainText
     }
 }
 
@@ -677,8 +696,9 @@ public enum PromptBuilder {
         - URL、邮箱、编号、金额、时间必须逐字保留，一个字符都不能改。
         - 中文用词保留原意，不得改写中文词语。
         - 原文是语音转写，句中英文词可能因近音被误识别。如某英文词在当前语境明显不通顺，请结合整句语义替换为读音相近、最符合语境的词，并在 corrections 中申报：{"from":"原词","to":"替换词"}。只在有把握时替换，没把握则保留原词不申报。corrections 最多 8 条。
-        - 邮件命令删除命令前缀；outputText 只写正文，不写问候、结束语或签名。
+        - 邮件命令删除命令前缀；outputText 只写正文，不写称呼、问候、结束语或签名（这些会在需要时自动补全）。
         - 邮件正文只写入 outputText；email 只写 recipient 和 missingFields。
+        - 转写中明确指出收件人时，recipient 填写该姓名；未明确收件人时 recipient 必须为 null，不得猜测姓名。
         - 用户签名为空时不得虚构签名。
         - 低于 0.85 的邮件判断返回 plainText。
         - 输出紧凑 JSON，不要空格或换行。
@@ -1032,6 +1052,7 @@ public actor DraftProcessingService {
                         result,
                         signature: signature,
                         recipient: extractedRecipient,
+                        source: transcript,
                         glossary: glossary
                     ),
                     usedFallback: false,
@@ -1060,6 +1081,7 @@ public actor DraftProcessingService {
                         result,
                         signature: signature,
                         recipient: extractedRecipient,
+                        source: transcript,
                         glossary: glossary
                     ),
                     usedFallback: false,
@@ -1328,25 +1350,44 @@ public actor DraftProcessingService {
         )
     }
 
-    private static func formatted(
-        _ result: ProcessingResult,
-        signature: String,
-        recipient: String?
-    ) -> ProcessingResult {
-        normalizedFormatted(result, signature: signature, recipient: recipient, glossary: [])
+    /// A recipient drives the email salutation, so it must be trustworthy. The
+    /// transcript-derived name (extracted by us) is always trusted; a model-supplied
+    /// name is only used if it actually appears in the transcript. This stops a
+    /// backend from inventing a placeholder addressee (e.g.「张三」) for an email
+    /// whose recipient was never stated — in which case no 称呼/问候 is added.
+    private static func trustworthyRecipient(
+        extracted: String?,
+        modelSupplied: String?,
+        source: String
+    ) -> String? {
+        if let extracted, !extracted.isEmpty {
+            return extracted
+        }
+        guard let candidate = modelSupplied?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !candidate.isEmpty,
+            source.contains(candidate) else {
+            return nil
+        }
+        return candidate
     }
 
     private static func normalizedFormatted(
         _ result: ProcessingResult,
         signature: String,
         recipient: String?,
+        source: String,
         glossary: [GlossaryTerm]
     ) -> ProcessingResult {
         let rawOutput: String
         if result.intent == .composeEmail {
             rawOutput = EmailOutputFormatter.format(
                 body: result.outputText,
-                recipient: recipient ?? result.email?.recipient,
+                recipient: trustworthyRecipient(
+                    extracted: recipient,
+                    modelSupplied: result.email?.recipient,
+                    source: source
+                ),
                 signature: signature
             )
         } else {

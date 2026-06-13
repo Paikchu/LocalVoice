@@ -231,12 +231,93 @@ import Testing
     )
 }
 
+@Test func emailOutputFormatterOmitsSalutationWhenRecipientUnknown() {
+    let output = EmailOutputFormatter.format(
+        body: "明天的会议取消了，请大家知悉。",
+        recipient: nil,
+        signature: "Max"
+    )
+
+    #expect(output == "明天的会议取消了，请大家知悉。\n\n祝好\nMax")
+}
+
+@Test func emailOutputFormatterOmitsSalutationAndSignatureWhenBothUnknown() {
+    let output = EmailOutputFormatter.format(
+        body: "会议取消了。",
+        recipient: nil,
+        signature: ""
+    )
+
+    #expect(output == "会议取消了。\n\n祝好")
+}
+
+@Test func emailOutputFormatterDropsDuplicatedAddresseeLeftInBody() {
+    let output = EmailOutputFormatter.format(
+        body: "张伟，项目可能要延期一周。",
+        recipient: "张伟",
+        signature: "Max"
+    )
+
+    #expect(output == "张伟，您好：\n\n项目可能要延期一周。\n\n祝好\nMax")
+}
+
+@Test func emailOutputFormatterOmitsEnglishSalutationWhenRecipientUnknown() {
+    let output = EmailOutputFormatter.format(
+        body: "The meeting tomorrow is cancelled.",
+        recipient: nil,
+        signature: "Max"
+    )
+
+    #expect(output == "The meeting tomorrow is cancelled.\n\nBest regards,\nMax")
+}
+
 @Test func recipientExtractorPreservesOriginalChineseName() {
     #expect(
         RecipientExtractor.recipient(
             from: "帮我给李明发一封邮件，说项目已经完成"
         ) == "李明"
     )
+}
+
+@Test func emailDropsHallucinatedRecipientNotInTranscript() async {
+    let model = CapturingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: #"{"intent":"composeEmail","confidence":0.95,"outputText":"明天下午三点的会议取消了，请大家知悉。","corrections":[],"email":{"recipient":"张三","missingFields":[]}}"#
+        )
+    )
+    let service = DraftProcessingService(languageModel: model)
+
+    let outcome = await service.process(
+        transcript: "写封邮件说明天下午三点的会议取消了请大家知悉",
+        mode: .dictation,
+        signature: "Max"
+    )
+
+    #expect(outcome.result.intent == .composeEmail)
+    // "张三" never appears in the transcript, so no salutation is invented.
+    #expect(!outcome.result.outputText.contains("张三"))
+    #expect(!outcome.result.outputText.contains("您好"))
+    #expect(outcome.result.outputText.hasPrefix("明天下午三点"))
+    #expect(outcome.result.outputText.contains("祝好\nMax"))
+}
+
+@Test func emailKeepsModelRecipientThatAppearsInTranscript() async {
+    let model = CapturingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: #"{"intent":"composeEmail","confidence":0.95,"outputText":"项目可能要延期一周，麻烦先跟客户沟通一下。","corrections":[],"email":{"recipient":"张伟","missingFields":[]}}"#
+        )
+    )
+    let service = DraftProcessingService(languageModel: model)
+
+    let outcome = await service.process(
+        transcript: "帮我写封邮件告诉张伟说项目可能要延期一周麻烦先跟客户沟通一下",
+        mode: .dictation,
+        signature: "Max"
+    )
+
+    // "张伟" is present in the transcript, so the salutation is added.
+    #expect(outcome.result.outputText.hasPrefix("张伟，您好："))
+    #expect(outcome.result.outputText.contains("祝好\nMax"))
 }
 
 @Test func benchmarkSampleCalculatesGenerationAndEndToEndSpeed() {

@@ -60,9 +60,8 @@ final class AppModel: ObservableObject {
     )
 
     init() {
-        let languageModel = MLXLanguageModelService()
-        modelManager = LocalModelManager(service: languageModel)
-        processingService = DraftProcessingService(languageModel: languageModel)
+        modelManager = LocalModelManager()
+        processingService = DraftProcessingService(languageModel: modelManager.proxy)
         dictationShortcut = Self.loadShortcut(
             key: "dictationShortcut",
             fallback: Self.defaultDictationShortcut

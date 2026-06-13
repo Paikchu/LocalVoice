@@ -5,9 +5,22 @@ import MLXLLM
 import MLXLMCommon
 import Tokenizers
 
-actor MLXLanguageModelService: LocalLanguageModelService {
+actor MLXLanguageModelService: LanguageModelBackend, ManagedModelAsset {
     static let modelID = LocalModelDescriptor.id
     static let modelRevision = LocalModelDescriptor.revision
+
+    nonisolated var descriptor: BackendDescriptor {
+        BackendDescriptor(
+            kind: .downloadableLocal,
+            displayName: "本地下载模型",
+            detail: "Qwen3 4B · 约 2.3 GB · 内容不离开本机"
+        )
+    }
+
+    /// The MLX backend owns the on-disk model files, so it is its own asset manager.
+    nonisolated var managedAsset: ManagedModelAsset? { self }
+
+    func availability() async -> BackendAvailability { .available }
 
     private let cache: HubCache
     private let hubClient: HubClient
@@ -152,6 +165,7 @@ enum LocalModelError: LocalizedError {
     case notLoaded
     case emptyOutput
     case invalidRepository
+    case refused(String)
 
     var errorDescription: String? {
         switch self {
@@ -161,6 +175,8 @@ enum LocalModelError: LocalizedError {
             return "本地模型未返回内容"
         case .invalidRepository:
             return "本地模型地址无效"
+        case .refused(let detail):
+            return "系统模型拒绝处理：\(detail)"
         }
     }
 }
