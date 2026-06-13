@@ -62,7 +62,7 @@ final class FloatingPanelController {
         panel.level = .floating
         panel.isOpaque = false
         panel.backgroundColor = .clear
-        panel.hasShadow = true
+        panel.hasShadow = false
         panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
         panel.hidesOnDeactivate = false
         panel.contentView = NSHostingView(rootView: FloatingBarView(model: model))
@@ -317,17 +317,25 @@ private struct GlowBorder: View {
             )
 
             ZStack {
-                // Soft outer halo that bleeds beyond the border.
                 shape
-                    .stroke(gradient, lineWidth: 2.6)
-                    .blur(radius: 7 + pulse * 3)
-                    .opacity(0.78 + pulse * 0.22)
-                // Crisp glow on the border itself.
+                    .inset(by: -4.5)
+                    .stroke(gradient, lineWidth: 1.4)
+                    .blur(radius: 0.8)
+                    .opacity(0.035 + pulse * 0.015)
                 shape
-                    .stroke(gradient, lineWidth: 1.3)
-                    .opacity(0.85 + pulse * 0.15)
+                    .inset(by: -3)
+                    .stroke(gradient, lineWidth: 1.6)
+                    .blur(radius: 0.6)
+                    .opacity(0.07 + pulse * 0.025)
+                shape
+                    .inset(by: -1.5)
+                    .stroke(gradient, lineWidth: 1.8)
+                    .blur(radius: 0.4)
+                    .opacity(0.14 + pulse * 0.04)
+                shape
+                    .stroke(gradient, lineWidth: 1.2)
+                    .opacity(0.78 + pulse * 0.10)
             }
-            .brightness(isProcessing ? 0.12 + pulse * 0.12 : 0)
         }
     }
 

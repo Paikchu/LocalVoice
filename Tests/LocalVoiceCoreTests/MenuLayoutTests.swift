@@ -15,7 +15,7 @@ import Testing
     #expect(FloatingBarLayout.height == 184)
     #expect(FloatingBarLayout.contentWidth == 314)
     #expect(FloatingBarLayout.controlsHeight == 38)
-    #expect(FloatingBarLayout.capsuleWidth == 168)
+    #expect(FloatingBarLayout.capsuleWidth == 140)
     #expect(FloatingBarLayout.buttonDiameter == 28)
     #expect(FloatingBarLayout.barCount == 13)
 }

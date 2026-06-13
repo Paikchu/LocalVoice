@@ -14,7 +14,7 @@ public enum FloatingBarLayout {
     public static let contentWidth: CGFloat = 314
     public static let glowPadding: CGFloat = 8
     public static let controlsHeight: CGFloat = 38
-    public static let capsuleWidth: CGFloat = 168
+    public static let capsuleWidth: CGFloat = 140
     public static let buttonDiameter: CGFloat = 28
     public static let barCount = 13
 
