@@ -9,7 +9,10 @@ let package = Package(
         .library(name: "LocalVoiceCore", targets: ["LocalVoiceCore"])
     ],
     targets: [
-        .target(name: "LocalVoiceCore"),
+        .target(
+            name: "LocalVoiceCore",
+            resources: [.process("Resources")]
+        ),
         .testTarget(
             name: "LocalVoiceCoreTests",
             dependencies: ["LocalVoiceCore"],

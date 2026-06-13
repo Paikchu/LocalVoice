@@ -27,6 +27,8 @@ targets:
     platform: macOS
     sources:
       - Sources/LocalVoiceCore
+    resources:
+      - Sources/LocalVoiceCore/Resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.core

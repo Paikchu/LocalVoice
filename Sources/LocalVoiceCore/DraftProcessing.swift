@@ -612,9 +612,11 @@ public enum PromptBuilder {
         transcript: String,
         mode: VoiceMode,
         signature: String,
-        intentHint: DraftIntent
+        intentHint: DraftIntent,
+        profileHint: String? = nil
     ) -> String {
         let targetLanguage = mode == .english ? "英文" : "跟随原文语言"
+        let profileSection = profileHint.map { "\n\($0)\n" } ?? ""
         return """
         你是本地语音输入整理器。只返回一个 JSON 对象，不要 Markdown，不要解释。
 
@@ -644,7 +646,7 @@ public enum PromptBuilder {
         - 用户签名为空时不得虚构签名。
         - 低于 0.85 的邮件判断返回 plainText。
         - 输出紧凑 JSON，不要空格或换行。
-
+        \(profileSection)
         用户签名：
         \(signature.isEmpty ? "(未设置)" : signature)
 
@@ -737,7 +739,9 @@ public actor DraftProcessingService {
     public func process(
         transcript: String,
         mode: VoiceMode,
-        signature: String
+        signature: String,
+        profileHint: String? = nil,
+        glossary: [GlossaryTerm] = []
     ) async -> DraftProcessingOutcome {
         let language: CorrectionLanguage = transcript.range(
             of: #"\p{Han}"#,
@@ -751,20 +755,21 @@ public actor DraftProcessingService {
         if mode == .english {
             let chunks = Self.translationChunks(normalized)
             if chunks.count > 1 {
-                return await processEnglishChunks(
-                    chunks
-                )
+                return await processEnglishChunks(chunks, glossary: glossary)
             }
         }
         return await processSingle(
             transcript: normalized,
             mode: mode,
-            signature: signature
+            signature: signature,
+            profileHint: profileHint,
+            glossary: glossary
         )
     }
 
     private func processEnglishChunks(
-        _ chunks: [String]
+        _ chunks: [String],
+        glossary: [GlossaryTerm] = []
     ) async -> DraftProcessingOutcome {
         var outputs: [String] = []
         var generations: [ModelGenerationOutput] = []
@@ -783,7 +788,8 @@ public actor DraftProcessingService {
             generationAttempts += outcome.generationAttempts
         }
 
-        let output = outputs.joined(separator: " ")
+        let rawOutput = outputs.joined(separator: " ")
+        let output = GlossaryNormalizer.normalize(rawOutput, glossary: glossary)
         return DraftProcessingOutcome(
             result: ProcessingResult(
                 intent: .plainText,
@@ -864,7 +870,9 @@ public actor DraftProcessingService {
     private func processSingle(
         transcript: String,
         mode: VoiceMode,
-        signature: String
+        signature: String,
+        profileHint: String? = nil,
+        glossary: [GlossaryTerm] = []
     ) async -> DraftProcessingOutcome {
         let clock = ContinuousClock()
         let start = clock.now
@@ -873,7 +881,8 @@ public actor DraftProcessingService {
             transcript: transcript,
             mode: mode,
             signature: signature,
-            intentHint: intentHint
+            intentHint: intentHint,
+            profileHint: profileHint
         )
         let facts = FactExtractor.hardFacts(from: transcript)
         let extractedRecipient = RecipientExtractor.recipient(from: transcript)
@@ -891,10 +900,11 @@ public actor DraftProcessingService {
                 facts: facts
             ) {
                 return DraftProcessingOutcome(
-                    result: Self.formatted(
+                    result: Self.normalizedFormatted(
                         result,
                         signature: signature,
-                        recipient: extractedRecipient
+                        recipient: extractedRecipient,
+                        glossary: glossary
                     ),
                     usedFallback: false,
                     generation: first,
@@ -918,10 +928,11 @@ public actor DraftProcessingService {
                 facts: facts
             ) {
                 return DraftProcessingOutcome(
-                    result: Self.formatted(
+                    result: Self.normalizedFormatted(
                         result,
                         signature: signature,
-                        recipient: extractedRecipient
+                        recipient: extractedRecipient,
+                        glossary: glossary
                     ),
                     usedFallback: false,
                     generation: repaired,
@@ -933,7 +944,8 @@ public actor DraftProcessingService {
             // Deterministic fallback below keeps dictation available offline.
         }
 
-        let fallback = DocumentFormatter.format(transcript).plainText
+        let rawFallback = DocumentFormatter.format(transcript).plainText
+        let fallback = GlossaryNormalizer.normalize(rawFallback, glossary: glossary)
         return DraftProcessingOutcome(
             result: ProcessingResult(
                 intent: .plainText,
@@ -1161,16 +1173,26 @@ public actor DraftProcessingService {
         signature: String,
         recipient: String?
     ) -> ProcessingResult {
-        let output: String
+        normalizedFormatted(result, signature: signature, recipient: recipient, glossary: [])
+    }
+
+    private static func normalizedFormatted(
+        _ result: ProcessingResult,
+        signature: String,
+        recipient: String?,
+        glossary: [GlossaryTerm]
+    ) -> ProcessingResult {
+        let rawOutput: String
         if result.intent == .composeEmail {
-            output = EmailOutputFormatter.format(
+            rawOutput = EmailOutputFormatter.format(
                 body: result.outputText,
                 recipient: recipient ?? result.email?.recipient,
                 signature: signature
             )
         } else {
-            output = DocumentFormatter.format(result.outputText).plainText
+            rawOutput = DocumentFormatter.format(result.outputText).plainText
         }
+        let output = GlossaryNormalizer.normalize(rawOutput, glossary: glossary)
         let email = result.email.map {
             EmailDraft(
                 subject: $0.subject,

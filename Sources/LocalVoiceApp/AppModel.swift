@@ -38,6 +38,7 @@ final class AppModel: ObservableObject {
     private var receivedTranscript = false
     private var pendingFinalizationTask: Task<Void, Never>?
     private var pendingProcessingTask: Task<Void, Never>?
+    private let profileStore = UserProfileStore.shared
     private let logger = Logger(
         subsystem: "com.localvoice.app",
         category: "session"
@@ -101,6 +102,7 @@ final class AppModel: ObservableObject {
         panelController.bind(to: self)
         _ = PermissionCoordinator.requestAccessibilityOnce()
         modelManager.preloadIfInstalled()
+        Task { await profileStore.load() }
     }
 
     func shutdown() {
@@ -110,6 +112,7 @@ final class AppModel: ObservableObject {
         hotkeyController.stop()
         panelController.hide()
         modelManager.shutdown()
+        Task { await profileStore.flushNow() }
     }
 
     func toggle(_ mode: VoiceMode) {
@@ -325,10 +328,21 @@ final class AppModel: ObservableObject {
         pendingProcessingTask?.cancel()
         pendingProcessingTask = Task { @MainActor [weak self] in
             guard let self else { return }
+
+            let hint = await profileStore.snapshot()
+            let profileHintText = hint.promptBlock
+            let glossaryTerms = await profileStore.snapshot().glossaryTerms
+            // Build GlossaryTerm array from canonical names for normalizer
+            let glossaryForNormalizer = glossaryTerms.map {
+                GlossaryTerm(canonical: $0, occurrences: 1, sessionCount: 1)
+            }
+
             let outcome = await processingService.process(
                 transcript: finalTranscript,
                 mode: mode,
-                signature: signature
+                signature: signature,
+                profileHint: profileHintText,
+                glossary: glossaryForNormalizer
             )
             guard !Task.isCancelled else { return }
 
@@ -347,6 +361,15 @@ final class AppModel: ObservableObject {
             insertionService.insert(formatted) { [weak self] inserted in
                 guard let self else { return }
                 if inserted {
+                    let ingestInput = ProfileIngestInput(
+                        finalText: formatted.plainText,
+                        mode: mode,
+                        wasEmail: outcome.result.intent == .composeEmail,
+                        usedFallback: outcome.usedFallback
+                    )
+                    Task.detached(priority: .utility) { [profileStore] in
+                        await profileStore.ingest(ingestInput)
+                    }
                     completeSession()
                 } else {
                     fail("无法写入目标文本框，请检查辅助功能权限")
