@@ -1,9 +1,10 @@
 import AVFoundation
+import LocalVoiceCore
 import OSLog
 import Speech
 
 final class SpeechRecognitionService {
-    typealias PartialHandler = @Sendable (String, Bool) -> Void
+    typealias PartialHandler = @Sendable (String, Bool, [SuspectSpan]) -> Void
     typealias LevelHandler = @Sendable (Float) -> Void
     typealias ErrorHandler = @Sendable (Error) -> Void
 
@@ -52,7 +53,32 @@ final class SpeechRecognitionService {
                 self?.logger.info(
                     "Recognition result final=\(result.isFinal) characters=\(text.count)"
                 )
-                onPartial(text, result.isFinal)
+                // Extract ASR confidence signals on final result only.
+                // Partial results carry no meaningful per-segment confidence.
+                let suspects: [SuspectSpan]
+                if result.isFinal {
+                    let bestSegs = result.bestTranscription.segments.map {
+                        TranscriptSegmentInfo(
+                            text: $0.substring,
+                            confidence: Double($0.confidence)
+                        )
+                    }
+                    let altSegs = result.transcriptions.dropFirst().map { t in
+                        t.segments.map {
+                            TranscriptSegmentInfo(
+                                text: $0.substring,
+                                confidence: Double($0.confidence)
+                            )
+                        }
+                    }
+                    suspects = SpeechSignalExtractor.suspects(
+                        best: bestSegs,
+                        alternatives: Array(altSegs)
+                    )
+                } else {
+                    suspects = []
+                }
+                onPartial(text, result.isFinal, suspects)
             }
             if let error {
                 self?.logger.error(

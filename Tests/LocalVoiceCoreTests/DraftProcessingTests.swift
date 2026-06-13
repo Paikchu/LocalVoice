@@ -347,6 +347,173 @@ import Testing
     #expect(prompt.contains("1.、2.、3."))
     #expect(!prompt.contains("当前应用正文"))
     #expect(!prompt.contains("屏幕内容"))
+    // Correction rules and schema field must be present
+    #expect(prompt.contains("corrections"))
+    #expect(prompt.contains("近音"))
+    // No suspects block when suspects is empty
+    #expect(!prompt.contains("低置信片段"))
+}
+
+@Test func promptBuilderIncludesSuspectsBlockWhenNonEmpty() {
+    let suspects = [
+        SuspectSpan(text: "employ", confidence: 0.31, alternatives: ["deploy"]),
+        SuspectSpan(text: "march", confidence: 0.38, alternatives: [])
+    ]
+    let prompt = PromptBuilder.processingPrompt(
+        transcript: "今天 employ 新版本，把这个分支 march 进去",
+        mode: .dictation,
+        signature: "",
+        intentHint: .plainText,
+        suspects: suspects
+    )
+
+    #expect(prompt.contains("低置信片段"))
+    #expect(prompt.contains("employ"))
+    #expect(prompt.contains("deploy"))
+    #expect(prompt.contains("march"))
+    #expect(prompt.contains("0.31"))
+}
+
+@Test func promptBuilderEmptySuspectsProducesNoSuspectsBlock() {
+    let promptWithout = PromptBuilder.processingPrompt(
+        transcript: "今天 deploy 新版本",
+        mode: .dictation,
+        signature: "",
+        intentHint: .plainText,
+        suspects: []
+    )
+    let promptWith = PromptBuilder.processingPrompt(
+        transcript: "今天 deploy 新版本",
+        mode: .dictation,
+        signature: "",
+        intentHint: .plainText,
+        suspects: [SuspectSpan(text: "deploy", confidence: 0.25)]
+    )
+
+    #expect(!promptWithout.contains("低置信片段"))
+    #expect(promptWith.contains("低置信片段"))
+}
+
+@Test func processingResultDecodesWithoutCorrectionsField() throws {
+    let json = """
+    {
+      "intent": "plainText",
+      "confidence": 0.99,
+      "outputText": "今天 deploy 新版本。",
+      "email": null
+    }
+    """
+    let result = try JSONDecoder().decode(ProcessingResult.self, from: Data(json.utf8))
+    #expect(result.corrections.isEmpty)
+    #expect(result.outputText == "今天 deploy 新版本。")
+}
+
+@Test func processingResultDecodesWithCorrectionsField() throws {
+    let json = """
+    {
+      "intent": "plainText",
+      "confidence": 0.99,
+      "outputText": "今天 deploy 新版本。",
+      "corrections": [{"from": "employ", "to": "deploy"}],
+      "email": null
+    }
+    """
+    let result = try JSONDecoder().decode(ProcessingResult.self, from: Data(json.utf8))
+    #expect(result.corrections.count == 1)
+    #expect(result.corrections[0].from == "employ")
+    #expect(result.corrections[0].to == "deploy")
+}
+
+@Test func draftProcessorAppliesValidCorrectionFromModelOutput() async {
+    let model = FakeLanguageModelService(
+        responses: [
+            ModelGenerationOutput(
+                text: """
+                {
+                  "intent": "plainText",
+                  "confidence": 0.99,
+                  "outputText": "今天我们要 deploy 新版本。",
+                  "corrections": [{"from": "employ", "to": "deploy"}],
+                  "email": null
+                }
+                """
+            )
+        ]
+    )
+    let processor = DraftProcessingService(languageModel: model, timeout: .seconds(1))
+
+    let outcome = await processor.process(
+        transcript: "今天我们要 employ 新版本",
+        mode: .dictation,
+        signature: ""
+    )
+
+    #expect(!outcome.usedFallback)
+    #expect(outcome.result.outputText.contains("deploy"))
+    #expect(!outcome.result.outputText.contains("employ"))
+    #expect(outcome.result.corrections.count == 1)
+}
+
+@Test func draftProcessorRevertsInvalidCorrectionWithUnrelatedWords() async {
+    // "deploy" → "banana": phonetically unrelated → should be reverted
+    let model = FakeLanguageModelService(
+        responses: [
+            ModelGenerationOutput(
+                text: """
+                {
+                  "intent": "plainText",
+                  "confidence": 0.99,
+                  "outputText": "今天我们要 banana 新版本。",
+                  "corrections": [{"from": "deploy", "to": "banana"}],
+                  "email": null
+                }
+                """
+            )
+        ]
+    )
+    let processor = DraftProcessingService(languageModel: model, timeout: .seconds(1))
+
+    let outcome = await processor.process(
+        transcript: "今天我们要 deploy 新版本",
+        mode: .dictation,
+        signature: ""
+    )
+
+    #expect(!outcome.usedFallback)
+    // "banana" should be reverted back to "deploy"
+    #expect(outcome.result.outputText.contains("deploy"))
+    #expect(!outcome.result.outputText.contains("banana"))
+    // No corrections accepted
+    #expect(outcome.result.corrections.isEmpty)
+}
+
+@Test func draftProcessorWithSuspectsPassesThemToPrompt() async {
+    let model = CapturingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: """
+            {
+              "intent": "plainText",
+              "confidence": 0.99,
+              "outputText": "今天我们要 deploy 新版本。",
+              "email": null
+            }
+            """
+        )
+    )
+    let processor = DraftProcessingService(languageModel: model, timeout: .seconds(1))
+    let suspects = [SuspectSpan(text: "employ", confidence: 0.30, alternatives: ["deploy"])]
+
+    _ = await processor.process(
+        transcript: "今天我们要 employ 新版本",
+        mode: .dictation,
+        signature: "",
+        suspects: suspects
+    )
+
+    let prompt = await model.lastPrompt
+    #expect(prompt?.contains("低置信片段") == true)
+    #expect(prompt?.contains("employ") == true)
+    #expect(prompt?.contains("deploy") == true)
 }
 
 @Test func englishModeKeepsChineseTranscriptIntactBeforeModelTranslation() async {

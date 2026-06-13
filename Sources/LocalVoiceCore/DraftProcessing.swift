@@ -42,22 +42,26 @@ public struct EmailDraft: Codable, Equatable, Sendable {
     }
 }
 
-public struct ProcessingResult: Codable, Equatable, Sendable {
+public struct ProcessingResult: Equatable, Sendable {
     public let intent: DraftIntent
     public let confidence: Double
     public let outputText: String
     public let email: EmailDraft?
+    /// Near-sound corrections the model declared and the validator accepted.
+    public let corrections: [TermCorrection]
 
     public init(
         intent: DraftIntent,
         confidence: Double,
         outputText: String,
-        email: EmailDraft?
+        email: EmailDraft?,
+        corrections: [TermCorrection] = []
     ) {
         self.intent = intent
         self.confidence = confidence
         self.outputText = outputText
         self.email = email
+        self.corrections = corrections
     }
 
     public func downgradedToPlainText() -> Self {
@@ -65,8 +69,35 @@ public struct ProcessingResult: Codable, Equatable, Sendable {
             intent: .plainText,
             confidence: confidence,
             outputText: outputText,
-            email: nil
+            email: nil,
+            corrections: corrections
         )
+    }
+}
+
+extension ProcessingResult: Codable {
+    private enum CodingKeys: String, CodingKey {
+        case intent, confidence, outputText, email, corrections
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        intent = try c.decode(DraftIntent.self, forKey: .intent)
+        confidence = try c.decode(Double.self, forKey: .confidence)
+        outputText = try c.decode(String.self, forKey: .outputText)
+        email = try c.decodeIfPresent(EmailDraft.self, forKey: .email)
+        corrections = try c.decodeIfPresent([TermCorrection].self, forKey: .corrections) ?? []
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(intent, forKey: .intent)
+        try c.encode(confidence, forKey: .confidence)
+        try c.encode(outputText, forKey: .outputText)
+        try c.encodeIfPresent(email, forKey: .email)
+        if !corrections.isEmpty {
+            try c.encode(corrections, forKey: .corrections)
+        }
     }
 }
 
@@ -613,10 +644,12 @@ public enum PromptBuilder {
         mode: VoiceMode,
         signature: String,
         intentHint: DraftIntent,
-        profileHint: String? = nil
+        profileHint: String? = nil,
+        suspects: [SuspectSpan] = []
     ) -> String {
         let targetLanguage = mode == .english ? "英文" : "跟随原文语言"
         let profileSection = profileHint.map { "\n\($0)\n" } ?? ""
+        let suspectsSection = buildSuspectsBlock(suspects)
         return """
         你是本地语音输入整理器。只返回一个 JSON 对象，不要 Markdown，不要解释。
 
@@ -625,6 +658,7 @@ public enum PromptBuilder {
           "intent": "plainText" | "composeEmail",
           "confidence": 0.0...1.0,
           "outputText": "最终可直接粘贴的文本",
+          "corrections": [{"from":"原词","to":"替换词"}],
           "email": null | {
             "recipient": "明确收件人或 null",
             "missingFields": ["缺失字段"]
@@ -640,19 +674,38 @@ public enum PromptBuilder {
         - 不得在 URL、邮箱、时间、金额或产品编号内部插入标点。
         - 完整保留原文信息，不得总结、缩写、截断或省略后半段。
         - 不得虚构姓名、日期、金额、URL、编号、附件或承诺。
-        - 人名、产品名、URL、编号必须逐字保留，不得翻译或转写拼音。
+        - URL、邮箱、编号、金额、时间必须逐字保留，一个字符都不能改。
+        - 中文用词保留原意，不得改写中文词语。
+        - 原文是语音转写，句中英文词可能因近音被误识别。如某英文词在当前语境明显不通顺，请结合整句语义替换为读音相近、最符合语境的词，并在 corrections 中申报：{"from":"原词","to":"替换词"}。只在有把握时替换，没把握则保留原词不申报。corrections 最多 8 条。
         - 邮件命令删除命令前缀；outputText 只写正文，不写问候、结束语或签名。
         - 邮件正文只写入 outputText；email 只写 recipient 和 missingFields。
         - 用户签名为空时不得虚构签名。
         - 低于 0.85 的邮件判断返回 plainText。
         - 输出紧凑 JSON，不要空格或换行。
-        \(profileSection)
+        \(profileSection)\(suspectsSection)
         用户签名：
         \(signature.isEmpty ? "(未设置)" : signature)
 
         完整转写：
         \(transcript)
         """
+    }
+
+    private static func buildSuspectsBlock(_ suspects: [SuspectSpan]) -> String {
+        guard !suspects.isEmpty else { return "" }
+        var lines = [
+            "\n识别器低置信片段（这些位置最可能是近音误识别；括号内是识别器的其他候选写法，可作参考但不必采用）："
+        ]
+        for span in suspects {
+            let conf = String(format: "%.2f", span.confidence)
+            if span.alternatives.isEmpty {
+                lines.append("- \"\(span.text)\"（置信度 \(conf)）")
+            } else {
+                let alts = span.alternatives.joined(separator: " / ")
+                lines.append("- \"\(span.text)\"（候选：\(alts)，置信度 \(conf)）")
+            }
+        }
+        return lines.joined(separator: "\n") + "\n"
     }
 
     public static func retryPrompt(
@@ -663,6 +716,7 @@ public enum PromptBuilder {
         上一次输出无效或不完整。重新执行原始任务。
         必须返回单个合法 JSON 对象，并完整保留原文全部信息。
         不得总结、缩写、截断或省略后半段。
+        如果输出中包含近音纠错替换，必须在 corrections 字段中逐条申报。
 
         原始任务：
         \(originalPrompt)
@@ -741,7 +795,8 @@ public actor DraftProcessingService {
         mode: VoiceMode,
         signature: String,
         profileHint: String? = nil,
-        glossary: [GlossaryTerm] = []
+        glossary: [GlossaryTerm] = [],
+        suspects: [SuspectSpan] = []
     ) async -> DraftProcessingOutcome {
         let language: CorrectionLanguage = transcript.range(
             of: #"\p{Han}"#,
@@ -763,7 +818,8 @@ public actor DraftProcessingService {
             mode: mode,
             signature: signature,
             profileHint: profileHint,
-            glossary: glossary
+            glossary: glossary,
+            suspects: suspects
         )
     }
 
@@ -872,7 +928,8 @@ public actor DraftProcessingService {
         mode: VoiceMode,
         signature: String,
         profileHint: String? = nil,
-        glossary: [GlossaryTerm] = []
+        glossary: [GlossaryTerm] = [],
+        suspects: [SuspectSpan] = []
     ) async -> DraftProcessingOutcome {
         let clock = ContinuousClock()
         let start = clock.now
@@ -882,7 +939,8 @@ public actor DraftProcessingService {
             mode: mode,
             signature: signature,
             intentHint: intentHint,
-            profileHint: profileHint
+            profileHint: profileHint,
+            suspects: suspects
         )
         let facts = FactExtractor.hardFacts(from: transcript)
         let extractedRecipient = RecipientExtractor.recipient(from: transcript)
@@ -967,12 +1025,35 @@ public actor DraftProcessingService {
         facts: [String]
     ) -> ProcessingResult? {
         guard let data = jsonData(from: response) else { return nil }
-        guard let result = try? ProcessingResultValidator.validate(
+        guard let raw = try? ProcessingResultValidator.validate(
             data,
             requiredFacts: facts
         ) else {
             return nil
         }
+
+        // Apply and validate near-sound corrections declared by the model.
+        // Invalid corrections are reverted (worst case: text unchanged).
+        // Hard facts are protected, so the facts check above remains valid after correction.
+        let (correctedText, accepted, _) = CorrectionValidator.apply(
+            corrections: raw.corrections,
+            to: raw.outputText,
+            source: source,
+            protectedFacts: facts
+        )
+        let result: ProcessingResult
+        if accepted.isEmpty && correctedText == raw.outputText {
+            result = raw
+        } else {
+            result = ProcessingResult(
+                intent: raw.intent,
+                confidence: raw.confidence,
+                outputText: correctedText,
+                email: raw.email,
+                corrections: accepted
+            )
+        }
+
         guard preservesInput(
             result.outputText,
             source: source,
@@ -1205,7 +1286,8 @@ public actor DraftProcessingService {
             intent: result.intent,
             confidence: result.confidence,
             outputText: output,
-            email: email
+            email: email,
+            corrections: result.corrections
         )
     }
 

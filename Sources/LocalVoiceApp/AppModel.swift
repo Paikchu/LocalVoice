@@ -34,6 +34,7 @@ final class AppModel: ObservableObject {
     private let panelController = FloatingPanelController()
     private let processingService: DraftProcessingService
     private var latestRawTranscript = ""
+    private var latestSuspects: [SuspectSpan] = []
     private var peakAudioLevel: Float = 0
     private var receivedTranscript = false
     private var pendingFinalizationTask: Task<Void, Never>?
@@ -137,6 +138,7 @@ final class AppModel: ObservableObject {
         recognitionAccumulator.reset()
         draft.cancel()
         latestRawTranscript = ""
+        latestSuspects = []
         transcript = ""
         unstableTranscript = ""
         state = stateMachine.handle(.cancel)
@@ -216,9 +218,9 @@ final class AppModel: ObservableObject {
 
             do {
                 try speechService.start(
-                    onPartial: { [weak self] text, isFinal in
+                    onPartial: { [weak self] text, isFinal, suspects in
                         Task { @MainActor in
-                            self?.receive(text, isFinal: isFinal, mode: mode)
+                            self?.receive(text, isFinal: isFinal, mode: mode, suspects: suspects)
                         }
                     },
                     onLevel: { [weak self] level in
@@ -242,13 +244,14 @@ final class AppModel: ObservableObject {
         }
     }
 
-    private func receive(_ text: String, isFinal: Bool, mode: VoiceMode) {
+    private func receive(_ text: String, isFinal: Bool, mode: VoiceMode, suspects: [SuspectSpan] = []) {
         guard !text.isEmpty else { return }
         let accumulated = recognitionAccumulator.consume(
             text,
             isFinal: isFinal
         )
         latestRawTranscript = accumulated
+        if isFinal { latestSuspects = suspects }
         draft.updateRaw(accumulated)
         receivedTranscript = true
         logger.info(
@@ -342,7 +345,8 @@ final class AppModel: ObservableObject {
                 mode: mode,
                 signature: signature,
                 profileHint: profileHintText,
-                glossary: glossaryForNormalizer
+                glossary: glossaryForNormalizer,
+                suspects: latestSuspects
             )
             guard !Task.isCancelled else { return }
 
