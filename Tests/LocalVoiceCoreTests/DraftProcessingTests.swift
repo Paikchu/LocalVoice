@@ -802,6 +802,50 @@ import Testing
     #expect(await model.requestCount == 2)
 }
 
+@Test func englishModeStripsResidualChineseEchoedByModel() async {
+    // The model translates but also echoes the original Chinese sentence.
+    let model = CapturingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: """
+            {
+              "intent": "plainText",
+              "confidence": 0.99,
+              "outputText": "We will start testing this afternoon. 今天下午我们开始测试。",
+              "email": null
+            }
+            """
+        )
+    )
+    let processor = DraftProcessingService(
+        languageModel: model,
+        timeout: .seconds(1)
+    )
+
+    let outcome = await processor.process(
+        transcript: "今天下午我们开始测试。",
+        mode: .english,
+        signature: ""
+    )
+
+    #expect(
+        outcome.result.outputText == "We will start testing this afternoon."
+    )
+}
+
+@Test func removingResidualChinesePreservesLineStructure() {
+    let mixed = """
+    First item is ready.
+    第二项还没准备好。
+    Third item is done.
+    """
+    #expect(
+        DraftProcessingService.removingResidualChinese(mixed) == """
+        First item is ready.
+        Third item is done.
+        """
+    )
+}
+
 private enum TestModelError: Error {
     case failed
 }

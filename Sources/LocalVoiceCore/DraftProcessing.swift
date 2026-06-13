@@ -807,11 +807,22 @@ public actor DraftProcessingService {
             language: language
         )
         let normalized = SpokenStructureNormalizer.normalize(corrected)
+        let outcome: DraftProcessingOutcome
         if mode == .english {
             let chunks = Self.translationChunks(normalized)
             if chunks.count > 1 {
-                return await processEnglishChunks(chunks, glossary: glossary)
+                outcome = await processEnglishChunks(chunks, glossary: glossary)
+            } else {
+                outcome = await processSingle(
+                    transcript: normalized,
+                    mode: mode,
+                    signature: signature,
+                    profileHint: profileHint,
+                    glossary: glossary,
+                    suspects: suspects
+                )
             }
+            return Self.sanitizingEnglishOutput(outcome)
         }
         return await processSingle(
             transcript: normalized,
@@ -821,6 +832,65 @@ public actor DraftProcessingService {
             glossary: glossary,
             suspects: suspects
         )
+    }
+
+    /// English translation output must never carry the original Chinese. The
+    /// model can echo the source, and per-chunk/whole-transcript fallbacks keep
+    /// the untranslated text verbatim. Drop any residual Han-bearing sentence as
+    /// a final guard so only the English translation reaches the user.
+    private static func sanitizingEnglishOutput(
+        _ outcome: DraftProcessingOutcome
+    ) -> DraftProcessingOutcome {
+        let cleaned = removingResidualChinese(outcome.result.outputText)
+        guard cleaned != outcome.result.outputText else { return outcome }
+        let result = outcome.result
+        return DraftProcessingOutcome(
+            result: ProcessingResult(
+                intent: result.intent,
+                confidence: result.confidence,
+                outputText: cleaned,
+                email: result.email,
+                corrections: result.corrections
+            ),
+            usedFallback: outcome.usedFallback,
+            generation: outcome.generation,
+            totalSeconds: outcome.totalSeconds,
+            generationAttempts: outcome.generationAttempts
+        )
+    }
+
+    /// Removes sentences that still contain Chinese (Han) characters, then
+    /// strips any stray Han characters left in otherwise-English sentences.
+    /// Line structure (numbered lists, paragraphs) is preserved.
+    static func removingResidualChinese(_ text: String) -> String {
+        guard text.range(
+            of: #"\p{Han}"#,
+            options: .regularExpression
+        ) != nil else {
+            return text
+        }
+        let cleanedLines = text.components(separatedBy: "\n").map { line -> String in
+            let sentences = line.matches(
+                of: /[^。！？!?.]+[。！？!?.]?/
+            ).map { String($0.output) }
+            let englishOnly = sentences.filter { sentence in
+                sentence.range(
+                    of: #"\p{Han}"#,
+                    options: .regularExpression
+                ) == nil
+            }
+            return englishOnly.joined()
+                .replacingOccurrences(
+                    of: #" {2,}"#,
+                    with: " ",
+                    options: .regularExpression
+                )
+                .trimmingCharacters(in: .whitespaces)
+        }
+        return cleanedLines
+            .filter { !$0.isEmpty }
+            .joined(separator: "\n")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private func processEnglishChunks(
@@ -1041,14 +1111,20 @@ public actor DraftProcessingService {
             source: source,
             protectedFacts: facts
         )
+        // In English mode the model can echo the original Chinese alongside its
+        // translation. Strip those source sentences before the preservation and
+        // translation checks so the English survives validation.
+        let outputText = mode == .english
+            ? removingResidualChinese(correctedText)
+            : correctedText
         let result: ProcessingResult
-        if accepted.isEmpty && correctedText == raw.outputText {
+        if accepted.isEmpty && outputText == raw.outputText {
             result = raw
         } else {
             result = ProcessingResult(
                 intent: raw.intent,
                 confidence: raw.confidence,
-                outputText: correctedText,
+                outputText: outputText,
                 email: raw.email,
                 corrections: accepted
             )
@@ -1128,8 +1204,11 @@ public actor DraftProcessingService {
         _ response: String,
         source: String
     ) -> String? {
-        let output = response.trimmingCharacters(
-            in: .whitespacesAndNewlines
+        // Drop any echoed source sentences before judging the translation so a
+        // partial mix of English + Chinese is salvaged into clean English rather
+        // than rejected (and replaced by the untranslated source on fallback).
+        let output = removingResidualChinese(
+            response.trimmingCharacters(in: .whitespacesAndNewlines)
         )
         guard !output.isEmpty,
               preservesInput(output, source: source, mode: .english),

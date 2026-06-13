@@ -25,12 +25,20 @@
 
 ### 构建与运行
 ```bash
+./scripts/run.sh              # 一键：退出旧实例 → 构建签名 → 重新启动
+```
+等价于手动分两步：
+```bash
 ./scripts/build-app.sh        # 构建并签名，产物在 build/LocalVoice.app
 open build/LocalVoice.app     # 启动，图标出现在菜单栏
 swift test                    # 运行纯逻辑单元测试
 ```
 
 首次运行需授予 **麦克风**、**语音识别**、**辅助功能** 三项权限。
+
+> **权限不会反复弹窗**：`run.sh` / `build-app.sh` 用固定的 `Apple Development` 证书签名，macOS 据此把每次重编译都识别为**同一个 App**（同一签名身份 + `com.localvoice.app`），已授予的权限保留——相当于每次 bug 修复都算作一次「软件更新」。
+>
+> ⚠️ 切勿用 `xcodebuild ... CODE_SIGNING_ALLOWED=NO` 直接从 `DerivedData` 启动：那是 ad-hoc 临时签名，每次构建签名都不同，会被 macOS 当成全新 App，导致权限重置、反复弹窗。
 
 ### 使用
 | 操作 | 默认快捷键 | 说明 |
@@ -117,7 +125,8 @@ stateDiagram-v2
 LocalVoice/
 ├── project.yml              # XcodeGen 工程定义（App 构建入口，单一来源）
 ├── Package.swift            # SPM：暴露 LocalVoiceCore 库供 swift test
-├── scripts/build-app.sh     # 一键构建 + 签名
+├── scripts/run.sh           # 一键：构建 + 签名 + 重启（日常开发用）
+├── scripts/build-app.sh     # 构建 + 固定证书签名（run.sh 内部调用）
 ├── Sources/
 │   ├── LocalVoiceCore/      # 纯逻辑、无 UI、可测试
 │   │   ├── LocalVoiceCore.swift     # 状态机 / 快捷键 / 文本累加 / 校正
@@ -148,6 +157,8 @@ LocalVoice/
 3. `ditto` —— 复制产物到 `build/LocalVoice.app`
 4. **签名** —— 有 `Apple Development` 证书则逐 framework 签名 + Hardened Runtime + entitlements；无证书则 ad-hoc（仅本机自用）
 
+> 用固定的 `Apple Development` 证书签名后，重复构建的签名身份一致，macOS 据此保留已授予的权限（麦克风 / 语音识别 / 辅助功能），重编译不再反复弹窗。
+>
 > 分发给他人需用 Developer ID 证书签名并**公证（notarization）**，否则会被 Gatekeeper 拦截。
 
 ---
