@@ -41,6 +41,7 @@ targets:
       - Sources/LocalVoiceApp
     dependencies:
       - target: LocalVoiceCore
+      - sdk: FoundationModels.framework
       - package: MLXSwiftLM
         product: MLXLLM
       - package: MLXSwiftLM

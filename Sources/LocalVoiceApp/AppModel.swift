@@ -66,9 +66,10 @@ final class AppModel: ObservableObject {
     )
 
     init() {
-        let languageModel = MLXLanguageModelService()
-        modelManager = LocalModelManager(service: languageModel)
-        processingService = DraftProcessingService(languageModel: languageModel)
+        modelManager = LocalModelManager()
+        processingService = DraftProcessingService(
+            languageModel: modelManager.proxy
+        )
         dictationShortcut = Self.loadShortcut(
             key: "dictationShortcut",
             fallback: Self.defaultDictationShortcut
@@ -107,6 +108,16 @@ final class AppModel: ObservableObject {
     var isListening: Bool {
         if case .listening = state { return true }
         return false
+    }
+
+    var canChangeLanguageModelBackend: Bool {
+        guard !modelManager.isBusy else { return false }
+        switch state {
+        case .ready, .failed:
+            return true
+        default:
+            return false
+        }
     }
 
     func start() {
@@ -244,6 +255,7 @@ final class AppModel: ObservableObject {
         UserDefaults.standard.removePersistentDomain(
             forName: Bundle.main.bundleIdentifier ?? "com.localvoice.app"
         )
+        modelManager.resetSelection()
 
         Task {
             var failures: [String] = []
@@ -429,7 +441,9 @@ final class AppModel: ObservableObject {
             return
         }
         state = stateMachine.handle(.finalTranscriptReady)
-        statusMessage = modelManager.isReady ? "正在本地整理" : "正在基础整理"
+        statusMessage = modelManager.isReady
+            ? "正在使用 \(modelManager.descriptor.title) 整理"
+            : "正在基础整理"
         processingProgress = ProcessingProgress.preparing.fraction
         unstableTranscript = ""
 
@@ -507,6 +521,11 @@ final class AppModel: ObservableObject {
         state = stateMachine.handle(.fail(message))
         statusMessage = message
         panelController.showError()
+    }
+
+    func selectLanguageModelBackend(_ backend: LanguageModelBackendKind) {
+        guard canChangeLanguageModelBackend else { return }
+        modelManager.select(backend)
     }
 
     private func handleShortcut(_ shortcut: KeyboardShortcut) -> Bool {

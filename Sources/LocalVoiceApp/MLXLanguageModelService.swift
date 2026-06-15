@@ -5,9 +5,24 @@ import MLXLLM
 import MLXLMCommon
 import Tokenizers
 
-actor MLXLanguageModelService: LocalLanguageModelService {
+actor MLXLanguageModelService:
+    LanguageModelBackend,
+    ManagedLanguageModelAsset
+{
     static let modelID = LocalModelDescriptor.id
     static let modelRevision = LocalModelDescriptor.revision
+
+    nonisolated var descriptor: LanguageModelBackendDescriptor {
+        LanguageModelBackendDescriptor(
+            kind: .qwen,
+            title: "Qwen3 4B",
+            detail: "约 2.3 GB · 下载后可离线使用 · 内容不离开本机"
+        )
+    }
+
+    nonisolated var managedAsset: (any ManagedLanguageModelAsset)? {
+        self
+    }
 
     private let cache: HubCache
     private let hubClient: HubClient
@@ -19,6 +34,10 @@ actor MLXLanguageModelService: LocalLanguageModelService {
     ) {
         cache = HubCache(cacheDirectory: cacheDirectory)
         hubClient = HubClient(cache: cache)
+    }
+
+    func availability() async -> LanguageModelBackendAvailability {
+        .available
     }
 
     func isInstalled() -> Bool {

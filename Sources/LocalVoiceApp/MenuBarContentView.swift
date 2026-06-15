@@ -122,9 +122,31 @@ private struct ModelSettingsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
+                Text("整理模型")
+                    .font(.system(size: 14, weight: .medium))
+                Spacer()
+                Picker(
+                    "整理模型",
+                    selection: Binding(
+                        get: { manager.selectedBackend },
+                        set: { model.selectLanguageModelBackend($0) }
+                    )
+                ) {
+                    ForEach(LanguageModelBackendKind.allCases, id: \.self) {
+                        backend in
+                        Text(backend.displayName).tag(backend)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .controlSize(.small)
+                .disabled(!model.canChangeLanguageModelBackend)
+            }
+
+            HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("本地整理模型")
-                        .font(.system(size: 14, weight: .medium))
+                    Text(manager.descriptor.title)
+                        .font(.system(size: 12, weight: .medium))
                     Text(manager.statusText)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
@@ -147,7 +169,7 @@ private struct ModelSettingsView: View {
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 
-            Text("Qwen3 4B · 约 2.3 GB · 内容不离开本机")
+            Text(manager.descriptor.detail)
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 
@@ -176,22 +198,36 @@ private struct ModelSettingsView: View {
 
     @ViewBuilder
     private var modelAction: some View {
-        switch manager.state {
-        case .notInstalled, .failed:
-            Button("下载") {
-                manager.download()
-            }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
-        case .downloading, .loading:
-            ProgressView()
+        if manager.managesDownload {
+            switch manager.state {
+            case .notInstalled, .failed, .unavailable:
+                Button("下载") {
+                    manager.download()
+                }
+                .buttonStyle(.bordered)
                 .controlSize(.small)
-        case .ready:
-            Button("移除") {
-                manager.remove()
+            case .downloading, .loading:
+                ProgressView()
+                    .controlSize(.small)
+            case .ready:
+                Button("移除") {
+                    manager.remove()
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
             }
-            .buttonStyle(.bordered)
-            .controlSize(.small)
+        } else {
+            switch manager.state {
+            case .loading:
+                ProgressView()
+                    .controlSize(.small)
+            case .ready:
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+            case .notInstalled, .downloading, .unavailable, .failed:
+                Image(systemName: "exclamationmark.circle")
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }
