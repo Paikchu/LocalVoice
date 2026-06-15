@@ -126,7 +126,9 @@ private struct FloatingBarView: View {
                 action: model.cancel
             )
 
-            if showsStatus {
+            if let progress = model.processingProgress {
+                processingView(progress: progress)
+            } else if showsStatus {
                 Text(model.statusMessage)
                     .font(.system(size: 10, weight: .medium))
                     .foregroundStyle(.white.opacity(0.82))
@@ -160,6 +162,59 @@ private struct FloatingBarView: View {
             in: .capsule
         )
         .overlay(Capsule().stroke(.white.opacity(0.14), lineWidth: 0.75))
+    }
+
+    private func processingView(progress: Double) -> some View {
+        HStack(spacing: 7) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(model.statusMessage)
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .lineLimit(1)
+
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        Capsule()
+                            .fill(.white.opacity(0.12))
+                        Capsule()
+                            .fill(progressGradient)
+                            .frame(
+                                width: geometry.size.width
+                                    * min(max(progress, 0), 1)
+                            )
+                    }
+                }
+                .frame(height: 3)
+            }
+            .frame(maxWidth: .infinity)
+
+            Text("\(Int((progress * 100).rounded()))%")
+                .font(.system(
+                    size: 9,
+                    weight: .semibold,
+                    design: .monospaced
+                ))
+                .foregroundStyle(.white.opacity(0.9))
+                .frame(width: 30, alignment: .trailing)
+        }
+        .animation(.easeOut(duration: 0.18), value: progress)
+    }
+
+    private var progressGradient: LinearGradient {
+        let colors = activeMode == .english
+            ? [
+                Color(red: 0.66, green: 0.55, blue: 0.98),
+                Color(red: 0.42, green: 0.62, blue: 1)
+            ]
+            : [
+                Color(red: 0.36, green: 0.78, blue: 0.99),
+                Color(red: 0.40, green: 0.92, blue: 0.95)
+            ]
+        return LinearGradient(
+            colors: colors,
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 
     private var preview: some View {

@@ -634,8 +634,32 @@ public struct ModelGenerationOutput: Equatable, Sendable {
     }
 }
 
+public struct ModelGenerationProgress: Equatable, Sendable {
+    public let outputCharacters: Int
+
+    public init(outputCharacters: Int) {
+        self.outputCharacters = max(outputCharacters, 0)
+    }
+}
+
 public protocol LocalLanguageModelService: Sendable {
     func generate(prompt: String) async throws -> ModelGenerationOutput
+    func generate(
+        prompt: String,
+        onProgress: @escaping @Sendable (ModelGenerationProgress) -> Void
+    ) async throws -> ModelGenerationOutput
+}
+
+public extension LocalLanguageModelService {
+    func generate(
+        prompt: String,
+        onProgress: @escaping @Sendable (ModelGenerationProgress) -> Void
+    ) async throws -> ModelGenerationOutput {
+        onProgress(ModelGenerationProgress(outputCharacters: 0))
+        let output = try await generate(prompt: prompt)
+        onProgress(ModelGenerationProgress(outputCharacters: output.text.count))
+        return output
+    }
 }
 
 public enum PromptBuilder {
@@ -796,8 +820,10 @@ public actor DraftProcessingService {
         signature: String,
         profileHint: String? = nil,
         glossary: [GlossaryTerm] = [],
-        suspects: [SuspectSpan] = []
+        suspects: [SuspectSpan] = [],
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void = { _ in }
     ) async -> DraftProcessingOutcome {
+        onProgress(.preparing)
         let language: CorrectionLanguage = transcript.range(
             of: #"\p{Han}"#,
             options: .regularExpression
@@ -811,7 +837,11 @@ public actor DraftProcessingService {
         if mode == .english {
             let chunks = Self.translationChunks(normalized)
             if chunks.count > 1 {
-                outcome = await processEnglishChunks(chunks, glossary: glossary)
+                outcome = await processEnglishChunks(
+                    chunks,
+                    glossary: glossary,
+                    onProgress: onProgress
+                )
             } else {
                 outcome = await processSingle(
                     transcript: normalized,
@@ -819,19 +849,24 @@ public actor DraftProcessingService {
                     signature: signature,
                     profileHint: profileHint,
                     glossary: glossary,
-                    suspects: suspects
+                    suspects: suspects,
+                    onProgress: onProgress
                 )
             }
+            onProgress(.validating)
             return Self.sanitizingEnglishOutput(outcome)
         }
-        return await processSingle(
+        outcome = await processSingle(
             transcript: normalized,
             mode: mode,
             signature: signature,
             profileHint: profileHint,
             glossary: glossary,
-            suspects: suspects
+            suspects: suspects,
+            onProgress: onProgress
         )
+        onProgress(.validating)
+        return outcome
     }
 
     /// English translation output must never carry the original Chinese. The
@@ -895,7 +930,8 @@ public actor DraftProcessingService {
 
     private func processEnglishChunks(
         _ chunks: [String],
-        glossary: [GlossaryTerm] = []
+        glossary: [GlossaryTerm] = [],
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void
     ) async -> DraftProcessingOutcome {
         var outputs: [String] = []
         var generations: [ModelGenerationOutput] = []
@@ -903,8 +939,21 @@ public actor DraftProcessingService {
         var totalSeconds = 0.0
         var generationAttempts = 0
 
-        for chunk in chunks {
-            let outcome = await processTranslationChunk(chunk)
+        for (index, chunk) in chunks.enumerated() {
+            let outcome = await processTranslationChunk(
+                chunk,
+                onProgress: { progress in
+                    let local = min(
+                        max((progress.fraction - 0.18) / 0.70, 0),
+                        1
+                    )
+                    let completed = (Double(index) + local)
+                        / Double(chunks.count)
+                    onProgress(ProcessingProgress(
+                        fraction: 0.18 + completed * 0.70
+                    ))
+                }
+            )
             outputs.append(outcome.result.outputText)
             if let generation = outcome.generation {
                 generations.append(generation)
@@ -931,7 +980,8 @@ public actor DraftProcessingService {
     }
 
     private func processTranslationChunk(
-        _ transcript: String
+        _ transcript: String,
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void
     ) async -> DraftProcessingOutcome {
         let clock = ContinuousClock()
         let start = clock.now
@@ -940,7 +990,13 @@ public actor DraftProcessingService {
             let first = try await Self.generate(
                 languageModel,
                 prompt: PromptBuilder.translationPrompt(transcript),
-                timeout: timeout
+                timeout: timeout,
+                estimatedCharacters: Self.estimatedGenerationCharacters(
+                    transcript: transcript,
+                    mode: .english
+                ),
+                attempt: 1,
+                onProgress: onProgress
             )
             if let translation = Self.validatedTranslation(
                 first.text,
@@ -961,7 +1017,13 @@ public actor DraftProcessingService {
                     transcript: transcript,
                     invalidOutput: first.text
                 ),
-                timeout: timeout
+                timeout: timeout,
+                estimatedCharacters: Self.estimatedGenerationCharacters(
+                    transcript: transcript,
+                    mode: .english
+                ),
+                attempt: 2,
+                onProgress: onProgress
             )
             if let translation = Self.validatedTranslation(
                 second.text,
@@ -999,7 +1061,8 @@ public actor DraftProcessingService {
         signature: String,
         profileHint: String? = nil,
         glossary: [GlossaryTerm] = [],
-        suspects: [SuspectSpan] = []
+        suspects: [SuspectSpan] = [],
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void
     ) async -> DraftProcessingOutcome {
         let clock = ContinuousClock()
         let start = clock.now
@@ -1019,7 +1082,13 @@ public actor DraftProcessingService {
             let first = try await Self.generate(
                 languageModel,
                 prompt: prompt,
-                timeout: timeout
+                timeout: timeout,
+                estimatedCharacters: Self.estimatedGenerationCharacters(
+                    transcript: transcript,
+                    mode: mode
+                ),
+                attempt: 1,
+                onProgress: onProgress
             )
             if let result = Self.validated(
                 first.text,
@@ -1047,7 +1116,13 @@ public actor DraftProcessingService {
                     originalPrompt: prompt,
                     invalidOutput: first.text
                 ),
-                timeout: timeout
+                timeout: timeout,
+                estimatedCharacters: Self.estimatedGenerationCharacters(
+                    transcript: transcript,
+                    mode: mode
+                ),
+                attempt: 2,
+                onProgress: onProgress
             )
             if let result = Self.validated(
                 repaired.text,
@@ -1382,13 +1457,25 @@ public actor DraftProcessingService {
     private static func generate(
         _ model: any LocalLanguageModelService,
         prompt: String,
-        timeout: Duration
+        timeout: Duration,
+        estimatedCharacters: Int,
+        attempt: Int,
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void
     ) async throws -> ModelGenerationOutput {
         try await withThrowingTaskGroup(
             of: ModelGenerationOutput.self
         ) { group in
             group.addTask {
-                try await model.generate(prompt: prompt)
+                try await model.generate(
+                    prompt: prompt,
+                    onProgress: { modelProgress in
+                        onProgress(.generating(
+                            outputCharacters: modelProgress.outputCharacters,
+                            estimatedCharacters: estimatedCharacters,
+                            attempt: attempt
+                        ))
+                    }
+                )
             }
             group.addTask {
                 try await Task.sleep(for: timeout)
@@ -1400,6 +1487,16 @@ public actor DraftProcessingService {
             group.cancelAll()
             return first
         }
+    }
+
+    private static func estimatedGenerationCharacters(
+        transcript: String,
+        mode: VoiceMode
+    ) -> Int {
+        let translatedText = mode == .english
+            ? transcript.count * 2
+            : transcript.count
+        return max(translatedText + 120, 160)
     }
 
     private static func seconds(

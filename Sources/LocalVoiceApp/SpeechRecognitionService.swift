@@ -19,6 +19,7 @@ final class SpeechRecognitionService {
     private var task: SFSpeechRecognitionTask?
     private var smoothedLevel: Float = 0
     private var tapInstalled = false
+    private let sessionGate = RecognitionSessionGate()
     private let logger = Logger(
         subsystem: "com.localvoice.app",
         category: "speech"
@@ -29,7 +30,8 @@ final class SpeechRecognitionService {
         onLevel: @escaping LevelHandler,
         onError: @escaping ErrorHandler
     ) throws {
-        stop()
+        cancel()
+        let session = sessionGate.begin()
 
         guard let recognizer = SFSpeechRecognizer(locale: Self.recognitionLocale),
               recognizer.isAvailable else {
@@ -48,7 +50,8 @@ final class SpeechRecognitionService {
 
         task = recognizer.recognitionTask(with: request) {
             [weak self] result, error in
-            if let result {
+            if let result,
+               self?.sessionGate.shouldDeliverResult(for: session) == true {
                 let text = result.bestTranscription.formattedString
                 self?.logger.info(
                     "Recognition result final=\(result.isFinal) characters=\(text.count)"
@@ -80,7 +83,8 @@ final class SpeechRecognitionService {
                 }
                 onPartial(text, result.isFinal, suspects)
             }
-            if let error {
+            if let error,
+               self?.sessionGate.shouldDeliverError(for: session) == true {
                 self?.logger.error(
                     "Recognition error: \(error.localizedDescription, privacy: .public)"
                 )
@@ -110,6 +114,7 @@ final class SpeechRecognitionService {
     }
 
     func stop() {
+        sessionGate.stopCurrent()
         if audioEngine.isRunning {
             audioEngine.stop()
         }
@@ -118,6 +123,7 @@ final class SpeechRecognitionService {
     }
 
     func cancel() {
+        sessionGate.cancelCurrent()
         if audioEngine.isRunning {
             audioEngine.stop()
         }

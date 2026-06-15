@@ -9,12 +9,58 @@ import Testing
     #expect(machine.handle(.completed) == .ready)
 }
 
+@Test func failedSessionCanStartListeningAgain() {
+    var machine = SessionStateMachine()
+    _ = machine.handle(.fail("No speech detected"))
+
+    #expect(machine.handle(.start(.english)) == .listening(.english))
+}
+
 @Test func switchingModeFinalizesCurrentSessionFirst() {
     var machine = SessionStateMachine()
     _ = machine.handle(.start(.dictation))
 
     #expect(machine.handle(.start(.english)) == .finalizing(.dictation))
     #expect(machine.pendingMode == .english)
+}
+
+@Test func intentionalRecognitionStopKeepsFinalResultsAndSuppressesErrors() {
+    let gate = RecognitionSessionGate()
+    let session = gate.begin()
+
+    gate.stop(session)
+
+    #expect(gate.shouldDeliverResult(for: session))
+    #expect(!gate.shouldDeliverError(for: session))
+}
+
+@Test func newRecognitionSessionRejectsCallbacksFromPreviousSession() {
+    let gate = RecognitionSessionGate()
+    let previous = gate.begin()
+    let current = gate.begin()
+
+    #expect(!gate.shouldDeliverResult(for: previous))
+    #expect(!gate.shouldDeliverError(for: previous))
+    #expect(gate.shouldDeliverResult(for: current))
+    #expect(gate.shouldDeliverError(for: current))
+}
+
+@Test func finishDuringRecordingStartupIsDeliveredAfterStartupCompletes() {
+    var gate = RecordingStartupGate()
+    let startup = gate.begin()
+
+    gate.requestFinish()
+
+    #expect(gate.actionWhenReady(for: startup) == .startThenFinish)
+}
+
+@Test func cancelledRecordingStartupIsDiscarded() {
+    var gate = RecordingStartupGate()
+    let startup = gate.begin()
+
+    gate.cancel()
+
+    #expect(gate.actionWhenReady(for: startup) == .discard)
 }
 
 @Test func selectedTextTranslationStartsProcessingWithoutRecording() {

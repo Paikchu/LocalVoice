@@ -454,6 +454,39 @@ import Testing
     #expect(outcome.result.corrections.count == 1)
 }
 
+@Test func draftProcessorReportsStreamingGenerationProgress() async {
+    let model = ProgressReportingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: """
+            {
+              "intent": "plainText",
+              "confidence": 0.99,
+              "outputText": "今天开始测试。",
+              "corrections": [],
+              "email": null
+            }
+            """
+        )
+    )
+    let recorder = ProgressRecorder()
+    let processor = DraftProcessingService(
+        languageModel: model,
+        timeout: .seconds(1)
+    )
+
+    _ = await processor.process(
+        transcript: "今天开始测试",
+        mode: .dictation,
+        signature: "",
+        onProgress: recorder.record
+    )
+
+    let values = recorder.values
+    #expect(values.first == ProcessingProgress.preparing.fraction)
+    #expect(values.contains { $0 > 0.18 && $0 < 0.88 })
+    #expect(values.last == ProcessingProgress.validating.fraction)
+}
+
 @Test func draftProcessorRevertsInvalidCorrectionWithUnrelatedWords() async {
     // "deploy" → "banana": phonetically unrelated → should be reverted
     let model = FakeLanguageModelService(
@@ -886,5 +919,41 @@ private actor FakeLanguageModelService: LocalLanguageModelService {
             throw TestModelError.failed
         }
         return responses.removeFirst()
+    }
+}
+
+private actor ProgressReportingLanguageModelService: LocalLanguageModelService {
+    private let response: ModelGenerationOutput
+
+    init(response: ModelGenerationOutput) {
+        self.response = response
+    }
+
+    func generate(prompt: String) async throws -> ModelGenerationOutput {
+        response
+    }
+
+    func generate(
+        prompt: String,
+        onProgress: @escaping @Sendable (ModelGenerationProgress) -> Void
+    ) async throws -> ModelGenerationOutput {
+        onProgress(ModelGenerationProgress(outputCharacters: 0))
+        onProgress(ModelGenerationProgress(outputCharacters: 80))
+        return response
+    }
+}
+
+private final class ProgressRecorder: @unchecked Sendable {
+    private let lock = NSLock()
+    private var storedValues: [Double] = []
+
+    var values: [Double] {
+        lock.withLock { storedValues }
+    }
+
+    func record(_ progress: ProcessingProgress) {
+        lock.withLock {
+            storedValues.append(progress.fraction)
+        }
     }
 }

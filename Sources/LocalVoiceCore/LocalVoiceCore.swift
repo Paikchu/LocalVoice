@@ -14,7 +14,7 @@ public enum FloatingBarLayout {
     public static let contentWidth: CGFloat = 314
     public static let glowPadding: CGFloat = 8
     public static let controlsHeight: CGFloat = 38
-    public static let capsuleWidth: CGFloat = 140
+    public static let capsuleWidth: CGFloat = 184
     public static let buttonDiameter: CGFloat = 28
     public static let barCount = 13
 
@@ -43,6 +43,122 @@ public enum FloatingBarLayout {
         let minHeight = textAreaHeight(forLines: previewMinLines)
         let maxHeight = textAreaHeight(forLines: previewMaxLines)
         return min(max(measured, minHeight), maxHeight)
+    }
+}
+
+public struct ProcessingProgress: Equatable, Sendable {
+    public let fraction: Double
+
+    public static let finalizing = Self(fraction: 0.06)
+    public static let preparing = Self(fraction: 0.14)
+    public static let validating = Self(fraction: 0.92)
+    public static let inserting = Self(fraction: 0.97)
+    public static let completed = Self(fraction: 1)
+
+    public static func generating(
+        outputCharacters: Int,
+        estimatedCharacters: Int,
+        attempt: Int
+    ) -> Self {
+        let normalized = min(
+            max(Double(outputCharacters) / Double(max(estimatedCharacters, 1)), 0),
+            1
+        )
+        let base = attempt > 1 ? 0.82 : 0.18
+        let span = attempt > 1 ? 0.06 : 0.64
+        return Self(fraction: base + normalized * span)
+    }
+
+    public init(fraction: Double) {
+        self.fraction = min(max(fraction, 0), 1)
+    }
+}
+
+public enum RecordingStartupAction: Equatable, Sendable {
+    case startListening
+    case startThenFinish
+    case discard
+}
+
+public struct RecordingStartupGate: Sendable {
+    private var generation = 0
+    private var activeGeneration: Int?
+    private var finishRequested = false
+
+    public init() {}
+
+    public mutating func begin() -> Int {
+        generation += 1
+        activeGeneration = generation
+        finishRequested = false
+        return generation
+    }
+
+    public mutating func requestFinish() {
+        guard activeGeneration != nil else { return }
+        finishRequested = true
+    }
+
+    public mutating func cancel() {
+        generation += 1
+        activeGeneration = nil
+        finishRequested = false
+    }
+
+    public mutating func actionWhenReady(
+        for startup: Int
+    ) -> RecordingStartupAction {
+        guard activeGeneration == startup else { return .discard }
+        activeGeneration = nil
+        return finishRequested ? .startThenFinish : .startListening
+    }
+}
+
+public final class RecognitionSessionGate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var currentSession = 0
+    private var stoppingSession: Int?
+
+    public init() {}
+
+    public func begin() -> Int {
+        lock.withLock {
+            currentSession += 1
+            stoppingSession = nil
+            return currentSession
+        }
+    }
+
+    public func stop(_ session: Int) {
+        lock.withLock {
+            guard session == currentSession else { return }
+            stoppingSession = session
+        }
+    }
+
+    public func stopCurrent() {
+        lock.withLock {
+            stoppingSession = currentSession
+        }
+    }
+
+    public func cancelCurrent() {
+        lock.withLock {
+            currentSession += 1
+            stoppingSession = nil
+        }
+    }
+
+    public func shouldDeliverResult(for session: Int) -> Bool {
+        lock.withLock {
+            session == currentSession
+        }
+    }
+
+    public func shouldDeliverError(for session: Int) -> Bool {
+        lock.withLock {
+            session == currentSession && stoppingSession != session
+        }
     }
 }
 
@@ -752,7 +868,8 @@ public struct SessionStateMachine: Sendable {
     @discardableResult
     public mutating func handle(_ event: SessionEvent) -> SessionState {
         switch (state, event) {
-        case (.ready, .start(let mode)):
+        case (.ready, .start(let mode)), (.failed, .start(let mode)):
+            pendingMode = nil
             state = .listening(mode)
         case (.ready, .translateSelection), (.failed, .translateSelection):
             pendingMode = nil

@@ -77,10 +77,18 @@ actor MLXLanguageModelService: LocalLanguageModelService {
     }
 
     func generate(prompt: String) async throws -> ModelGenerationOutput {
+        try await generate(prompt: prompt, onProgress: { _ in })
+    }
+
+    func generate(
+        prompt: String,
+        onProgress: @escaping @Sendable (ModelGenerationProgress) -> Void
+    ) async throws -> ModelGenerationOutput {
         guard let container else {
             throw LocalModelError.notLoaded
         }
 
+        onProgress(ModelGenerationProgress(outputCharacters: 0))
         let clock = ContinuousClock()
         let start = clock.now
         let input = try await container.prepare(input: UserInput(prompt: prompt))
@@ -108,6 +116,9 @@ actor MLXLanguageModelService: LocalLanguageModelService {
                     )
                 }
                 text += chunk
+                onProgress(ModelGenerationProgress(
+                    outputCharacters: text.count
+                ))
             case .info(let completion):
                 info = completion
             case .toolCall:

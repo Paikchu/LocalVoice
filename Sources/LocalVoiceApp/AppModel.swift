@@ -13,6 +13,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var statusMessage = "已就绪"
     @Published private(set) var permissionSummary = "等待权限"
     @Published private(set) var isTranslatingSelectedText = false
+    @Published private(set) var processingProgress: Double?
     @Published var recordingShortcut: VoiceMode?
     @Published var dictationShortcut: KeyboardShortcut
     @Published var englishShortcut: KeyboardShortcut
@@ -55,6 +56,9 @@ final class AppModel: ObservableObject {
     private var receivedTranscript = false
     private var pendingFinalizationTask: Task<Void, Never>?
     private var pendingProcessingTask: Task<Void, Never>?
+    private var pendingStartTask: Task<Void, Never>?
+    private var recordingStartupGate = RecordingStartupGate()
+    private var speechServiceStarted = false
     private let profileStore = UserProfileStore()
     private let logger = Logger(
         subsystem: "com.localvoice.app",
@@ -129,6 +133,9 @@ final class AppModel: ObservableObject {
     }
 
     func shutdown() {
+        recordingStartupGate.cancel()
+        speechServiceStarted = false
+        pendingStartTask?.cancel()
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
         insertionService.cancelPendingInsertion()
@@ -147,13 +154,16 @@ final class AppModel: ObservableObject {
             finish()
         case .listening(let activeMode):
             state = stateMachine.handle(.start(mode))
-            stopAndAwaitFinal(mode: activeMode)
+            requestFinalization(mode: activeMode)
         case .finalizing, .processing, .inserting:
             break
         }
     }
 
     func cancel() {
+        recordingStartupGate.cancel()
+        speechServiceStarted = false
+        pendingStartTask?.cancel()
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
         insertionService.cancelPendingInsertion()
@@ -164,6 +174,7 @@ final class AppModel: ObservableObject {
         latestRawTranscript = ""
         latestSuspects = []
         isTranslatingSelectedText = false
+        processingProgress = nil
         transcript = ""
         unstableTranscript = ""
         state = stateMachine.handle(.cancel)
@@ -174,11 +185,23 @@ final class AppModel: ObservableObject {
     func finish() {
         guard case .listening(let mode) = state else { return }
         state = stateMachine.handle(.finish)
+        requestFinalization(mode: mode)
+    }
+
+    private func requestFinalization(mode: VoiceMode) {
+        recordingStartupGate.requestFinish()
+        guard speechServiceStarted else {
+            statusMessage = "正在完成"
+            processingProgress = ProcessingProgress.finalizing.fraction
+            return
+        }
         stopAndAwaitFinal(mode: mode)
     }
 
     private func stopAndAwaitFinal(mode: VoiceMode) {
         statusMessage = "正在完成"
+        processingProgress = ProcessingProgress.finalizing.fraction
+        speechServiceStarted = false
         speechService.stop()
         pendingFinalizationTask?.cancel()
         pendingFinalizationTask = Task { @MainActor [weak self] in
@@ -241,21 +264,43 @@ final class AppModel: ObservableObject {
     }
 
     private func begin(_ mode: VoiceMode) {
+        pendingStartTask?.cancel()
+        let startup = recordingStartupGate.begin()
+        speechServiceStarted = false
         isTranslatingSelectedText = false
+        processingProgress = nil
         insertionService.captureTarget()
+        state = stateMachine.handle(.start(mode))
+        statusMessage = "正在准备"
+        transcript = ""
+        unstableTranscript = ""
+        latestRawTranscript = ""
+        peakAudioLevel = 0
+        receivedTranscript = false
+        projection.reset()
+        recognitionAccumulator.reset()
+        draft = DictationDraft()
+        panelController.show(mode: mode)
 
-        Task {
+        pendingStartTask = Task { @MainActor [weak self] in
+            guard let self else { return }
             let recordingGranted =
                 await PermissionCoordinator.requestRecording()
             let insertionGranted = PermissionCoordinator.accessibilityGranted
             permissionSummary = PermissionCoordinator.summary
             hotkeyController.start()
+            guard !Task.isCancelled else {
+                return
+            }
+            let startupAction = recordingStartupGate.actionWhenReady(
+                for: startup
+            )
+            guard startupAction != .discard else { return }
             guard recordingGranted else {
                 fail("需要麦克风和语音识别权限")
                 return
             }
 
-            state = stateMachine.handle(.start(mode))
             if insertionGranted {
                 statusMessage = mode == .dictation
                     ? "正在听写"
@@ -263,16 +308,6 @@ final class AppModel: ObservableObject {
             } else {
                 statusMessage = "正在录音，未授权文本输入"
             }
-            transcript = ""
-            unstableTranscript = ""
-            latestRawTranscript = ""
-            peakAudioLevel = 0
-            receivedTranscript = false
-            projection.reset()
-            recognitionAccumulator.reset()
-            draft = DictationDraft()
-            panelController.show(mode: mode)
-
             do {
                 try speechService.start(
                     onPartial: { [weak self] text, isFinal, suspects in
@@ -295,7 +330,12 @@ final class AppModel: ObservableObject {
                         }
                     }
                 )
+                speechServiceStarted = true
+                if startupAction == .startThenFinish {
+                    stopAndAwaitFinal(mode: mode)
+                }
             } catch {
+                speechServiceStarted = false
                 fail(error.localizedDescription)
             }
         }
@@ -372,6 +412,9 @@ final class AppModel: ObservableObject {
         state = stateMachine.handle(.insertionCompleted)
         statusMessage = message
         isTranslatingSelectedText = false
+        processingProgress = message == "已完成"
+            ? ProcessingProgress.completed.fraction
+            : nil
         panelController.hide(after: delay)
 
         if case .listening(let pendingMode) = state {
@@ -387,6 +430,7 @@ final class AppModel: ObservableObject {
         }
         state = stateMachine.handle(.finalTranscriptReady)
         statusMessage = modelManager.isReady ? "正在本地整理" : "正在基础整理"
+        processingProgress = ProcessingProgress.preparing.fraction
         unstableTranscript = ""
 
         pendingProcessingTask?.cancel()
@@ -407,7 +451,8 @@ final class AppModel: ObservableObject {
                 signature: signature,
                 profileHint: profileHintText,
                 glossary: glossaryForNormalizer,
-                suspects: latestSuspects
+                suspects: latestSuspects,
+                onProgress: processingProgressHandler()
             )
             guard !Task.isCancelled else { return }
 
@@ -423,6 +468,7 @@ final class AppModel: ObservableObject {
             statusMessage = outcome.usedFallback
                 ? "模型不可用，已使用基础整理"
                 : "正在写入"
+            processingProgress = ProcessingProgress.inserting.fraction
             insertionService.insert(formatted) { [weak self] result in
                 guard let self else { return }
                 switch result {
@@ -452,8 +498,12 @@ final class AppModel: ObservableObject {
     }
 
     private func fail(_ message: String) {
+        recordingStartupGate.cancel()
+        speechServiceStarted = false
+        pendingStartTask?.cancel()
         insertionService.cancelPendingInsertion()
         speechService.cancel()
+        processingProgress = nil
         state = stateMachine.handle(.fail(message))
         statusMessage = message
         panelController.showError()
@@ -511,6 +561,7 @@ final class AppModel: ObservableObject {
         pendingProcessingTask?.cancel()
         insertionService.captureTarget(capture.request.target)
         isTranslatingSelectedText = true
+        processingProgress = ProcessingProgress.preparing.fraction
         transcript = capture.request.sourceText
         unstableTranscript = ""
         state = stateMachine.handle(.translateSelection)
@@ -532,7 +583,8 @@ final class AppModel: ObservableObject {
                 transcript: capture.request.sourceText,
                 mode: .english,
                 signature: "",
-                glossary: glossary
+                glossary: glossary,
+                onProgress: processingProgressHandler()
             )
             guard !Task.isCancelled else { return }
             guard let replacement = SelectedTextTranslationValidator.replacement(
@@ -553,6 +605,7 @@ final class AppModel: ObservableObject {
             transcript = normalized.plainText
             state = stateMachine.handle(.processingSucceeded)
             statusMessage = "正在替换选中文本"
+            processingProgress = ProcessingProgress.inserting.fraction
             insertionService.insert(
                 formatted,
                 requiring: capture
@@ -577,6 +630,19 @@ final class AppModel: ObservableObject {
         let recognizer = NLLanguageRecognizer()
         recognizer.processString(text)
         return recognizer.dominantLanguage == .english ? .english : .chinese
+    }
+
+    private func processingProgressHandler()
+        -> @Sendable (ProcessingProgress) -> Void {
+        { [weak self] progress in
+            Task { @MainActor in
+                guard let self else { return }
+                self.processingProgress = max(
+                    self.processingProgress ?? 0,
+                    progress.fraction
+                )
+            }
+        }
     }
 
     private func setShortcut(_ shortcut: KeyboardShortcut, for mode: VoiceMode) {

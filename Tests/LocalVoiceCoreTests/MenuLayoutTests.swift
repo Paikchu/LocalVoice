@@ -15,9 +15,53 @@ import Testing
     #expect(FloatingBarLayout.height == 184)
     #expect(FloatingBarLayout.contentWidth == 314)
     #expect(FloatingBarLayout.controlsHeight == 38)
-    #expect(FloatingBarLayout.capsuleWidth == 140)
+    #expect(FloatingBarLayout.capsuleWidth == 184)
     #expect(FloatingBarLayout.buttonDiameter == 28)
     #expect(FloatingBarLayout.barCount == 13)
+}
+
+@Test func processingProgressUsesStablePhaseRanges() {
+    #expect(ProcessingProgress.finalizing.fraction == 0.06)
+    #expect(ProcessingProgress.preparing.fraction == 0.14)
+    #expect(ProcessingProgress.validating.fraction == 0.92)
+    #expect(ProcessingProgress.inserting.fraction == 0.97)
+    #expect(ProcessingProgress.completed.fraction == 1)
+}
+
+@Test func generationProgressAdvancesWithoutCompletingEarly() {
+    let start = ProcessingProgress.generating(
+        outputCharacters: 0,
+        estimatedCharacters: 200,
+        attempt: 1
+    )
+    let midpoint = ProcessingProgress.generating(
+        outputCharacters: 100,
+        estimatedCharacters: 200,
+        attempt: 1
+    )
+    let oversized = ProcessingProgress.generating(
+        outputCharacters: 1_000,
+        estimatedCharacters: 200,
+        attempt: 1
+    )
+    let retry = ProcessingProgress.generating(
+        outputCharacters: 0,
+        estimatedCharacters: 200,
+        attempt: 2
+    )
+    let completedRetry = ProcessingProgress.generating(
+        outputCharacters: 1_000,
+        estimatedCharacters: 200,
+        attempt: 2
+    )
+
+    #expect(start.fraction == 0.18)
+    #expect(midpoint.fraction > start.fraction)
+    #expect(abs(oversized.fraction - 0.82) < 0.001)
+    #expect(retry.fraction >= midpoint.fraction)
+    #expect(abs(retry.fraction - oversized.fraction) < 0.001)
+    #expect(abs(completedRetry.fraction - 0.88) < 0.001)
+    #expect(completedRetry.fraction < ProcessingProgress.validating.fraction)
 }
 
 @Test func previewTextAreaClampsBetweenTwoAndFiveLines() {
