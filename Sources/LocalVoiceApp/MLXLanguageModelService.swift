@@ -26,14 +26,29 @@ actor MLXLanguageModelService:
 
     private let cache: HubCache
     private let hubClient: HubClient
+    private let storage: ManagedModelStorage
     private var container: ModelContainer?
     private(set) var lastLoadSeconds: Double = 0
 
     init(
         cacheDirectory: URL = MLXLanguageModelService.defaultCacheDirectory
     ) {
-        cache = HubCache(cacheDirectory: cacheDirectory)
-        hubClient = HubClient(cache: cache)
+        let resolvedCache = HubCache(cacheDirectory: cacheDirectory)
+        cache = resolvedCache
+        hubClient = HubClient(cache: resolvedCache)
+        let repositoryDirectoryName: String
+        if let repo = Repo.ID(rawValue: Self.modelID) {
+            repositoryDirectoryName = resolvedCache.repoDirectory(
+                repo: repo,
+                kind: .model
+            ).lastPathComponent
+        } else {
+            repositoryDirectoryName = "models--mlx-community--Qwen3-4B-Instruct-2507-4bit"
+        }
+        storage = ManagedModelStorage(
+            rootDirectory: cacheDirectory,
+            repositoryDirectoryName: repositoryDirectoryName
+        )
     }
 
     func availability() async -> LanguageModelBackendAvailability {
@@ -88,11 +103,7 @@ actor MLXLanguageModelService:
 
     func removeFiles() throws {
         container = nil
-        guard let repo = Repo.ID(rawValue: Self.modelID) else { return }
-        let directory = cache.repoDirectory(repo: repo, kind: .model)
-        if FileManager.default.fileExists(atPath: directory.path) {
-            try FileManager.default.removeItem(at: directory)
-        }
+        try storage.removeArtifacts()
     }
 
     func generate(prompt: String) async throws -> ModelGenerationOutput {

@@ -113,6 +113,7 @@ private struct ModelSettingsView: View {
     @ObservedObject var model: AppModel
     @ObservedObject private var manager: LocalModelManager
     @State private var showsClearConfirmation = false
+    @State private var showsModelRemovalConfirmation = false
 
     init(model: AppModel) {
         self.model = model
@@ -194,6 +195,18 @@ private struct ModelSettingsView: View {
         } message: {
             Text("画像、模型、邮件签名和快捷键设置都会被删除。系统权限需在系统设置中单独撤销。")
         }
+        .confirmationDialog(
+            "移除 Qwen 模型？",
+            isPresented: $showsModelRemovalConfirmation,
+            titleVisibility: .visible
+        ) {
+            Button("移除模型", role: .destructive) {
+                manager.remove()
+            }
+            Button("取消", role: .cancel) {}
+        } message: {
+            Text("将释放约 2.3 GB 空间。之后可随时重新下载。")
+        }
     }
 
     @ViewBuilder
@@ -210,15 +223,19 @@ private struct ModelSettingsView: View {
                 ProgressView()
                     .controlSize(.small)
             case .ready:
-                Button("移除") {
-                    manager.remove()
+                Button("移除", role: .destructive) {
+                    showsModelRemovalConfirmation = true
                 }
                 .buttonStyle(.bordered)
                 .controlSize(.small)
+                .disabled(!model.canChangeLanguageModelBackend)
+            case .removing:
+                ProgressView()
+                    .controlSize(.small)
             }
         } else {
             switch manager.state {
-            case .loading:
+            case .loading, .removing:
                 ProgressView()
                     .controlSize(.small)
             case .ready:

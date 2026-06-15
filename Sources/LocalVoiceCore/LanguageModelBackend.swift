@@ -70,6 +70,81 @@ public enum LanguageModelBackendAvailability: Equatable, Sendable {
     case unavailable(String)
 }
 
+public enum LanguageModelLifecycleState: Equatable, Sendable {
+    case notInstalled
+    case downloading(Double)
+    case loading
+    case ready
+    case removing
+    case unavailable(String)
+    case failed(String)
+
+    public var isBusy: Bool {
+        switch self {
+        case .downloading, .loading, .removing:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public var allowsDownload: Bool {
+        switch self {
+        case .notInstalled, .unavailable, .failed:
+            return true
+        default:
+            return false
+        }
+    }
+
+    public var allowsRemoval: Bool {
+        self == .ready
+    }
+}
+
+public struct ManagedModelStorage: Sendable {
+    public let rootDirectory: URL
+    public let repositoryDirectoryName: String
+
+    public init(
+        rootDirectory: URL,
+        repositoryDirectoryName: String
+    ) {
+        self.rootDirectory = rootDirectory
+        self.repositoryDirectoryName = repositoryDirectoryName
+    }
+
+    public var artifactDirectories: [URL] {
+        [
+            rootDirectory.appendingPathComponent(
+                repositoryDirectoryName,
+                isDirectory: true
+            ),
+            rootDirectory
+                .appendingPathComponent(".metadata", isDirectory: true)
+                .appendingPathComponent(
+                    repositoryDirectoryName,
+                    isDirectory: true
+                ),
+            rootDirectory
+                .appendingPathComponent(".locks", isDirectory: true)
+                .appendingPathComponent(
+                    repositoryDirectoryName,
+                    isDirectory: true
+                )
+        ]
+    }
+
+    public func removeArtifacts(
+        fileManager: FileManager = .default
+    ) throws {
+        for directory in artifactDirectories
+        where fileManager.fileExists(atPath: directory.path) {
+            try fileManager.removeItem(at: directory)
+        }
+    }
+}
+
 public protocol ManagedLanguageModelAsset: Sendable {
     func isInstalled() async -> Bool
     func removeFiles() async throws

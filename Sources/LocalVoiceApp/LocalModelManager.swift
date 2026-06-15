@@ -4,16 +4,8 @@ import LocalVoiceCore
 
 @MainActor
 final class LocalModelManager: ObservableObject {
-    enum State: Equatable {
-        case notInstalled
-        case downloading(Double)
-        case loading
-        case ready
-        case unavailable(String)
-        case failed(String)
-    }
-
-    @Published private(set) var state: State = .notInstalled
+    @Published private(set) var state: LanguageModelLifecycleState =
+        .notInstalled
     @Published private(set) var lastLoadSeconds: Double = 0
     @Published private(set) var selectedBackend: LanguageModelBackendKind
     @Published private(set) var descriptor: LanguageModelBackendDescriptor
@@ -55,6 +47,8 @@ final class LocalModelManager: ObservableObject {
             return "正在准备"
         case .ready:
             return "已就绪"
+        case .removing:
+            return "正在移除"
         case .unavailable(let reason):
             return reason
         case .failed(let message):
@@ -67,12 +61,7 @@ final class LocalModelManager: ObservableObject {
     }
 
     var isBusy: Bool {
-        switch state {
-        case .downloading, .loading:
-            return true
-        default:
-            return false
-        }
+        state.isBusy
     }
 
     var managesDownload: Bool {
@@ -109,7 +98,9 @@ final class LocalModelManager: ObservableObject {
     }
 
     func download() {
-        guard task == nil, selectedBackend == .qwen else { return }
+        guard task == nil,
+              selectedBackend == .qwen,
+              state.allowsDownload else { return }
         task = Task { [weak self] in
             guard let self else { return }
             await prepareSelectedBackend(download: true)
@@ -118,10 +109,14 @@ final class LocalModelManager: ObservableObject {
     }
 
     func remove() {
-        guard task == nil, selectedBackend == .qwen else { return }
+        guard task == nil,
+              selectedBackend == .qwen,
+              state.allowsRemoval else { return }
+        state = .removing
         task = Task { [weak self] in
             guard let self else { return }
             do {
+                await qwenBackend.unload()
                 try await removeQwenFiles()
             } catch {}
             task = nil

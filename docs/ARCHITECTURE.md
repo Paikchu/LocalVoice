@@ -162,7 +162,8 @@ ready ──start(mode)──▶ listening(mode) ──finish──▶ finalizin
 ### 4.5 本地模型（`MLXLanguageModelService` + `LocalModelManager`）
 
 - 模型：`mlx-community/Qwen3-4B-Instruct-2507-4bit`，经 HuggingFace Hub 下载到 `~/Library/Application Support/LocalVoice/Models`。
-- `LocalModelManager` 维护 `notInstalled / downloading(%) / loading / ready / failed` 状态，App 启动时 `preloadIfInstalled()` 预热。
+- `LocalModelManager` 维护下载、加载、移除和失败状态，App 启动时 `preloadIfInstalled()` 预热。
+- 用户可在菜单栏移除 Qwen；删除范围包含模型仓库、下载元数据和锁文件，不影响个性化数据。
 - 生成参数：`maxTokens 2048, temperature 0.1, topP 0.9, repetitionPenalty 1.05`，流式累积。
 - 通过 `LocalLanguageModelService` 协议与 Core 解耦——测试里可注入假模型，无需真跑 LLM。
 
