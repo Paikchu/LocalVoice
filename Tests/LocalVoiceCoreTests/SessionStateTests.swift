@@ -17,6 +17,21 @@ import Testing
     #expect(machine.pendingMode == .english)
 }
 
+@Test func selectedTextTranslationStartsProcessingWithoutRecording() {
+    var machine = SessionStateMachine()
+
+    #expect(machine.handle(.translateSelection) == .processing(.english))
+    #expect(machine.handle(.processingSucceeded) == .inserting(.english))
+    #expect(machine.handle(.insertionCompleted) == .ready)
+}
+
+@Test func selectedTextTranslationCanRestartFromFailedState() {
+    var machine = SessionStateMachine()
+    _ = machine.handle(.fail("模型未就绪"))
+
+    #expect(machine.handle(.translateSelection) == .processing(.english))
+}
+
 @Test func insertionTargetIsCapturedBeforePermissionRequests() {
     var session = DictationStartSequence()
 

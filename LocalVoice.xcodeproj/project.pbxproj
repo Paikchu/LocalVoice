@@ -47,6 +47,7 @@
 		AA10C8BB61828C34340CEE0C /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 9A57761C9CCBB4A614AFF358 /* MLXLLM */; };
 		B45D73B2CE9161822FEECF9F /* MLXLanguageModelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B87DA56156CD2C77803C6B4 /* MLXLanguageModelService.swift */; };
 		B75C19B4A8B8BF42356B4563 /* BenchmarkMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7287ED176155B19A0F9F1467 /* BenchmarkMain.swift */; };
+		C2B66D6A7881E01BBF012A86 /* SelectedTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B4F6F93EDDD8445A60F533 /* SelectedTextService.swift */; };
 		C4E3EAD3D3F7D8DFBB52E8CC /* TextCorrectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3DB361EC2D1D541183C090 /* TextCorrectorTests.swift */; };
 		CB83EAC35115E05CAC2C1A21 /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
 		EA9E2AF6C009FB6715C1BCEE /* LocalVoiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD179A5E622E1C843E35529 /* LocalVoiceApp.swift */; };
@@ -112,6 +113,7 @@
 		2FD5E01F621E2042802939BB /* DraftProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftProcessing.swift; sourceTree = "<group>"; };
 		3259A7A83FAC9D96EF3333DF /* UserProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileStore.swift; sourceTree = "<group>"; };
 		3FD179A5E622E1C843E35529 /* LocalVoiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalVoiceApp.swift; sourceTree = "<group>"; };
+		42B4F6F93EDDD8445A60F533 /* SelectedTextService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedTextService.swift; sourceTree = "<group>"; };
 		45D9EAA3A66CAB9EE681AF42 /* DictationDraftTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DictationDraftTests.swift; sourceTree = "<group>"; };
 		4A503E9D5A550BED20D4235D /* LocalModelManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalModelManager.swift; sourceTree = "<group>"; };
 		4C0DA50BD1EA18D20A2231DE /* MenuBarContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarContentView.swift; sourceTree = "<group>"; };
@@ -276,6 +278,7 @@
 				4C0DA50BD1EA18D20A2231DE /* MenuBarContentView.swift */,
 				2B87DA56156CD2C77803C6B4 /* MLXLanguageModelService.swift */,
 				57EEE4D953B75BE90C1870BC /* PermissionCoordinator.swift */,
+				42B4F6F93EDDD8445A60F533 /* SelectedTextService.swift */,
 				5F259ADAA666D33E535A2055 /* SpeechRecognitionService.swift */,
 				A3D7370DB2EBE07647F38035 /* TextInsertionService.swift */,
 			);
@@ -471,6 +474,7 @@
 				B45D73B2CE9161822FEECF9F /* MLXLanguageModelService.swift in Sources */,
 				348DEF118933BB4100608C4B /* MenuBarContentView.swift in Sources */,
 				2234D5AA07C355F1D91C7987 /* PermissionCoordinator.swift in Sources */,
+				C2B66D6A7881E01BBF012A86 /* SelectedTextService.swift in Sources */,
 				4BFD1E230C545CF6E1493C59 /* SpeechRecognitionService.swift in Sources */,
 				FB6E79B4CBB20A58C4FF1479 /* TextInsertionService.swift in Sources */,
 			);
