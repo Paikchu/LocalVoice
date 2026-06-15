@@ -269,6 +269,26 @@ public enum TextInsertionRoute: Equatable, Sendable {
     case pasteboard
 }
 
+public enum TextInsertionDestination: Equatable, Sendable {
+    case target
+    case clipboard
+}
+
+public enum TextInsertionPolicy {
+    public static func destination(
+        accessibilityGranted: Bool,
+        requiresCurrentSelection: Bool,
+        selectionIsCurrent: Bool,
+        cursorIsAvailable: Bool
+    ) -> TextInsertionDestination {
+        guard accessibilityGranted else { return .clipboard }
+        if requiresCurrentSelection {
+            return selectionIsCurrent ? .target : .clipboard
+        }
+        return cursorIsAvailable ? .target : .clipboard
+    }
+}
+
 public struct ConfirmedInsertionRequest: Equatable, Sendable {
     public let text: String
     public let target: InsertionTarget
@@ -292,6 +312,72 @@ public struct ConfirmedInsertionRequest: Equatable, Sendable {
         target.requiresActivation(
             currentApplicationPID: currentApplicationPID
         )
+    }
+}
+
+public struct SelectedTextTranslationRequest: Equatable, Sendable {
+    public let sourceText: String
+    public let target: InsertionTarget
+    private let selectedText: String
+    private let leadingWhitespace: String
+    private let trailingWhitespace: String
+
+    public init?(selectedText: String, target: InsertionTarget) {
+        let sourceText = selectedText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+        guard !sourceText.isEmpty,
+              sourceText.range(
+                of: #"\p{Han}"#,
+                options: .regularExpression
+              ) != nil else {
+            return nil
+        }
+        self.sourceText = sourceText
+        self.target = target
+        self.selectedText = selectedText
+        self.leadingWhitespace = String(
+            selectedText.prefix(while: \.isWhitespace)
+        )
+        self.trailingWhitespace = String(
+            selectedText.reversed().prefix(while: \.isWhitespace).reversed()
+        )
+    }
+
+    public func matchesCurrentSelection(_ text: String?) -> Bool {
+        text == selectedText
+    }
+
+    public func replacementText(for translation: String) -> String {
+        leadingWhitespace + translation + trailingWhitespace
+    }
+
+    public func canReplace(
+        currentApplicationPID: Int32?,
+        currentSelectedText: String?
+    ) -> Bool {
+        currentApplicationPID == target.applicationPID
+            && matchesCurrentSelection(currentSelectedText)
+    }
+}
+
+public enum SelectedTextTranslationValidator {
+    public static func replacement(
+        output: String,
+        usedFallback: Bool
+    ) -> String? {
+        let replacement = output.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        )
+        guard !usedFallback,
+              !replacement.isEmpty,
+              replacement.range(
+                of: #"\p{Han}"#,
+                options: .regularExpression
+              ) == nil else {
+            return nil
+        }
+        return replacement
     }
 }
 
@@ -646,6 +732,7 @@ public enum SessionState: Equatable, Sendable {
 
 public enum SessionEvent: Equatable, Sendable {
     case start(VoiceMode)
+    case translateSelection
     case finish
     case finalTranscriptReady
     case processingSucceeded
@@ -667,6 +754,9 @@ public struct SessionStateMachine: Sendable {
         switch (state, event) {
         case (.ready, .start(let mode)):
             state = .listening(mode)
+        case (.ready, .translateSelection), (.failed, .translateSelection):
+            pendingMode = nil
+            state = .processing(.english)
         case (.listening(let mode), .start(let nextMode)) where mode != nextMode:
             pendingMode = nextMode
             state = .finalizing(mode)

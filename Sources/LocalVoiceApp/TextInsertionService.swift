@@ -2,6 +2,12 @@ import AppKit
 import LocalVoiceCore
 import OSLog
 
+enum TextInsertionResult {
+    case inserted
+    case copiedToClipboard
+    case failed
+}
+
 @MainActor
 final class TextInsertionService {
     private var target: InsertionTarget?
@@ -24,32 +30,77 @@ final class TextInsertionService {
         )
     }
 
+    func captureTarget(_ target: InsertionTarget) {
+        pendingInsertionTask?.cancel()
+        pendingInsertionTask = nil
+        self.target = target
+        logger.info("Captured insertion target pid=\(target.applicationPID)")
+    }
+
+    func cancelPendingInsertion() {
+        pendingInsertionTask?.cancel()
+        pendingInsertionTask = nil
+    }
+
     func insert(
         _ document: FormattedDocument,
-        completion: @escaping (Bool) -> Void
+        requiring selection: SelectedTextCapture? = nil,
+        completion: @escaping (TextInsertionResult) -> Void
     ) {
         let text = document.plainText
-        guard !text.isEmpty, let target else {
-            completion(false)
+        guard !text.isEmpty else {
+            completion(.failed)
+            return
+        }
+        guard let target else {
+            completion(
+                copyToClipboard(document)
+                    ? .copiedToClipboard
+                    : .failed
+            )
             return
         }
         let request = ConfirmedInsertionRequest(text: text, target: target)
-        guard request.canAttemptInsertion(
-            accessibilityGranted: PermissionCoordinator.accessibilityGranted
-        ) else {
-            logger.error("Insertion blocked: Accessibility permission missing")
+        let accessibilityGranted = PermissionCoordinator.accessibilityGranted
+        if !request.canAttemptInsertion(
+            accessibilityGranted: accessibilityGranted
+        ) {
+            logger.notice(
+                "Target insertion unavailable: Accessibility permission missing"
+            )
             _ = PermissionCoordinator.requestAccessibility()
-            completion(false)
+            completion(
+                copyToClipboard(document)
+                    ? .copiedToClipboard
+                    : .failed
+            )
             return
         }
         let currentPID = NSWorkspace.shared.frontmostApplication?
             .processIdentifier
 
+        if let selection,
+           !selection.isCurrent(currentApplicationPID: currentPID) {
+            logger.notice(
+                "Target insertion unavailable: selected text changed"
+            )
+            completion(
+                copyToClipboard(document)
+                    ? .copiedToClipboard
+                    : .failed
+            )
+            return
+        }
+
         if request.requiresActivation(currentApplicationPID: currentPID) {
             guard let application = NSRunningApplication(
                 processIdentifier: target.applicationPID
             ) else {
-                completion(false)
+                completion(
+                    copyToClipboard(document)
+                        ? .copiedToClipboard
+                        : .failed
+                )
                 return
             }
             application.activate()
@@ -59,33 +110,100 @@ final class TextInsertionService {
         pendingInsertionTask = Task { @MainActor [weak self] in
             try? await Task.sleep(for: .milliseconds(100))
             guard !Task.isCancelled else { return }
-            self?.logger.info(
+            let currentPID = NSWorkspace.shared.frontmostApplication?
+                .processIdentifier
+            guard let self else { return }
+            let selectionIsCurrent = selection?.isCurrent(
+                currentApplicationPID: currentPID
+            ) ?? true
+            let cursorIsAvailable = selection != nil
+                || self.cursorIsAvailable(for: target.applicationPID)
+            let destination = TextInsertionPolicy.destination(
+                accessibilityGranted:
+                    PermissionCoordinator.accessibilityGranted,
+                requiresCurrentSelection: selection != nil,
+                selectionIsCurrent: selectionIsCurrent,
+                cursorIsAvailable: cursorIsAvailable
+            )
+            if destination == .clipboard {
+                self.logger.notice(
+                    "Target insertion unavailable: copying result to clipboard"
+                )
+                self.pendingInsertionTask = nil
+                completion(
+                    self.copyToClipboard(document)
+                        ? .copiedToClipboard
+                        : .failed
+                )
+                return
+            }
+            self.logger.info(
                 "Inserting confirmed transcript characters=\(text.count)"
             )
-            self?.paste(document)
-            self?.pendingInsertionTask = nil
+            guard self.paste(document) else {
+                self.pendingInsertionTask = nil
+                completion(.failed)
+                return
+            }
+            self.pendingInsertionTask = nil
             try? await Task.sleep(for: .milliseconds(120))
             guard !Task.isCancelled else { return }
-            completion(true)
+            completion(.inserted)
         }
     }
 
-    private func paste(_ document: FormattedDocument) {
+    private func cursorIsAvailable(for applicationPID: Int32) -> Bool {
+        let systemWide = AXUIElementCreateSystemWide()
+        var focusedValue: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            systemWide,
+            kAXFocusedUIElementAttribute as CFString,
+            &focusedValue
+        ) == .success,
+              let focusedValue,
+              CFGetTypeID(focusedValue) == AXUIElementGetTypeID() else {
+            return false
+        }
+        let element = unsafeDowncast(focusedValue, to: AXUIElement.self)
+        var pid: pid_t = 0
+        guard AXUIElementGetPid(element, &pid) == .success,
+              pid == applicationPID else {
+            return false
+        }
+
+        var selectedRangeValue: CFTypeRef?
+        guard AXUIElementCopyAttributeValue(
+            element,
+            kAXSelectedTextRangeAttribute as CFString,
+            &selectedRangeValue
+        ) == .success,
+              let selectedRangeValue,
+              CFGetTypeID(selectedRangeValue) == AXValueGetTypeID() else {
+            return false
+        }
+        let axRange = unsafeDowncast(selectedRangeValue, to: AXValue.self)
+        var range = CFRange()
+        return AXValueGetValue(axRange, .cfRange, &range)
+    }
+
+    private func copyToClipboard(_ document: FormattedDocument) -> Bool {
+        restoreTask?.cancel()
+        restoreTask = nil
+        pendingPasteboardItems = nil
+        return write(document, to: NSPasteboard.general) != nil
+    }
+
+    private func paste(_ document: FormattedDocument) -> Bool {
         let pasteboard = NSPasteboard.general
         if pendingPasteboardItems == nil {
             pendingPasteboardItems = pasteboard.pasteboardItems?
                 .map(PasteboardItemSnapshot.init)
         }
         restoreTask?.cancel()
-        pasteboard.clearContents()
-        let item = NSPasteboardItem()
-        item.setString(document.plainText, forType: .string)
-        item.setData(Data(document.html.utf8), forType: .html)
-        if let rtf = Self.rtfData(for: document.plainText) {
-            item.setData(rtf, forType: .rtf)
+        guard let insertionChangeCount = write(document, to: pasteboard) else {
+            pendingPasteboardItems = nil
+            return false
         }
-        pasteboard.writeObjects([item])
-        let insertionChangeCount = pasteboard.changeCount
 
         let source = CGEventSource(stateID: .combinedSessionState)
         let keyDown = CGEvent(
@@ -116,6 +234,22 @@ final class TextInsertionService {
             self?.pendingPasteboardItems = nil
             self?.restoreTask = nil
         }
+        return true
+    }
+
+    private func write(
+        _ document: FormattedDocument,
+        to pasteboard: NSPasteboard
+    ) -> Int? {
+        pasteboard.clearContents()
+        let item = NSPasteboardItem()
+        item.setString(document.plainText, forType: .string)
+        item.setData(Data(document.html.utf8), forType: .html)
+        if let rtf = Self.rtfData(for: document.plainText) {
+            item.setData(rtf, forType: .rtf)
+        }
+        guard pasteboard.writeObjects([item]) else { return nil }
+        return pasteboard.changeCount
     }
 
     private static func rtfData(for text: String) -> Data? {

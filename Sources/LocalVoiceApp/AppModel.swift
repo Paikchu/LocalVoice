@@ -12,6 +12,7 @@ final class AppModel: ObservableObject {
     @Published private(set) var audioLevel: Float = 0
     @Published private(set) var statusMessage = "已就绪"
     @Published private(set) var permissionSummary = "等待权限"
+    @Published private(set) var isTranslatingSelectedText = false
     @Published var recordingShortcut: VoiceMode?
     @Published var dictationShortcut: KeyboardShortcut
     @Published var englishShortcut: KeyboardShortcut
@@ -45,6 +46,7 @@ final class AppModel: ObservableObject {
     private let speechService = SpeechRecognitionService()
     private let hotkeyController = HotkeyController()
     private let insertionService = TextInsertionService()
+    private let selectedTextService = SelectedTextService()
     private let panelController = FloatingPanelController()
     private let processingService: DraftProcessingService
     private var latestRawTranscript = ""
@@ -129,6 +131,7 @@ final class AppModel: ObservableObject {
     func shutdown() {
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
+        insertionService.cancelPendingInsertion()
         speechService.stop()
         hotkeyController.stop()
         panelController.hide()
@@ -153,12 +156,14 @@ final class AppModel: ObservableObject {
     func cancel() {
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
+        insertionService.cancelPendingInsertion()
         speechService.cancel()
         projection.reset()
         recognitionAccumulator.reset()
         draft.cancel()
         latestRawTranscript = ""
         latestSuspects = []
+        isTranslatingSelectedText = false
         transcript = ""
         unstableTranscript = ""
         state = stateMachine.handle(.cancel)
@@ -236,6 +241,7 @@ final class AppModel: ObservableObject {
     }
 
     private func begin(_ mode: VoiceMode) {
+        isTranslatingSelectedText = false
         insertionService.captureTarget()
 
         Task {
@@ -356,13 +362,17 @@ final class AppModel: ObservableObject {
         )
     }
 
-    private func completeSession() {
+    private func completeSession(
+        message: String = "已完成",
+        hideAfter delay: TimeInterval = 0.35
+    ) {
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
         unstableTranscript = ""
         state = stateMachine.handle(.insertionCompleted)
-        statusMessage = "已完成"
-        panelController.hide(after: 0.35)
+        statusMessage = message
+        isTranslatingSelectedText = false
+        panelController.hide(after: delay)
 
         if case .listening(let pendingMode) = state {
             begin(pendingMode)
@@ -413,9 +423,10 @@ final class AppModel: ObservableObject {
             statusMessage = outcome.usedFallback
                 ? "模型不可用，已使用基础整理"
                 : "正在写入"
-            insertionService.insert(formatted) { [weak self] inserted in
+            insertionService.insert(formatted) { [weak self] result in
                 guard let self else { return }
-                if inserted {
+                switch result {
+                case .inserted, .copiedToClipboard:
                     let ingestInput = ProfileIngestInput(
                         finalText: formatted.plainText,
                         mode: mode,
@@ -425,8 +436,15 @@ final class AppModel: ObservableObject {
                     Task.detached(priority: .utility) { [profileStore] in
                         await profileStore.ingest(ingestInput)
                     }
-                    completeSession()
-                } else {
+                    if result == .inserted {
+                        completeSession()
+                    } else {
+                        completeSession(
+                            message: "光标不可用，内容已复制",
+                            hideAfter: 1.4
+                        )
+                    }
+                case .failed:
                     fail("无法写入目标文本框，请检查辅助功能权限")
                 }
             }
@@ -434,6 +452,7 @@ final class AppModel: ObservableObject {
     }
 
     private func fail(_ message: String) {
+        insertionService.cancelPendingInsertion()
         speechService.cancel()
         state = stateMachine.handle(.fail(message))
         statusMessage = message
@@ -466,8 +485,92 @@ final class AppModel: ObservableObject {
             english: englishShortcut
         )
         guard let mode = pair.mode(matching: shortcut) else { return false }
+        if mode == .english,
+           canStartSelectedTextTranslation,
+           let capture = selectedTextService.captureChineseSelection() {
+            beginSelectedTextTranslation(capture)
+            return true
+        }
         toggle(mode)
         return true
+    }
+
+    private var canStartSelectedTextTranslation: Bool {
+        switch state {
+        case .ready, .failed:
+            return true
+        default:
+            return false
+        }
+    }
+
+    private func beginSelectedTextTranslation(
+        _ capture: SelectedTextCapture
+    ) {
+        pendingFinalizationTask?.cancel()
+        pendingProcessingTask?.cancel()
+        insertionService.captureTarget(capture.request.target)
+        isTranslatingSelectedText = true
+        transcript = capture.request.sourceText
+        unstableTranscript = ""
+        state = stateMachine.handle(.translateSelection)
+        statusMessage = "正在翻译选中文本"
+        panelController.show(mode: .english)
+
+        guard modelManager.isReady else {
+            fail("本地模型尚未就绪，原文未修改")
+            return
+        }
+
+        pendingProcessingTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            let glossaryTerms = await profileStore.snapshot().glossaryTerms
+            let glossary = glossaryTerms.map {
+                GlossaryTerm(canonical: $0, occurrences: 1, sessionCount: 1)
+            }
+            let outcome = await processingService.process(
+                transcript: capture.request.sourceText,
+                mode: .english,
+                signature: "",
+                glossary: glossary
+            )
+            guard !Task.isCancelled else { return }
+            guard let replacement = SelectedTextTranslationValidator.replacement(
+                output: outcome.result.outputText,
+                usedFallback: outcome.usedFallback
+            ) else {
+                fail("翻译失败，原文未修改")
+                return
+            }
+
+            let normalized = DocumentFormatter.format(replacement)
+            let formatted = FormattedDocument(
+                plainText: capture.request.replacementText(
+                    for: normalized.plainText
+                ),
+                html: normalized.html
+            )
+            transcript = normalized.plainText
+            state = stateMachine.handle(.processingSucceeded)
+            statusMessage = "正在替换选中文本"
+            insertionService.insert(
+                formatted,
+                requiring: capture
+            ) { [weak self] result in
+                guard let self else { return }
+                switch result {
+                case .inserted:
+                    completeSession()
+                case .copiedToClipboard:
+                    completeSession(
+                        message: "选区已变化，英文已复制",
+                        hideAfter: 1.4
+                    )
+                case .failed:
+                    fail("无法替换选区，英文复制失败")
+                }
+            }
+        }
     }
 
     private func correctionLanguage(for text: String) -> CorrectionLanguage {

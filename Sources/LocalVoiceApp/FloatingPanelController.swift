@@ -126,18 +126,28 @@ private struct FloatingBarView: View {
                 action: model.cancel
             )
 
-            WaveformView(
-                level: model.audioLevel,
-                isEnglish: activeMode == .english
-            )
-            .frame(maxWidth: .infinity)
+            if showsStatus {
+                Text(model.statusMessage)
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .lineLimit(1)
+                    .frame(maxWidth: .infinity)
 
-            circleButton(
-                icon: "checkmark",
-                foreground: .black,
-                background: Color.white.opacity(0.9),
-                action: model.finish
-            )
+                statusIndicator
+            } else {
+                WaveformView(
+                    level: model.audioLevel,
+                    isEnglish: activeMode == .english
+                )
+                .frame(maxWidth: .infinity)
+
+                circleButton(
+                    icon: "checkmark",
+                    foreground: .black,
+                    background: Color.white.opacity(0.9),
+                    action: model.finish
+                )
+            }
         }
         .padding(.horizontal, 6)
         .padding(.vertical, 2)
@@ -176,13 +186,48 @@ private struct FloatingBarView: View {
         .overlay(
             GlowBorder(
                 cornerRadius: FloatingBarLayout.cornerRadius,
-                isEnglish: activeMode == .english,
+                isEnglish: model.isTranslatingSelectedText
+                    || activeMode == .english,
                 isProcessing: isProcessing
             )
         )
         .onPreferenceChange(PreviewHeightKey.self) { height in
             measuredTextHeight = height
         }
+    }
+
+    @ViewBuilder
+    private var statusIndicator: some View {
+        if case .failed = model.state {
+            Image(systemName: "exclamationmark")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(
+                    width: FloatingBarLayout.buttonDiameter,
+                    height: FloatingBarLayout.buttonDiameter
+                )
+        } else if case .ready = model.state {
+            Image(systemName: "checkmark")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white)
+                .frame(
+                    width: FloatingBarLayout.buttonDiameter,
+                    height: FloatingBarLayout.buttonDiameter
+                )
+        } else {
+            ProgressView()
+                .controlSize(.small)
+                .tint(.white)
+                .frame(
+                    width: FloatingBarLayout.buttonDiameter,
+                    height: FloatingBarLayout.buttonDiameter
+                )
+        }
+    }
+
+    private var showsStatus: Bool {
+        model.isTranslatingSelectedText
+            || model.statusMessage.hasSuffix("已复制")
     }
 
     private var scrollingText: some View {
