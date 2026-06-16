@@ -78,6 +78,31 @@ import Testing
     #expect(twoLines < fiveLines)
 }
 
+@Test func previewPaginationKeepsEveryCharacterAcrossPages() {
+    let text = " " + String(repeating: "本次测试会持续输入较长内容", count: 8) + "\n"
+    let pages = PreviewPagination.pages(for: text, charactersPerPage: 20)
+
+    #expect(pages.count > 1)
+    #expect(pages.joined() == text)
+    #expect(pages.dropLast().allSatisfy { $0.count <= 20 })
+}
+
+@Test func previewPaginationFollowsLiveTailUnlessUserPagedBack() {
+    let currentTail = PreviewPagination.pageIndexAfterTextChange(
+        currentIndex: 1,
+        previousPageCount: 2,
+        newPageCount: 4
+    )
+    let userPagedBack = PreviewPagination.pageIndexAfterTextChange(
+        currentIndex: 0,
+        previousPageCount: 2,
+        newPageCount: 4
+    )
+
+    #expect(currentTail == 3)
+    #expect(userPagedBack == 0)
+}
+
 @Test func waveformLinesStayFlatWhenIdleAndSwellWithVoice() {
     let height: CGFloat = 26
 

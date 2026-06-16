@@ -95,8 +95,8 @@ private struct PreviewHeightKey: PreferenceKey {
 private struct FloatingBarView: View {
     @ObservedObject var model: AppModel
     @State private var measuredTextHeight: CGFloat = 0
-
-    private static let bottomAnchor = "preview-bottom-anchor"
+    @State private var previewPageIndex = 0
+    @State private var previousPreviewPageCount = 1
 
     var body: some View {
         // No GlassEffectContainer: the preview and capsule are only 8pt apart,
@@ -249,6 +249,19 @@ private struct FloatingBarView: View {
         .onPreferenceChange(PreviewHeightKey.self) { height in
             measuredTextHeight = height
         }
+        .onAppear {
+            previousPreviewPageCount = previewPages.count
+            previewPageIndex = max(previewPages.count - 1, 0)
+        }
+        .onChange(of: displayText) { _, _ in
+            let newPageCount = previewPages.count
+            previewPageIndex = PreviewPagination.pageIndexAfterTextChange(
+                currentIndex: previewPageIndex,
+                previousPageCount: previousPreviewPageCount,
+                newPageCount: newPageCount
+            )
+            previousPreviewPageCount = newPageCount
+        }
     }
 
     @ViewBuilder
@@ -286,48 +299,53 @@ private struct FloatingBarView: View {
     }
 
     private var scrollingText: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(spacing: 0) {
-                    Text(displayText)
-                        .font(.system(
-                            size: FloatingBarLayout.previewFontSize,
-                            weight: .medium
-                        ))
-                        .lineSpacing(FloatingBarLayout.previewLineSpacing)
-                        .foregroundStyle(displayColor)
-                        .frame(
-                            width: FloatingBarLayout.previewTextWidth,
-                            alignment: .leading
+        ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .topLeading) {
+                Text(activePreviewPage)
+                    .font(.system(
+                        size: FloatingBarLayout.previewFontSize,
+                        weight: .medium
+                    ))
+                    .lineSpacing(FloatingBarLayout.previewLineSpacing)
+                    .foregroundStyle(displayColor)
+                    .frame(
+                        width: previewTextColumnWidth,
+                        alignment: .leading
+                    )
+                    .fixedSize(horizontal: false, vertical: true)
+                    .id(previewPageIndex)
+                    .transition(
+                        .asymmetric(
+                            insertion: .move(edge: .trailing)
+                                .combined(with: .opacity),
+                            removal: .move(edge: .leading)
+                                .combined(with: .opacity)
                         )
-                        .fixedSize(horizontal: false, vertical: true)
-                    Color.clear
-                        .frame(height: 1)
-                        .id(Self.bottomAnchor)
-                }
+                    )
             }
             .frame(
                 width: FloatingBarLayout.previewTextWidth,
                 height: FloatingBarLayout.clampedTextAreaHeight(measuredTextHeight),
                 alignment: .topLeading
             )
-            .onChange(of: model.transcript) { _, _ in
-                withAnimation(.easeOut(duration: 0.18)) {
-                    proxy.scrollTo(Self.bottomAnchor, anchor: .bottom)
-                }
+            .clipped()
+
+            if previewPages.count > 1 {
+                pageControls
             }
         }
+        .animation(.easeOut(duration: 0.18), value: previewPageIndex)
     }
 
     private var measuringText: some View {
-        Text(displayText)
+        Text(activePreviewPage)
             .font(.system(
                 size: FloatingBarLayout.previewFontSize,
                 weight: .medium
             ))
             .lineSpacing(FloatingBarLayout.previewLineSpacing)
             .frame(
-                width: FloatingBarLayout.previewTextWidth,
+                width: previewTextColumnWidth,
                 alignment: .leading
             )
             .fixedSize(horizontal: false, vertical: true)
@@ -341,6 +359,66 @@ private struct FloatingBarView: View {
             )
             .hidden()
             .allowsHitTesting(false)
+    }
+
+    private var pageControls: some View {
+        HStack(spacing: 4) {
+            pageButton(icon: "chevron.left") {
+                previewPageIndex = max(previewPageIndex - 1, 0)
+            }
+            .disabled(previewPageIndex == 0)
+
+            Text("\(previewPageIndex + 1)/\(previewPages.count)")
+                .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                .foregroundStyle(.white.opacity(0.82))
+                .frame(minWidth: 28)
+
+            pageButton(icon: "chevron.right") {
+                previewPageIndex = min(
+                    previewPageIndex + 1,
+                    previewPages.count - 1
+                )
+            }
+            .disabled(previewPageIndex >= previewPages.count - 1)
+        }
+        .padding(.horizontal, 5)
+        .padding(.vertical, 3)
+        .background(
+            Capsule()
+                .fill(.black.opacity(0.28))
+                .background(.ultraThinMaterial, in: Capsule())
+        )
+    }
+
+    private func pageButton(
+        icon: String,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: icon)
+                .font(.system(size: 9, weight: .bold))
+                .foregroundStyle(.white.opacity(0.88))
+                .frame(width: 14, height: 14)
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var previewPages: [String] {
+        PreviewPagination.pages(for: displayText)
+    }
+
+    private var activePreviewPage: String {
+        guard !previewPages.isEmpty else { return "" }
+        let index = min(max(previewPageIndex, 0), previewPages.count - 1)
+        return previewPages[index]
+    }
+
+    private var previewTextColumnWidth: CGFloat {
+        guard previewPages.count > 1 else {
+            return FloatingBarLayout.previewTextWidth
+        }
+        return FloatingBarLayout.previewTextWidth
+            - FloatingBarLayout.previewPagerReserveWidth
     }
 
     private var displayText: String {

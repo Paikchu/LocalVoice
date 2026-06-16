@@ -26,6 +26,8 @@ public enum FloatingBarLayout {
     public static let previewLineHeight: CGFloat = 17
     public static let previewMinLines = 2
     public static let previewMaxLines = 5
+    public static let previewCharactersPerPage = 72
+    public static let previewPagerReserveWidth: CGFloat = 64
     public static let previewHorizontalPadding: CGFloat = 14
     public static let previewVerticalPadding: CGFloat = 10
     public static let statusTextHeight: CGFloat = 12
@@ -45,6 +47,47 @@ public enum FloatingBarLayout {
         let minHeight = textAreaHeight(forLines: previewMinLines)
         let maxHeight = textAreaHeight(forLines: previewMaxLines)
         return min(max(measured, minHeight), maxHeight)
+    }
+}
+
+public enum PreviewPagination {
+    public static func pages(
+        for text: String,
+        charactersPerPage: Int = FloatingBarLayout.previewCharactersPerPage
+    ) -> [String] {
+        guard !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            return [""]
+        }
+
+        let limit = max(charactersPerPage, 1)
+        var pages: [String] = []
+        var current = ""
+
+        for character in text {
+            current.append(character)
+            if current.count >= limit {
+                pages.append(current)
+                current = ""
+            }
+        }
+
+        if !current.isEmpty {
+            pages.append(current)
+        }
+        return pages
+    }
+
+    public static func pageIndexAfterTextChange(
+        currentIndex: Int,
+        previousPageCount: Int,
+        newPageCount: Int
+    ) -> Int {
+        guard newPageCount > 0 else { return 0 }
+        let previousLastIndex = max(previousPageCount - 1, 0)
+        if currentIndex >= previousLastIndex {
+            return newPageCount - 1
+        }
+        return min(max(currentIndex, 0), newPageCount - 1)
     }
 }
 
