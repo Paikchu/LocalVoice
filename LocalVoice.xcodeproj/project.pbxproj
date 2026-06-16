@@ -57,6 +57,7 @@
 		C2B66D6A7881E01BBF012A86 /* SelectedTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B4F6F93EDDD8445A60F533 /* SelectedTextService.swift */; };
 		C4E3EAD3D3F7D8DFBB52E8CC /* TextCorrectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3DB361EC2D1D541183C090 /* TextCorrectorTests.swift */; };
 		CB83EAC35115E05CAC2C1A21 /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
+		DBE047EA4279C7D80000614B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3BC8A531458CE591A1BE903 /* Assets.xcassets */; };
 		DD08719BFAA69CA8FFD1C762 /* ProfileAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899BE7B20A2355389078DB15 /* ProfileAnalysis.swift */; };
 		DF88C99B2CA90908F2E6DFCF /* ProfileEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E9284EA27402CFAA0B1041 /* ProfileEvidence.swift */; };
 		EA9E2AF6C009FB6715C1BCEE /* LocalVoiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD179A5E622E1C843E35529 /* LocalVoiceApp.swift */; };
@@ -163,6 +164,7 @@
 		C62C8C47E83D4AD80B48252F /* LanguageModelBackendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageModelBackendTests.swift; sourceTree = "<group>"; };
 		CBD82DC886D82EEE4B2933F3 /* LanguageModelBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageModelBackend.swift; sourceTree = "<group>"; };
 		CE2A6CACE5212E04C66EB1E2 /* TextInsertionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInsertionTests.swift; sourceTree = "<group>"; };
+		D3BC8A531458CE591A1BE903 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D954E4DC6C8FA94B0EBCA617 /* LocalVoiceCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalVoiceCore.swift; sourceTree = "<group>"; };
 		EDFABD8B1C3AADFD00D96648 /* LocalVoiceCoreTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LocalVoiceCoreTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		EE3DB361EC2D1D541183C090 /* TextCorrectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextCorrectorTests.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 			children = (
 				C06B50C306BBAD18FADD8C4D /* AppDelegate.swift */,
 				569E9FEE40E934DE9A216519 /* AppModel.swift */,
+				D3BC8A531458CE591A1BE903 /* Assets.xcassets */,
 				777E213C141A78B79D492302 /* FloatingPanelController.swift */,
 				0B34313A420DCE90D7284EB6 /* FoundationModelBackend.swift */,
 				C36B46C39475A84F77192EF6 /* HotkeyController.swift */,
@@ -348,6 +351,7 @@
 			buildConfigurationList = 11174078DD5BCC60559EB888 /* Build configuration list for PBXNativeTarget "LocalVoice" */;
 			buildPhases = (
 				501DC39BB4B4673CCF497BA3 /* Sources */,
+				9337C9DDFE3893DC069EFDFA /* Resources */,
 				CBFE67C26644502656F807F1 /* Frameworks */,
 				58D18F230B07D81842FAA5C6 /* Embed Frameworks */,
 			);
@@ -470,6 +474,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A7AED1A94A15AB230B37B82 /* seed-glossary.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9337C9DDFE3893DC069EFDFA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DBE047EA4279C7D80000614B /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

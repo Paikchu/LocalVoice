@@ -8,7 +8,12 @@ struct LocalVoiceApp: App {
         MenuBarExtra {
             MenuBarContentView(model: appDelegate.model)
         } label: {
-            Image(systemName: appDelegate.model.menuBarSymbol)
+            Image("MenuBarIcon")
+                .renderingMode(.template)
+                .resizable()
+                .frame(width: 18, height: 18)
+                .foregroundStyle(.primary)
+                .accessibilityLabel("LocalVoice")
         }
         .menuBarExtraStyle(.window)
     }
