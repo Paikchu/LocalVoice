@@ -22,21 +22,6 @@ final class AppModel: ObservableObject {
             UserDefaults.standard.set(signature, forKey: "emailSignature")
         }
     }
-    @Published var personalizationEnabled: Bool {
-        didSet {
-            UserDefaults.standard.set(
-                personalizationEnabled,
-                forKey: "personalizationEnabled"
-            )
-            Task {
-                await profileStore.setEnabled(personalizationEnabled)
-                if personalizationEnabled {
-                    await profileStore.load()
-                }
-            }
-        }
-    }
-
     let microphoneName: String
     let modelManager: LocalModelManager
 
@@ -60,6 +45,7 @@ final class AppModel: ObservableObject {
     private var recordingStartupGate = RecordingStartupGate()
     private var speechServiceStarted = false
     private let profileStore = UserProfileStore()
+    private let historyStore = SessionHistoryStore()
     private let logger = Logger(
         subsystem: "com.localvoice.app",
         category: "session"
@@ -79,9 +65,6 @@ final class AppModel: ObservableObject {
             fallback: Self.defaultEnglishShortcut
         )
         signature = UserDefaults.standard.string(forKey: "emailSignature") ?? ""
-        personalizationEnabled = UserDefaults.standard.bool(
-            forKey: "personalizationEnabled"
-        )
         microphoneName = SpeechRecognitionService.defaultInputName
         permissionSummary = PermissionCoordinator.summary
     }
@@ -138,7 +121,7 @@ final class AppModel: ObservableObject {
         _ = PermissionCoordinator.requestAccessibilityOnce()
         modelManager.preloadIfInstalled()
         Task {
-            await profileStore.setEnabled(personalizationEnabled)
+            await profileStore.setEnabled(true)
             await profileStore.load()
         }
     }
@@ -247,7 +230,6 @@ final class AppModel: ObservableObject {
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
 
-        personalizationEnabled = false
         signature = ""
         dictationShortcut = Self.defaultDictationShortcut
         englishShortcut = Self.defaultEnglishShortcut
@@ -269,6 +251,13 @@ final class AppModel: ObservableObject {
             } catch {
                 failures.append("画像：\(error.localizedDescription)")
             }
+            do {
+                try await historyStore.clear()
+            } catch {
+                failures.append("历史：\(error.localizedDescription)")
+            }
+            await profileStore.setEnabled(true)
+            await profileStore.load()
             statusMessage = failures.isEmpty
                 ? "本地数据已清除"
                 : "清除失败：" + failures.joined(separator: "；")
@@ -321,7 +310,9 @@ final class AppModel: ObservableObject {
                 statusMessage = "正在录音，未授权文本输入"
             }
             do {
+                let contextualStrings = await profileStore.speechContextualStrings()
                 try speechService.start(
+                    contextualStrings: contextualStrings,
                     onPartial: { [weak self] text, isFinal, suspects in
                         Task { @MainActor in
                             self?.receive(text, isFinal: isFinal, mode: mode, suspects: suspects)
@@ -493,8 +484,31 @@ final class AppModel: ObservableObject {
                         wasEmail: outcome.result.intent == .composeEmail,
                         usedFallback: outcome.usedFallback
                     )
-                    Task.detached(priority: .utility) { [profileStore] in
+                    let historyRecord = SessionHistoryRecord(
+                        rawTranscript: finalTranscript,
+                        finalOutput: formatted.plainText,
+                        mode: mode,
+                        suspects: latestSuspects,
+                        corrections: outcome.result.corrections,
+                        usedFallback: outcome.usedFallback,
+                        targetAppBundleID: NSWorkspace.shared.frontmostApplication?
+                            .bundleIdentifier
+                    )
+                    Task.detached(priority: .utility) { [profileStore, historyStore] in
                         await profileStore.ingest(ingestInput)
+                        do {
+                            try await historyStore.append(historyRecord)
+                            let records = try await historyStore.recentRecords()
+                            let evidence = records.flatMap(
+                                ProfileEvidenceExtractor.extract
+                            )
+                            let proposal = ProfileAnalysisProposalBuilder
+                                .build(from: evidence)
+                            await profileStore.merge(
+                                proposal: proposal,
+                                evidence: evidence
+                            )
+                        } catch {}
                     }
                     if result == .inserted {
                         completeSession()

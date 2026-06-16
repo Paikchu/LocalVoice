@@ -26,6 +26,7 @@ final class SpeechRecognitionService {
     )
 
     func start(
+        contextualStrings: [String] = [],
         onPartial: @escaping PartialHandler,
         onLevel: @escaping LevelHandler,
         onError: @escaping ErrorHandler
@@ -46,7 +47,11 @@ final class SpeechRecognitionService {
         request.requiresOnDeviceRecognition = true
         request.addsPunctuation = true
         request.taskHint = .dictation
+        request.contextualStrings = contextualStrings
         self.request = request
+        if !contextualStrings.isEmpty {
+            logger.info("Using speech contextual strings count=\(contextualStrings.count)")
+        }
 
         task = recognizer.recognitionTask(with: request) {
             [weak self] result, error in

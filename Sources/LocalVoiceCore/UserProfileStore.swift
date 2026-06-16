@@ -52,9 +52,31 @@ public actor UserProfileStore {
         return ProfileHintBuilder.build(from: profile)
     }
 
+    public func speechContextualStrings(limit: Int = 80) -> [String] {
+        guard isEnabled else { return [] }
+        return ProfileHintBuilder.speechContextualStrings(
+            from: profile,
+            limit: limit
+        )
+    }
+
     public func ingest(_ input: ProfileIngestInput) {
         guard isEnabled else { return }
         ProfileExtractor.ingest(input, into: &profile)
+        isDirty = true
+        scheduleDebouncedFlush()
+    }
+
+    public func merge(
+        proposal: ProfileAnalysisProposal,
+        evidence: [ProfileEvidence]
+    ) {
+        guard isEnabled else { return }
+        ProfileAnalysisMerger.merge(
+            proposal,
+            evidence: evidence,
+            into: &profile
+        )
         isDirty = true
         scheduleDebouncedFlush()
     }

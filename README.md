@@ -54,8 +54,8 @@ swift test                    # 运行纯逻辑单元测试
 
 ### 隐私与本地数据
 
-- “本地个性化学习”默认关闭。开启后，LocalVoice 会从最终文本中提取常用术语、领域及邮箱、电话、地址，写入 `~/Library/Application Support/LocalVoice/profile.json`，用于后续本地整理。
-- 关闭开关后不再读取、提取或写入画像；已有文件保留，直到点击“清除全部本地数据”。
+- LocalVoice 会在本机保存已确认插入的历史记录和画像，用于学习常用术语、音译纠错、领域及联系方式。
+- 画像写入 `~/Library/Application Support/LocalVoice/profile.json`，历史记录写入 `~/Library/Application Support/LocalVoice/history/`；这些内容不上传。
 - “清除全部本地数据”会删除画像、模型缓存、邮件签名和快捷键偏好。麦克风、语音识别与辅助功能授权由 macOS 管理，需要在“系统设置 → 隐私与安全性”中撤销。
 - 本地模型固定到 Hugging Face commit `50d427756c6b1b2fe0c0a10f67fbda1fc8e82c1b`，不会随 `main` 分支静默变化。
 - 完整说明见 [PRIVACY.md](PRIVACY.md)。

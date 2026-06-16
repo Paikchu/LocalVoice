@@ -160,13 +160,7 @@ private struct ModelSettingsView: View {
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12))
 
-            Toggle(
-                "允许本地个性化学习",
-                isOn: $model.personalizationEnabled
-            )
-            .font(.system(size: 12))
-
-            Text("开启后会在本机保存常用术语、领域和联系方式。")
+            Text("本地画像会保存常用术语、领域、音译纠错和历史记录。")
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
 

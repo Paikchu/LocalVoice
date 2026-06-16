@@ -46,6 +46,96 @@ public struct ContactFact: Codable, Equatable, Sendable {
     }
 }
 
+public enum ProfileScope: Codable, Equatable, Sendable {
+    case technicalTerm
+    case domain(String)
+    case recent
+
+    private enum CodingKeys: String, CodingKey {
+        case kind, value
+    }
+
+    private enum Kind: String, Codable {
+        case technicalTerm, domain, recent
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let kind = try container.decode(Kind.self, forKey: .kind)
+        switch kind {
+        case .technicalTerm:
+            self = .technicalTerm
+        case .domain:
+            self = .domain(try container.decode(String.self, forKey: .value))
+        case .recent:
+            self = .recent
+        }
+    }
+
+    public func encode(to encoder: any Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        switch self {
+        case .technicalTerm:
+            try container.encode(Kind.technicalTerm, forKey: .kind)
+        case .domain(let value):
+            try container.encode(Kind.domain, forKey: .kind)
+            try container.encode(value, forKey: .value)
+        case .recent:
+            try container.encode(Kind.recent, forKey: .kind)
+        }
+    }
+}
+
+public struct TermAlias: Codable, Equatable, Sendable {
+    public var surface: String
+    public var canonical: String
+    public var confidence: Double
+    public var evidenceSessionIds: [String]
+    public var lastSeen: Date
+
+    public init(
+        surface: String,
+        canonical: String,
+        confidence: Double,
+        evidenceSessionIds: [String],
+        lastSeen: Date = Date()
+    ) {
+        self.surface = surface
+        self.canonical = canonical
+        self.confidence = confidence
+        self.evidenceSessionIds = evidenceSessionIds
+        self.lastSeen = lastSeen
+    }
+}
+
+public struct CommonCorrection: Codable, Equatable, Sendable {
+    public var from: String
+    public var to: String
+    public var context: String
+    public var scope: ProfileScope
+    public var confidence: Double
+    public var evidenceSessionIds: [String]
+    public var lastSeen: Date
+
+    public init(
+        from: String,
+        to: String,
+        context: String,
+        scope: ProfileScope,
+        confidence: Double,
+        evidenceSessionIds: [String],
+        lastSeen: Date = Date()
+    ) {
+        self.from = from
+        self.to = to
+        self.context = context
+        self.scope = scope
+        self.confidence = confidence
+        self.evidenceSessionIds = evidenceSessionIds
+        self.lastSeen = lastSeen
+    }
+}
+
 public struct StyleStats: Codable, Equatable, Sendable {
     public var totalSessions: Int = 0
     public var emailSessions: Int = 0
@@ -67,6 +157,8 @@ public struct UserProfile: Codable, Equatable, Sendable {
     public var domains: [String: Double] = [:]
     public var glossary: [GlossaryTerm] = []
     public var candidates: [GlossaryTerm] = []
+    public var termAliases: [TermAlias] = []
+    public var commonCorrections: [CommonCorrection] = []
     public var contacts: [ContactFact] = []
     public var contactCandidates: [ContactFact] = []
     public var style: StyleStats = StyleStats()
@@ -76,6 +168,8 @@ public struct UserProfile: Codable, Equatable, Sendable {
     public static let candidatesLimit = 256
     public static let contactsLimit = 16
     public static let contactCandidatesLimit = 64
+    public static let aliasesLimit = 128
+    public static let commonCorrectionsLimit = 128
 
     // Promotion thresholds
     public static let glossaryMinOccurrences: Double = 3.0
@@ -84,6 +178,25 @@ public struct UserProfile: Codable, Equatable, Sendable {
     public static let domainPromotionThreshold: Double = 5.0
 
     public init() {}
+
+    private enum CodingKeys: String, CodingKey {
+        case version, domains, glossary, candidates, termAliases,
+             commonCorrections, contacts, contactCandidates, style, sessionCount
+    }
+
+    public init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        version = try container.decodeIfPresent(Int.self, forKey: .version) ?? 1
+        domains = try container.decodeIfPresent([String: Double].self, forKey: .domains) ?? [:]
+        glossary = try container.decodeIfPresent([GlossaryTerm].self, forKey: .glossary) ?? []
+        candidates = try container.decodeIfPresent([GlossaryTerm].self, forKey: .candidates) ?? []
+        termAliases = try container.decodeIfPresent([TermAlias].self, forKey: .termAliases) ?? []
+        commonCorrections = try container.decodeIfPresent([CommonCorrection].self, forKey: .commonCorrections) ?? []
+        contacts = try container.decodeIfPresent([ContactFact].self, forKey: .contacts) ?? []
+        contactCandidates = try container.decodeIfPresent([ContactFact].self, forKey: .contactCandidates) ?? []
+        style = try container.decodeIfPresent(StyleStats.self, forKey: .style) ?? StyleStats()
+        sessionCount = try container.decodeIfPresent(Int.self, forKey: .sessionCount) ?? 0
+    }
 }
 
 // MARK: - Session input
@@ -111,17 +224,37 @@ public struct ProfileHint: Sendable {
     public let glossaryTerms: [String]  // canonical forms, top-16 by frequency
     public let topDomains: [String]     // top-2
     public let contacts: [ContactFact]  // top-4
+    public let aliases: [TermAlias]
+    public let commonCorrections: [CommonCorrection]
 
-    public static let empty = ProfileHint(glossaryTerms: [], topDomains: [], contacts: [])
+    public static let empty = ProfileHint(
+        glossaryTerms: [],
+        topDomains: [],
+        contacts: [],
+        aliases: [],
+        commonCorrections: []
+    )
 
-    public init(glossaryTerms: [String], topDomains: [String], contacts: [ContactFact]) {
+    public init(
+        glossaryTerms: [String],
+        topDomains: [String],
+        contacts: [ContactFact],
+        aliases: [TermAlias] = [],
+        commonCorrections: [CommonCorrection] = []
+    ) {
         self.glossaryTerms = glossaryTerms
         self.topDomains = topDomains
         self.contacts = contacts
+        self.aliases = aliases
+        self.commonCorrections = commonCorrections
     }
 
     public var isEmpty: Bool {
-        glossaryTerms.isEmpty && topDomains.isEmpty && contacts.isEmpty
+        glossaryTerms.isEmpty
+            && topDomains.isEmpty
+            && contacts.isEmpty
+            && aliases.isEmpty
+            && commonCorrections.isEmpty
     }
 
     /// Compact text block injected into the prompt. Hard limit: 400 characters.
@@ -139,6 +272,16 @@ public struct ProfileHint: Sendable {
         if !contacts.isEmpty {
             let lines = contacts.map { "\($0.kind.rawValue): \($0.value)" }
             parts.append("常用联系方式：\n" + lines.joined(separator: "\n"))
+        }
+        if !aliases.isEmpty {
+            let lines = aliases.map { "\($0.surface) -> \($0.canonical)" }
+            parts.append("用户音译纠错：\n" + lines.joined(separator: "、"))
+        }
+        if !commonCorrections.isEmpty {
+            let lines = commonCorrections.map { correction in
+                "\(correction.from) -> \(correction.to)（\(correction.context)）"
+            }
+            parts.append("常见近音纠错：\n" + lines.joined(separator: "、"))
         }
 
         var block = parts.joined(separator: "\n\n")
@@ -570,12 +713,43 @@ public enum ProfileHintBuilder {
                 .sorted { $0.lastSeen > $1.lastSeen }
                 .prefix(4)
         )
+        let aliases = Array(
+            profile.termAliases
+                .filter { $0.confidence >= 0.85 }
+                .sorted { $0.confidence > $1.confidence }
+                .prefix(8)
+        )
+        let corrections = Array(
+            profile.commonCorrections
+                .filter { $0.confidence >= 0.85 }
+                .sorted { $0.confidence > $1.confidence }
+                .prefix(6)
+        )
 
         return ProfileHint(
             glossaryTerms: Array(scoredGlossary),
             topDomains: Array(topDomains),
-            contacts: topContacts
+            contacts: topContacts,
+            aliases: aliases,
+            commonCorrections: corrections
         )
+    }
+
+    public static func speechContextualStrings(
+        from profile: UserProfile,
+        limit: Int = 80
+    ) -> [String] {
+        var seen = Set<String>()
+        var output: [String] = []
+        let rankedTerms = profile.glossary
+            .sorted { $0.occurrences > $1.occurrences }
+            .map(\.canonical)
+
+        for term in rankedTerms where output.count < limit {
+            guard seen.insert(term.lowercased()).inserted else { continue }
+            output.append(term)
+        }
+        return output
     }
 }
 

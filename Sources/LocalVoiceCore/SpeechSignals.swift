@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Value types for ASR signal
 
 /// One segment from a speech recognition transcription.
-public struct TranscriptSegmentInfo: Equatable, Sendable {
+public struct TranscriptSegmentInfo: Codable, Equatable, Sendable {
     public let text: String
     /// Per-segment confidence score in [0, 1]. 0 when unavailable.
     public let confidence: Double
@@ -16,7 +16,7 @@ public struct TranscriptSegmentInfo: Equatable, Sendable {
 
 /// A segment span that is likely a near-sound mis-recognition.
 /// Passed to the LLM as evidence when contextual correction is applied.
-public struct SuspectSpan: Equatable, Sendable {
+public struct SuspectSpan: Codable, Equatable, Sendable {
     /// The text as it appears in the best transcription.
     public let text: String
     /// Confidence score from the recognizer. Lower means more uncertain.
