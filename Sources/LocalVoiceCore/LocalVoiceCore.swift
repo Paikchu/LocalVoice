@@ -1,11 +1,13 @@
 import Foundation
 
 public enum MenuLayout {
-    public static let width: CGFloat = 300
-    public static let headerHeight: CGFloat = 58
-    public static let modeRowHeight: CGFloat = 55
-    public static let footerHeight: CGFloat = 38
-    public static let horizontalPadding: CGFloat = 16
+    public static let width: CGFloat = 200
+    public static let nativeRowHeight: CGFloat = 34
+    public static let footerHeight: CGFloat = 32
+    public static let closedContentHeight: CGFloat = nativeRowHeight * 4 + footerHeight
+    public static let horizontalPadding: CGFloat = 14
+    public static let settingsSectionSpacing: CGFloat = 8
+    public static let settingsSectionVerticalPadding: CGFloat = 8
 }
 
 public enum FloatingBarLayout {

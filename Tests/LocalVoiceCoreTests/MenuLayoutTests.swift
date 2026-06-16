@@ -3,11 +3,13 @@ import Testing
 @testable import LocalVoiceCore
 
 @Test func compactMenuUsesSelectedReferenceMetrics() {
-    #expect(MenuLayout.width == 300)
-    #expect(MenuLayout.headerHeight == 58)
-    #expect(MenuLayout.modeRowHeight == 55)
-    #expect(MenuLayout.footerHeight == 38)
-    #expect(MenuLayout.horizontalPadding == 16)
+    #expect(MenuLayout.width == 200)
+    #expect(MenuLayout.nativeRowHeight == 34)
+    #expect(MenuLayout.footerHeight == 32)
+    #expect(MenuLayout.closedContentHeight == 168)
+    #expect(MenuLayout.horizontalPadding == 14)
+    #expect(MenuLayout.settingsSectionSpacing == 8)
+    #expect(MenuLayout.settingsSectionVerticalPadding == 8)
 }
 
 @Test func floatingBarUsesCompactTranslucentMetrics() {

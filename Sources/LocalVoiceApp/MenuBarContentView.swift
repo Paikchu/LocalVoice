@@ -4,40 +4,41 @@ import SwiftUI
 
 struct MenuBarContentView: View {
     @ObservedObject var model: AppModel
+    @ObservedObject private var manager: LocalModelManager
+    @State private var showsSettings = false
+
+    init(model: AppModel) {
+        self.model = model
+        manager = model.modelManager
+    }
 
     var body: some View {
         VStack(spacing: 0) {
-            header
-            separator
-            modeRow(
-                title: "听写模式",
+            actionRow(
+                title: "听写",
                 icon: "mic",
                 mode: .dictation,
                 shortcut: model.dictationShortcut
             )
             separator
-            modeRow(
-                title: "英文模式",
+            actionRow(
+                title: "英文",
                 icon: "translate",
                 mode: .english,
                 shortcut: model.englishShortcut
             )
             separator
-            ModelSettingsView(model: model)
+            modelRow
             separator
-            footer
+            settingsRow
+            if showsSettings {
+                separator
+                NativeSettingsView(model: model)
+            }
+            separator
+            quitRow
         }
         .frame(width: MenuLayout.width)
-    }
-
-    private var header: some View {
-        HStack {
-            Text("LocalVoice")
-                .font(.system(size: 22, weight: .semibold))
-            Spacer()
-        }
-        .padding(.horizontal, MenuLayout.horizontalPadding)
-        .frame(height: MenuLayout.headerHeight)
     }
 
     private var separator: some View {
@@ -45,22 +46,22 @@ struct MenuBarContentView: View {
             .padding(.horizontal, MenuLayout.horizontalPadding)
     }
 
-    private func modeRow(
+    private func actionRow(
         title: String,
         icon: String,
         mode: VoiceMode,
         shortcut: LocalVoiceCore.KeyboardShortcut
     ) -> some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             Button {
                 model.toggle(mode)
             } label: {
-                HStack(spacing: 11) {
+                HStack(spacing: 9) {
                     Image(systemName: icon)
-                        .font(.system(size: 18, weight: .regular))
-                        .frame(width: 22)
+                        .font(.system(size: 13, weight: .regular))
+                        .frame(width: 16)
                     Text(title)
-                        .font(.system(size: 16, weight: .regular))
+                        .font(.system(size: 13))
                     Spacer()
                 }
                 .contentShape(Rectangle())
@@ -75,41 +76,91 @@ struct MenuBarContentView: View {
                         ? "请按键…"
                         : shortcut.displayString
                 )
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(.primary)
-                .padding(.horizontal, 9)
-                .padding(.vertical, 4)
-                .background(
-                    Capsule()
-                        .fill(.quaternary.opacity(0.55))
-                )
+                .font(.system(size: 12, weight: .regular, design: .rounded))
+                .foregroundStyle(.secondary)
+                .monospaced()
             }
             .buttonStyle(.plain)
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(.tertiary)
         }
         .padding(.horizontal, MenuLayout.horizontalPadding)
-        .frame(height: MenuLayout.modeRowHeight)
+        .frame(height: MenuLayout.nativeRowHeight)
     }
 
-    private var footer: some View {
-        HStack {
+    private var modelRow: some View {
+        HStack(spacing: 8) {
+            Image(systemName: "cpu")
+                .font(.system(size: 13))
+                .foregroundStyle(.secondary)
+                .frame(width: 16)
+            Text("模型")
+                .font(.system(size: 13))
             Spacer()
-            Button("退出") {
-                NSApplication.shared.terminate(nil)
+            Picker(
+                "模型",
+                selection: Binding(
+                    get: { manager.selectedBackend },
+                    set: { model.selectLanguageModelBackend($0) }
+                )
+            ) {
+                ForEach(LanguageModelBackendKind.allCases, id: \.self) {
+                    backend in
+                    Text(backend.displayName).tag(backend)
+                }
             }
-            .buttonStyle(.plain)
-            .font(.system(size: 13))
-            .foregroundStyle(.secondary)
+            .labelsHidden()
+            .pickerStyle(.menu)
+            .controlSize(.small)
+            .frame(maxWidth: 76)
+            .disabled(!model.canChangeLanguageModelBackend)
         }
+        .padding(.horizontal, MenuLayout.horizontalPadding)
+        .frame(height: MenuLayout.nativeRowHeight)
+    }
+
+    private var settingsRow: some View {
+        Button {
+            showsSettings.toggle()
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "gearshape")
+                    .font(.system(size: 13))
+                    .frame(width: 16)
+                Text("设置…")
+                    .font(.system(size: 13))
+                Spacer()
+                Image(systemName: showsSettings ? "chevron.up" : "chevron.down")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, MenuLayout.horizontalPadding)
+        .frame(height: MenuLayout.nativeRowHeight)
+    }
+
+    private var quitRow: some View {
+        Button {
+            NSApplication.shared.terminate(nil)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "power")
+                    .font(.system(size: 13))
+                    .frame(width: 16)
+                Text("退出")
+                    .font(.system(size: 13))
+                Spacer()
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(.secondary)
         .padding(.horizontal, MenuLayout.horizontalPadding)
         .frame(height: MenuLayout.footerHeight)
     }
 }
 
-private struct ModelSettingsView: View {
+private struct NativeSettingsView: View {
     @ObservedObject var model: AppModel
     @ObservedObject private var manager: LocalModelManager
     @State private var showsClearConfirmation = false
@@ -121,36 +172,15 @@ private struct ModelSettingsView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text("整理模型")
-                    .font(.system(size: 14, weight: .medium))
-                Spacer()
-                Picker(
-                    "整理模型",
-                    selection: Binding(
-                        get: { manager.selectedBackend },
-                        set: { model.selectLanguageModelBackend($0) }
-                    )
-                ) {
-                    ForEach(LanguageModelBackendKind.allCases, id: \.self) {
-                        backend in
-                        Text(backend.displayName).tag(backend)
-                    }
-                }
-                .labelsHidden()
-                .pickerStyle(.menu)
-                .controlSize(.small)
-                .disabled(!model.canChangeLanguageModelBackend)
-            }
-
-            HStack {
+        VStack(alignment: .leading, spacing: MenuLayout.settingsSectionSpacing) {
+            HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(manager.descriptor.title)
                         .font(.system(size: 12, weight: .medium))
                     Text(manager.statusText)
                         .font(.system(size: 11))
                         .foregroundStyle(.secondary)
+                        .lineLimit(1)
                 }
                 Spacer()
                 modelAction
@@ -160,13 +190,10 @@ private struct ModelSettingsView: View {
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12))
 
-            Text("本地画像会保存常用术语、领域、音译纠错和历史记录。")
-                .font(.system(size: 10))
-                .foregroundStyle(.tertiary)
-
             Text(manager.descriptor.detail)
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)
+                .lineLimit(2)
 
             Button("清除全部本地数据", role: .destructive) {
                 showsClearConfirmation = true
@@ -176,7 +203,7 @@ private struct ModelSettingsView: View {
             .foregroundStyle(.red)
         }
         .padding(.horizontal, MenuLayout.horizontalPadding)
-        .padding(.vertical, 12)
+        .padding(.vertical, MenuLayout.settingsSectionVerticalPadding)
         .confirmationDialog(
             "清除全部本地数据？",
             isPresented: $showsClearConfirmation,
