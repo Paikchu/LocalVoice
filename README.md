@@ -1,207 +1,154 @@
 # LocalVoice
 
-一款**本地运行、隐私优先**的 macOS 菜单栏语音输入工具。按下快捷键即可对任意应用的输入框进行普通话语音听写，或「中文 → 英文」语音翻译。语音识别、文本整理与翻译都在本机完成，音频与文字不会上传；首次启用本地大模型时需要联网下载约 2.3 GB 模型文件。
+![LocalVoice 宣传图](docs/assets/marketing/localvoice-promo-hero.png)
 
-> 录音过程中**不**向目标应用写入临时文本，只在底部悬浮条预览；停止后才执行一次「整段语义整理 → 单次插入」，避免光标跳动与脏文本。
+本地运行的 macOS 语音输入工具。按快捷键说中文，LocalVoice 在底部预览文字，停止后整理成可直接发送的文本，再插入当前光标位置。
 
----
+它不是云端听写套壳。语音识别、文本整理、中文转英文、个人词汇学习都在这台 Mac 上完成。
 
-## ✨ 特性
+[宣传页](docs/site/index.html) · [隐私说明](PRIVACY.md) · [架构文档](docs/ARCHITECTURE.md) · [模型评测](docs/reports/2026-06-12-localvoice-model-evaluation.md) · [Releases](https://github.com/Paikchu/LocalVoice/releases)
 
-- 🎙️ **本地语音识别** —— Apple `Speech` 框架，`requiresOnDeviceRecognition`，纯离线
-- 🧠 **本地大模型整理** —— MLX `Qwen3-4B`，首次使用需联网下载约 2.3 GB；下载后可离线运行，不可用时自动降级为规则整理
-- 🌐 **中译英模式** —— 普通话语音直接输出自然英文
-- ✍️ **选区中译英** —— 选中中文后按英文快捷键，预览并原位替换为英文
-- 📋 **剪贴板兜底** —— 选区变化或语音输入光标失效时，结果保留在剪贴板
-- 🗒️ **口语结构化** —— 「句号 / 逗号 / 另起一段」转标点；「第一点…第二点…」转编号列表
-- 🔒 **隐私** —— 音频、转写、提示词、模型输出全程留在本机
-- ⌨️ **全局快捷键** + 菜单栏常驻，无 Dock 图标
+## 适合谁
 
----
+- 经常用中文写邮件、IM、文档、Issue，不想把录音和原文发到云端。
+- 需要把口语整理成干净文本，而不是逐字转写一堆“嗯、那个、然后”。
+- 中英文混用频繁，需要把中文口述或选中的中文快速转成英文。
+- 在意光标位置。停止录音后一次性插入，不边听边污染目标输入框。
 
-## 🚀 快速上手
+## 核心能力
 
-### 环境要求
-- macOS 26 / Apple Silicon (`arm64`)
-- Xcode 26、`xcodegen`（`brew install xcodegen`）
+- **本地听写**：使用 Apple Speech 的本机识别能力，录音不上传。
+- **本地整理**：Qwen3 4B 通过 MLX 在 Apple Silicon 上运行，下载后可离线。
+- **Foundation Models 可选**：也可以切到 macOS 提供的系统模型，无需额外下载。
+- **中文转英文**：按英文快捷键，说中文，输出自然英文。
+- **选区翻译**：选中中文后按英文快捷键，预览译文，再原位替换。
+- **个人词汇学习**：从已确认插入的文本里学习术语、联系人、常见写法。
+- **剪贴板兜底**：目标输入框失效或选区变化时，不乱覆盖，结果留在剪贴板。
+- **可清除数据**：画像、历史、模型、签名、快捷键设置都能从菜单栏清掉。
 
-### 构建与运行
+## 使用体验
+
+![LocalVoice 真实菜单栏弹窗](docs/assets/marketing/localvoice-real-menu-popover.png)
+
+| 操作 | 默认快捷键 | 结果 |
+|---|---:|---|
+| 中文听写 | `⌘⇧D` | 说中文，停止后整理并插入当前光标 |
+| 中文转英文 | `⌘⇧E` | 说中文，停止后插入英文 |
+| 翻译选中文本 | 选中中文后按 `⌘⇧E` | 预览英文，确认后替换原选区 |
+| 停止并插入 | 再按一次当前快捷键 | 结束录音，整理，单次插入 |
+| 取消 | 点击悬浮条关闭按钮 | 丢弃本次内容 |
+
+录音时只显示预览，不写入目标应用。停止后才进入整理和插入阶段，所以不会在微信、飞书、邮件、浏览器输入框里留下半截脏文本。
+
+## 安装
+
+### 下载 DMG
+
+从 [GitHub Releases](https://github.com/Paikchu/LocalVoice/releases) 下载 `LocalVoice-<version>-arm64.dmg`，拖到 Applications。
+
+当前公开 DMG 未经过 Apple 公证。首次打开时 macOS 可能拦截：
+
+- 打开一次 `LocalVoice.app`。
+- 进入“系统设置 → 隐私与安全性”。
+- 点击“仍要打开”。
+
+首次运行需要授予：
+
+- 麦克风
+- 语音识别
+- 辅助功能
+
+辅助功能权限用于把最终文本粘贴到当前应用的光标位置。
+
+### 本地模型
+
+菜单栏里可以选择模型：
+
+| 模型 | 特点 |
+|---|---|
+| Qwen | 约 2.3 GB，首次下载需要联网，下载后离线运行 |
+| Foundation Models | macOS 提供，无需额外下载，能力取决于系统可用性 |
+
+Qwen 固定到 `mlx-community/Qwen3-4B-Instruct-2507-4bit` 的指定 commit，避免上游 `main` 变化后模型内容静默漂移。
+
+## 隐私边界
+
+LocalVoice 不包含遥测、广告或分析 SDK。
+
+本地数据位置：
+
+```text
+~/Library/Application Support/LocalVoice/profile.json
+~/Library/Application Support/LocalVoice/history/
+~/Library/Application Support/LocalVoice/Models/
+```
+
+“清除全部本地数据”会删除画像、历史、模型缓存、邮件签名和快捷键设置。macOS 系统权限需要在“系统设置 → 隐私与安全性”里单独撤销。
+
+## 性能基准
+
+本地模型评测环境：Apple M5，24 GB 内存，macOS 26.5.1，200 条中文邮件和普通听写样本。
+
+| 指标 | 结果 |
+|---|---:|
+| 本地整理 P95 | 1.66 秒 |
+| 首 token P95 | 0.29 秒 |
+| 生成速度 P50 | 44.77 tokens/s |
+| 2.5 秒内完成 | 200/200 |
+| 语义与结构通过 | 200/200 |
+
+完整数据见 [模型评测报告](docs/reports/2026-06-12-localvoice-model-evaluation.md)。
+
+## 从源码运行
+
+要求：
+
+- macOS 26
+- Apple Silicon
+- Xcode 26
+- `xcodegen`
+
 ```bash
-./scripts/run.sh              # 一键：退出旧实例 → 构建签名 → 重新启动
+brew install xcodegen
+./scripts/run.sh
 ```
-等价于手动分两步：
+
+常用命令：
+
 ```bash
-./scripts/build-app.sh        # 构建并签名，产物在 build/LocalVoice.app
-open build/LocalVoice.app     # 启动，图标出现在菜单栏
-swift test                    # 运行纯逻辑单元测试
+./scripts/build-app.sh        # 构建并签名到 build/LocalVoice.app
+open build/LocalVoice.app     # 启动菜单栏应用
+swift test                    # 运行 LocalVoiceCore 单元测试
+./scripts/package-dmg.sh      # 生成未公证 DMG 和 SHA256SUMS
 ```
 
-首次运行需授予 **麦克风**、**语音识别**、**辅助功能** 三项权限。
+不要从 `DerivedData` 里直接启动 ad-hoc 构建。开发脚本会用固定签名身份生成 `build/LocalVoice.app`，macOS 才会把重编译视为同一个 app，已授予的麦克风、语音识别和辅助功能权限也能稳定保留。
 
-> **权限不会反复弹窗**：`run.sh` / `build-app.sh` 用固定的 `Apple Development` 证书签名，macOS 据此把每次重编译都识别为**同一个 App**（同一签名身份 + `com.localvoice.app`），已授予的权限保留——相当于每次 bug 修复都算作一次「软件更新」。
->
-> ⚠️ 切勿用 `xcodebuild ... CODE_SIGNING_ALLOWED=NO` 直接从 `DerivedData` 启动：那是 ad-hoc 临时签名，每次构建签名都不同，会被 macOS 当成全新 App，导致权限重置、反复弹窗。
+## 项目结构
 
-### 使用
-| 操作 | 默认快捷键 | 说明 |
-|------|-----------|------|
-| 听写模式 | `⌘⇧D` | 识别普通话，整理后写入当前输入框 |
-| 英文模式 | `⌘⇧E` | 有中文选区时翻译并原位替换；选区变化时英文保留在剪贴板；无中文选区时启动语音中译英 |
-| 停止并插入 | 再按一次同一快捷键 / 点击悬浮条勾号 | 触发最终整理与插入 |
-| 取消 | 点击悬浮条 ✕ | 丢弃本次会话 |
-
-快捷键可在菜单栏面板点击「快捷键胶囊」后重新录制。本地 Qwen 模型可在菜单栏面板内下载或移除（约 2.3 GB）；未下载时听写仍可用，仅不做语义级整理/翻译。
-
-### 隐私与本地数据
-
-- LocalVoice 会在本机保存已确认插入的历史记录和画像，用于学习常用术语、音译纠错、领域及联系方式。
-- 画像写入 `~/Library/Application Support/LocalVoice/profile.json`，历史记录写入 `~/Library/Application Support/LocalVoice/history/`；这些内容不上传。
-- “清除全部本地数据”会删除画像、模型缓存、邮件签名和快捷键偏好。麦克风、语音识别与辅助功能授权由 macOS 管理，需要在“系统设置 → 隐私与安全性”中撤销。
-- 本地模型固定到 Hugging Face commit `50d427756c6b1b2fe0c0a10f67fbda1fc8e82c1b`，不会随 `main` 分支静默变化。
-- 完整说明见 [PRIVACY.md](PRIVACY.md)。
-
----
-
-## 🏗️ 架构总览
-
-```mermaid
-flowchart TB
-    subgraph input["输入"]
-        HK["全局热键<br/>HotkeyController · Carbon"]
-        MIC["麦克风<br/>AVAudioEngine"]
-    end
-
-    subgraph app["LocalVoiceApp（系统框架集成层）"]
-        SR["SpeechRecognitionService<br/>SFSpeechRecognizer zh-CN · 本地"]
-        AM["AppModel<br/>@MainActor 编排中枢"]
-        TIS["TextInsertionService<br/>剪贴板 + 模拟 ⌘V"]
-        MLX["MLXLanguageModelService<br/>Qwen3-4B 本地推理"]
-        FP["FloatingPanel + 菜单栏面板<br/>实时预览"]
-    end
-
-    subgraph core["LocalVoiceCore（纯逻辑 · 可单测）"]
-        SM["SessionStateMachine<br/>会话状态机"]
-        ACC["RecognitionAccumulator<br/>识别回改合并"]
-        DPS["DraftProcessingService<br/>整理 / 校验 / 回退"]
-        SSN["SpokenStructureNormalizer<br/>口语标点 + 编号列表"]
-        FMT["DocumentFormatter<br/>排版"]
-    end
-
-    TGT["🎯 目标应用输入框"]
-
-    HK --> AM
-    MIC --> SR
-    SR -- "partial / final" --> AM
-    AM --> SM
-    AM --> ACC
-    AM -- "实时预览" --> FP
-    AM -- "最终转写" --> DPS
-    DPS --> SSN
-    DPS -- "提示词" --> MLX
-    MLX -- "JSON 结果" --> DPS
-    DPS -- "校验失败 → 回退" --> FMT
-    DPS -- "整理结果" --> AM
-    AM -- "单次插入" --> TIS
-    TIS --> TGT
-
-    style core fill:#1f2d3d,stroke:#4a90d9,color:#fff
-    style app fill:#2d2438,stroke:#9b59b6,color:#fff
-    style TGT fill:#1e3a2f,stroke:#27ae60,color:#fff
-```
-
-**会话流程（状态机）**
-
-```mermaid
-stateDiagram-v2
-    [*] --> ready
-    ready --> listening: start(mode)
-    listening --> finalizing: finish / 切换模式
-    finalizing --> processing: 最终转写就绪
-    processing --> inserting: 整理成功 / 回退
-    inserting --> ready: 插入完成
-    listening --> failed: fail
-    processing --> failed: fail
-    failed --> ready: 重新开始
-    ready --> ready: cancel
-```
-
-> 录音中**不写入**目标应用，仅预览；用户停止后才在 `processing` 阶段调用本地模型整段整理，并在 `inserting` 阶段执行**唯一一次**跨应用插入。
-
----
-
-## 📂 项目结构
-
-```
+```text
 LocalVoice/
-├── project.yml              # XcodeGen 工程定义（App 构建入口，单一来源）
-├── Package.swift            # SPM：暴露 LocalVoiceCore 库供 swift test
-├── scripts/run.sh           # 一键：构建 + 签名 + 重启（日常开发用）
-├── scripts/build-app.sh     # 构建 + 固定证书签名（run.sh 内部调用）
-├── Sources/
-│   ├── LocalVoiceCore/      # 纯逻辑、无 UI、可测试
-│   │   ├── LocalVoiceCore.swift     # 状态机 / 快捷键 / 文本累加 / 校正
-│   │   └── DraftProcessing.swift    # 整理：提示词 / 校验 / 回退 / 口语结构化
-│   └── LocalVoiceApp/       # macOS App（AppKit + SwiftUI + 系统框架）
-│       ├── AppModel.swift              # ★ 会话编排中枢
-│       ├── SpeechRecognitionService.swift
-│       ├── MLXLanguageModelService.swift / LocalModelManager.swift
-│       ├── TextInsertionService.swift / HotkeyController.swift
-│       ├── PermissionCoordinator.swift
-│       └── FloatingPanelController.swift / MenuBarContentView.swift
-├── Tools/                   # 基准工具 + 质量语料生成
-├── Tests/                   # LocalVoiceCore 单元测试 + 语料 fixture
-└── docs/                    # 设计方案、实现报告、模型评测
+├── Sources/LocalVoiceCore/      # 状态机、文本整理、提示词、校验、画像逻辑
+├── Sources/LocalVoiceApp/       # AppKit + SwiftUI + Speech + MLX + AX 集成
+├── Tests/                       # Swift Testing 单元测试和质量语料
+├── Tools/LocalVoiceBenchmark/   # 本地模型性能和质量基准
+├── docs/                        # 架构、设计方案、评测报告
+├── scripts/build-app.sh         # Release 构建和稳定签名
+└── scripts/package-dmg.sh       # DMG 打包
 ```
 
-**分层原则**：可单测的纯逻辑（状态机、文本算法、提示词、校验）全部放 `LocalVoiceCore`，不依赖 AppKit；`LocalVoiceApp` 只负责把系统框架（Speech / MLX / AX / Carbon）接到这些纯逻辑上。
+核心原则：能测试的逻辑放在 `LocalVoiceCore`，系统集成留在 `LocalVoiceApp`。状态机、文本算法、模型输出校验和隐私数据路径都能单独验证。
 
----
+## 技术栈
 
-## 📦 打包封装
+- Swift 6
+- SwiftUI + AppKit MenuBarExtra
+- Apple Speech，本机识别
+- Accessibility API，跨应用插入和选区替换
+- MLX Swift LM，本地 Qwen 推理
+- Hugging Face Swift，模型下载
+- Swift Testing，核心逻辑回归测试
 
-```bash
-./scripts/build-app.sh
-```
-1. `xcodegen generate` —— 从 `project.yml` 生成 `LocalVoice.xcodeproj`
-2. `xcodebuild` —— Release / `arm64` 构建
-3. `ditto` —— 复制产物到 `build/LocalVoice.app`
-4. **签名** —— 有 `Apple Development` 证书则逐 framework 签名 + Hardened Runtime + entitlements；无证书则 ad-hoc（仅本机自用）
+## 许可证
 
-> 用固定的 `Apple Development` 证书签名后，重复构建的签名身份一致，macOS 据此保留已授予的权限（麦克风 / 语音识别 / 辅助功能），重编译不再反复弹窗。
->
-> 分发给他人需用 Developer ID 证书签名并**公证（notarization）**，否则会被 Gatekeeper 拦截。
-
-### 未公证 DMG
-
-```bash
-./scripts/package-dmg.sh
-```
-
-产物写入 `build/releases/`：
-
-- `LocalVoice-<version>-arm64.dmg`
-- `SHA256SUMS`
-
-该 DMG 使用 ad-hoc 签名，没有经过 Apple 公证。首次打开时 macOS 会阻止运行：
-
-1. 尝试打开 `LocalVoice.app`。
-2. 打开「系统设置 → 隐私与安全性」。
-3. 在安全性区域点击「仍要打开」，再次确认。
-
-不要关闭 Gatekeeper，也不需要执行删除 quarantine 属性的命令。安装后仍需授予麦克风、语音识别和辅助功能权限。版本更新后，macOS 可能要求重新授权。
-
----
-
-## 📖 深入文档
-
-- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** —— 完整架构、内部逻辑详解、关键文件速查
-- [docs/plans/](docs/plans/) —— 设计方案（开源模型处理、标点/列表结构化）
-- [docs/reports/](docs/reports/) —— 本地模型评测数据
-
----
-
-## 🧪 测试与质量
-
-- `swift test` —— `LocalVoiceCoreTests`（Swift Testing），覆盖状态机、快捷键、文本累加/稳定化、校正、草稿整理、插入请求等
-- 质量语料 `Tests/Fixtures/processing-quality-corpus.json` 由 `Tools/generate_quality_corpus.swift` 生成，`ProcessingQualityEvaluator` 判定整理结果是否保留事实/语义/结构
-- `LocalVoiceBenchmark` —— 跑真实模型，输出 token 速率、首字延迟、整体耗时
+Apache-2.0。详见 [LICENSE](LICENSE)。

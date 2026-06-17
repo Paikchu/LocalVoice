@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LocalVoice</title>
+    <meta name="description" content="LocalVoice 是本地运行的 macOS 语音输入工具。说中文，整理好，再插入光标。">
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="../../README.md">LocalVoice</a>
+      <nav aria-label="主要链接">
+        <a href="#privacy">隐私</a>
+        <a href="#benchmark">性能</a>
+        <a href="https://github.com/Paikchu/LocalVoice/releases">下载</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <h1>说中文，整理好，再插入光标。</h1>
+          <p>
+            LocalVoice 是本地运行的 macOS 菜单栏语音输入工具。录音时只预览，停止后整理成可直接发送的文本，再一次性插入当前输入框。
+          </p>
+          <div class="actions">
+            <a class="button primary" href="https://github.com/Paikchu/LocalVoice/releases">下载 DMG</a>
+            <a class="button secondary" href="../../README.md">查看源码</a>
+          </div>
+        </div>
+        <figure class="hero-art">
+          <img src="../assets/marketing/localvoice-promo-hero.png" alt="LocalVoice 真实运行截图合成宣传图">
+        </figure>
+      </section>
+
+      <section class="strip" aria-label="核心卖点">
+        <p>本地语音识别</p>
+        <p>Qwen / Foundation Models</p>
+        <p>选区中译英</p>
+        <p>剪贴板兜底</p>
+      </section>
+
+      <section class="section split" id="workflow">
+        <div>
+          <h2>录音时不污染输入框</h2>
+          <p>
+            目标应用不会出现半截转写。LocalVoice 只在悬浮条和菜单栏里显示状态，等你停止录音后再执行整段整理和一次性插入。
+          </p>
+          <dl class="facts">
+            <div>
+              <dt>听写</dt>
+              <dd>CMD + SHIFT + D，中文语音整理后插入</dd>
+            </div>
+            <div>
+              <dt>英文</dt>
+              <dd>CMD + SHIFT + E，语音或选区转英文</dd>
+            </div>
+          </dl>
+        </div>
+        <figure class="image-card">
+          <img src="../assets/marketing/localvoice-real-menu-popover.png" alt="LocalVoice 真实菜单栏弹窗">
+        </figure>
+      </section>
+
+      <section class="section cards" id="privacy">
+        <article>
+          <h2>录音不上传</h2>
+          <p>使用 Apple Speech 的本机识别能力。音频、转写文本和模型输出不发到开发者服务器。</p>
+        </article>
+        <article>
+          <h2>模型在本机</h2>
+          <p>Qwen3 4B 首次下载约 2.3 GB；下载后可离线运行。也可以切到 macOS Foundation Models。</p>
+        </article>
+        <article>
+          <h2>数据可清除</h2>
+          <p>画像、历史、模型缓存、邮件签名和快捷键设置都能从菜单栏清掉。</p>
+        </article>
+      </section>
+
+      <section class="section benchmark" id="benchmark">
+        <div>
+          <h2>本地整理 P95：1.66 秒</h2>
+          <p>200 条中文邮件和普通听写样本，Apple M5，24 GB 内存，macOS 26.5.1。</p>
+        </div>
+        <div class="metrics">
+          <span><strong>200/200</strong>语义结构通过</span>
+          <span><strong>0.29s</strong>首 token P95</span>
+          <span><strong>44.77</strong>tokens/s P50</span>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
