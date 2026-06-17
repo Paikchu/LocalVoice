@@ -70,3 +70,63 @@ import Testing
     #expect(permissions.canRecord)
     #expect(!permissions.canInsertText)
 }
+
+@Test func playsActivationSoundWhenRecordingShortcutStartsOrFinishes() {
+    #expect(
+        DictationActivationSoundPolicy.shouldPlay(
+            currentState: .ready,
+            shortcutMode: .dictation
+        )
+    )
+    #expect(
+        DictationActivationSoundPolicy.shouldPlay(
+            currentState: .listening(.dictation),
+            shortcutMode: .dictation
+        )
+    )
+}
+
+@Test func skipsActivationSoundWhenShortcutCannotChangeRecordingState() {
+    #expect(
+        !DictationActivationSoundPolicy.shouldPlay(
+            currentState: .processing(.dictation),
+            shortcutMode: .dictation
+        )
+    )
+    #expect(
+        !DictationActivationSoundPolicy.shouldPlay(
+            currentState: .inserting(.english),
+            shortcutMode: .english
+        )
+    )
+}
+
+@Test func activationSoundUsesCrispSystemCue() {
+    #expect(DictationActivationSoundPolicy.soundName == "Glass")
+}
+
+@Test func activationSoundSettingsDefaultToEnabledGlass() {
+    let settings = DictationActivationSoundSettings()
+
+    #expect(settings.isEnabled)
+    #expect(settings.option == .glass)
+    #expect(settings.soundName == "Glass")
+}
+
+@Test func activationSoundOptionsExposeSeveralSystemCues() {
+    #expect(DictationActivationSoundOption.allCases.count >= 4)
+    #expect(
+        DictationActivationSoundOption.allCases.map(\.systemSoundName)
+            .contains("Ping")
+    )
+}
+
+@Test func disabledActivationSoundDoesNotPlayForShortcut() {
+    #expect(
+        !DictationActivationSoundPolicy.shouldPlay(
+            currentState: .ready,
+            shortcutMode: .dictation,
+            settings: DictationActivationSoundSettings(isEnabled: false)
+        )
+    )
+}

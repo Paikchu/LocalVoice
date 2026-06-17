@@ -30,6 +30,7 @@
 		5232C9777A022AD3FBA9DACF /* SessionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C070E505E9D91EC26AA09A5A /* SessionStateTests.swift */; };
 		54B8A6FC07B9B974E771CF7D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36B46C39475A84F77192EF6 /* HotkeyController.swift */; };
 		61673E048AE95BBBB24FAAB7 /* TextInsertionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2A6CACE5212E04C66EB1E2 /* TextInsertionTests.swift */; };
+		617816FB07D86845F94A6E6D /* ActivationSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFF3D8F371765710823A066 /* ActivationSoundPlayer.swift */; };
 		63954D14FE381C4211192A09 /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
 		68C53F6306354D36976356A7 /* MenuLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A6004CB795EA8B957B1E5D /* MenuLayoutTests.swift */; };
 		6A19AE0F5EE355A4B05519F9 /* FoundationModelBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B34313A420DCE90D7284EB6 /* FoundationModelBackend.swift */; };
@@ -144,6 +145,7 @@
 		65A6004CB795EA8B957B1E5D /* MenuLayoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuLayoutTests.swift; sourceTree = "<group>"; };
 		7287ED176155B19A0F9F1467 /* BenchmarkMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkMain.swift; sourceTree = "<group>"; };
 		777E213C141A78B79D492302 /* FloatingPanelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingPanelController.swift; sourceTree = "<group>"; };
+		7AFF3D8F371765710823A066 /* ActivationSoundPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivationSoundPlayer.swift; sourceTree = "<group>"; };
 		88A29A4B0E616C3B21EB7817 /* SessionHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionHistory.swift; sourceTree = "<group>"; };
 		88E9284EA27402CFAA0B1041 /* ProfileEvidence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileEvidence.swift; sourceTree = "<group>"; };
 		899BE7B20A2355389078DB15 /* ProfileAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileAnalysis.swift; sourceTree = "<group>"; };
@@ -303,6 +305,7 @@
 		F72348BB9319478FEFDDAB8E /* LocalVoiceApp */ = {
 			isa = PBXGroup;
 			children = (
+				7AFF3D8F371765710823A066 /* ActivationSoundPlayer.swift */,
 				C06B50C306BBAD18FADD8C4D /* AppDelegate.swift */,
 				569E9FEE40E934DE9A216519 /* AppModel.swift */,
 				D3BC8A531458CE591A1BE903 /* Assets.xcassets */,
@@ -515,6 +518,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				617816FB07D86845F94A6E6D /* ActivationSoundPlayer.swift in Sources */,
 				EFAECFF42507A4A8127C37F1 /* AppDelegate.swift in Sources */,
 				1A5772C813A660CBF4AC549B /* AppModel.swift in Sources */,
 				1E472D572F3BF8BE007ACA3E /* FloatingPanelController.swift in Sources */,

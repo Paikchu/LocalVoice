@@ -22,6 +22,22 @@ final class AppModel: ObservableObject {
             UserDefaults.standard.set(signature, forKey: "emailSignature")
         }
     }
+    @Published var activationSoundEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(
+                activationSoundEnabled,
+                forKey: Self.activationSoundEnabledKey
+            )
+        }
+    }
+    @Published var activationSoundOption: DictationActivationSoundOption {
+        didSet {
+            UserDefaults.standard.set(
+                activationSoundOption.rawValue,
+                forKey: Self.activationSoundOptionKey
+            )
+        }
+    }
     let microphoneName: String
     let modelManager: LocalModelManager
 
@@ -34,6 +50,7 @@ final class AppModel: ObservableObject {
     private let insertionService = TextInsertionService()
     private let selectedTextService = SelectedTextService()
     private let panelController = FloatingPanelController()
+    private let activationSoundPlayer = ActivationSoundPlayer()
     private let processingService: DraftProcessingService
     private var latestRawTranscript = ""
     private var latestSuspects: [SuspectSpan] = []
@@ -65,6 +82,10 @@ final class AppModel: ObservableObject {
             fallback: Self.defaultEnglishShortcut
         )
         signature = UserDefaults.standard.string(forKey: "emailSignature") ?? ""
+        activationSoundEnabled = UserDefaults.standard.object(
+            forKey: Self.activationSoundEnabledKey
+        ) as? Bool ?? true
+        activationSoundOption = Self.loadActivationSoundOption()
         microphoneName = SpeechRecognitionService.defaultInputName
         permissionSummary = PermissionCoordinator.summary
     }
@@ -231,6 +252,8 @@ final class AppModel: ObservableObject {
         pendingProcessingTask?.cancel()
 
         signature = ""
+        activationSoundEnabled = true
+        activationSoundOption = .glass
         dictationShortcut = Self.defaultDictationShortcut
         englishShortcut = Self.defaultEnglishShortcut
         hotkeyController.setShortcuts(shortcutPair)
@@ -542,6 +565,24 @@ final class AppModel: ObservableObject {
         modelManager.select(backend)
     }
 
+    func setActivationSoundEnabled(_ isEnabled: Bool) {
+        activationSoundEnabled = isEnabled
+        if isEnabled {
+            previewActivationSound()
+        }
+    }
+
+    func selectActivationSoundOption(_ option: DictationActivationSoundOption) {
+        activationSoundOption = option
+        if activationSoundEnabled {
+            previewActivationSound()
+        }
+    }
+
+    func previewActivationSound() {
+        activationSoundPlayer.play(activationSoundOption)
+    }
+
     private func handleShortcut(_ shortcut: KeyboardShortcut) -> Bool {
         if let mode = recordingShortcut {
             let other = mode == .dictation ? englishShortcut : dictationShortcut
@@ -574,8 +615,22 @@ final class AppModel: ObservableObject {
             beginSelectedTextTranslation(capture)
             return true
         }
+        if DictationActivationSoundPolicy.shouldPlay(
+            currentState: state,
+            shortcutMode: mode,
+            settings: activationSoundSettings
+        ) {
+            activationSoundPlayer.play(activationSoundOption)
+        }
         toggle(mode)
         return true
+    }
+
+    private var activationSoundSettings: DictationActivationSoundSettings {
+        DictationActivationSoundSettings(
+            isEnabled: activationSoundEnabled,
+            option: activationSoundOption
+        )
     }
 
     private var canStartSelectedTextTranslation: Bool {
@@ -715,6 +770,19 @@ final class AppModel: ObservableObject {
         guard let data = try? JSONEncoder().encode(shortcut) else { return }
         UserDefaults.standard.set(data, forKey: key)
     }
+
+    private static func loadActivationSoundOption()
+        -> DictationActivationSoundOption {
+        guard let rawValue = UserDefaults.standard.string(
+            forKey: activationSoundOptionKey
+        ) else {
+            return .glass
+        }
+        return DictationActivationSoundOption(rawValue: rawValue) ?? .glass
+    }
+
+    private static let activationSoundEnabledKey = "activationSoundEnabled"
+    private static let activationSoundOptionKey = "activationSoundOption"
 
     private static let defaultDictationShortcut = KeyboardShortcut(
         keyCode: 2,

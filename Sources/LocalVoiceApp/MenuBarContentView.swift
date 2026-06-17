@@ -190,6 +190,47 @@ private struct NativeSettingsView: View {
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12))
 
+            Toggle(
+                "快捷键音效",
+                isOn: Binding(
+                    get: { model.activationSoundEnabled },
+                    set: { model.setActivationSoundEnabled($0) }
+                )
+            )
+            .font(.system(size: 12))
+            .toggleStyle(.switch)
+            .controlSize(.small)
+
+            HStack(spacing: 8) {
+                Text("音色")
+                    .font(.system(size: 12))
+                Spacer()
+                Picker(
+                    "音色",
+                    selection: Binding(
+                        get: { model.activationSoundOption },
+                        set: { model.selectActivationSoundOption($0) }
+                    )
+                ) {
+                    ForEach(DictationActivationSoundOption.allCases, id: \.self) {
+                        option in
+                        Text(option.displayName).tag(option)
+                    }
+                }
+                .labelsHidden()
+                .pickerStyle(.menu)
+                .controlSize(.small)
+                .frame(maxWidth: 82)
+
+                Button {
+                    model.previewActivationSound()
+                } label: {
+                    Image(systemName: "speaker.wave.2")
+                }
+                .buttonStyle(.plain)
+                .disabled(!model.activationSoundEnabled)
+            }
+
             Text(manager.descriptor.detail)
                 .font(.system(size: 10))
                 .foregroundStyle(.tertiary)

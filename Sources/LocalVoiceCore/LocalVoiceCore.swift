@@ -358,6 +358,74 @@ public struct ShortcutPair: Equatable, Sendable {
     }
 }
 
+public enum DictationActivationSoundOption: String, Codable, CaseIterable, Sendable {
+    case glass
+    case ping
+    case tink
+    case pop
+
+    public var displayName: String {
+        switch self {
+        case .glass:
+            return "清脆"
+        case .ping:
+            return "明亮"
+        case .tink:
+            return "轻点"
+        case .pop:
+            return "柔和"
+        }
+    }
+
+    public var systemSoundName: String {
+        switch self {
+        case .glass:
+            return "Glass"
+        case .ping:
+            return "Ping"
+        case .tink:
+            return "Tink"
+        case .pop:
+            return "Pop"
+        }
+    }
+}
+
+public struct DictationActivationSoundSettings: Codable, Equatable, Sendable {
+    public var isEnabled: Bool
+    public var option: DictationActivationSoundOption
+
+    public init(
+        isEnabled: Bool = true,
+        option: DictationActivationSoundOption = .glass
+    ) {
+        self.isEnabled = isEnabled
+        self.option = option
+    }
+
+    public var soundName: String {
+        option.systemSoundName
+    }
+}
+
+public enum DictationActivationSoundPolicy {
+    public static let soundName = DictationActivationSoundOption.glass.systemSoundName
+
+    public static func shouldPlay(
+        currentState: SessionState,
+        shortcutMode _: VoiceMode,
+        settings: DictationActivationSoundSettings = .init()
+    ) -> Bool {
+        guard settings.isEnabled else { return false }
+        switch currentState {
+        case .ready, .failed, .listening:
+            return true
+        case .finalizing, .processing, .inserting:
+            return false
+        }
+    }
+}
+
 public struct VoicePermissionState: Equatable, Sendable {
     public let microphoneGranted: Bool
     public let speechRecognitionGranted: Bool
