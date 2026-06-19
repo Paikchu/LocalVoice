@@ -68,7 +68,7 @@ final class AppModel: ObservableObject {
         category: "session"
     )
 
-    init(speechService: any SpeechRecognitionBackend = SpeechRecognitionService()) {
+    init(speechService: any SpeechRecognitionBackend = WhisperKitSpeechBackend()) {
         self.speechService = speechService
         modelManager = LocalModelManager()
         processingService = DraftProcessingService(

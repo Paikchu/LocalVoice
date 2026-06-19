@@ -16,7 +16,7 @@ public enum SpeechRecognitionBackendKind:
     case apple
     case whisper
 
-    public static let defaultValue: Self = .apple
+    public static let defaultValue: Self = .whisper
 
     public var displayName: String {
         switch self {
