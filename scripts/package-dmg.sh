@@ -37,6 +37,14 @@ rm -rf "$STAGING"
 mkdir -p "$STAGING" "$OUTPUT"
 ditto "$DERIVED/Build/Products/Release/LocalVoice.app" "$APP"
 
+# Bundle Whisper model (downloaded above by download-whisper-model.sh).
+MODEL_SRC="$ROOT/Resources/WhisperModels"
+MODEL_DST="$APP/Contents/Resources/WhisperModels"
+echo "Bundling Whisper model into DMG app…"
+rm -rf "$MODEL_DST"
+ditto "$MODEL_SRC" "$MODEL_DST"
+echo "Model bundled ($(du -sh "$MODEL_DST" | cut -f1))"
+
 while IFS= read -r code; do
   codesign --force --sign - "$code"
 done < <(
