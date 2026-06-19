@@ -1,8 +1,11 @@
 .build/
 .derived/
+.derived-quality/
 .derived-release/
 .packages/
 build/
+benchmark-data/
+benchmark-results/
 .DS_Store
 DerivedData/
 *.xcuserstate
