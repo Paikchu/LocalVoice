@@ -7,12 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0001E0FC50DA8CF238DC9011 /* Speech.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 101F6DEC31BA3A018E9F6504 /* Speech.framework */; };
+		038C43886756943116EEC43D /* QualityBenchmark.swift in Sources */ = {isa = PBXBuildFile; fileRef = 128F07C398171C839269521A /* QualityBenchmark.swift */; };
 		0972A398DC1F225E359ED39B /* LocalModelDescriptor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB4D9D408538E88E42DE628 /* LocalModelDescriptor.swift */; };
 		0F0E477A5495FABC84BF683A /* ShortcutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54794DAEC547E3494825ADE5 /* ShortcutTests.swift */; };
 		13D8B96945AC1F40585052EA /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = 486EE8EB8BC1EAECC6360966 /* HuggingFace */; };
 		13DAF6F065AD31A590761B40 /* SpeechSignalsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9561C97B9EACC9A12BFEC5F2 /* SpeechSignalsTests.swift */; };
 		1A5772C813A660CBF4AC549B /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 569E9FEE40E934DE9A216519 /* AppModel.swift */; };
 		1E108DF96C40C6EFC3FA3BA4 /* ProfileEvidenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 516D4F9F03E090DCEE8EC009 /* ProfileEvidenceTests.swift */; };
+		1E21DF22CD22954DF01D5F6A /* FoundationModels.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 06A18E19F1B48EFEB20C22AE /* FoundationModels.framework */; };
 		1E472D572F3BF8BE007ACA3E /* FloatingPanelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 777E213C141A78B79D492302 /* FloatingPanelController.swift */; };
 		21946908758B3B79E32F70F1 /* UserProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3259A7A83FAC9D96EF3333DF /* UserProfileStore.swift */; };
 		2234D5AA07C355F1D91C7987 /* PermissionCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57EEE4D953B75BE90C1870BC /* PermissionCoordinator.swift */; };
@@ -21,6 +24,7 @@
 		2E77CE4B2620D128E5FFD049 /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = E7999460528D93A79C1B8C77 /* HuggingFace */; };
 		2F1A47BA1D6A8F9148C32751 /* SpeechSignals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA8F63D6B3E3FED5BB49192 /* SpeechSignals.swift */; };
 		348DEF118933BB4100608C4B /* MenuBarContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0DA50BD1EA18D20A2231DE /* MenuBarContentView.swift */; };
+		34E8CA9186A5697D1B13F598 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 910820A7939AFC885A6212F5 /* AVFoundation.framework */; };
 		34EF2AA7252F118D8FF8D1E6 /* LocalVoiceCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		37DF5DC005186433880DA0C2 /* UserProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 512413B56A7CA45450630DD3 /* UserProfile.swift */; };
 		3DCB1EEB9AA483D9B1FA8A4F /* LanguageModelBackendTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C62C8C47E83D4AD80B48252F /* LanguageModelBackendTests.swift */; };
@@ -29,6 +33,7 @@
 		4BFD1E230C545CF6E1493C59 /* SpeechRecognitionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F259ADAA666D33E535A2055 /* SpeechRecognitionService.swift */; };
 		5232C9777A022AD3FBA9DACF /* SessionStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C070E505E9D91EC26AA09A5A /* SessionStateTests.swift */; };
 		54B8A6FC07B9B974E771CF7D /* HotkeyController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36B46C39475A84F77192EF6 /* HotkeyController.swift */; };
+		5930E93B4A9ED727F18A3D12 /* FoundationModelBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B34313A420DCE90D7284EB6 /* FoundationModelBackend.swift */; };
 		61673E048AE95BBBB24FAAB7 /* TextInsertionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE2A6CACE5212E04C66EB1E2 /* TextInsertionTests.swift */; };
 		617816FB07D86845F94A6E6D /* ActivationSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AFF3D8F371765710823A066 /* ActivationSoundPlayer.swift */; };
 		63954D14FE381C4211192A09 /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
@@ -55,14 +60,18 @@
 		B45D73B2CE9161822FEECF9F /* MLXLanguageModelService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B87DA56156CD2C77803C6B4 /* MLXLanguageModelService.swift */; };
 		B75C19B4A8B8BF42356B4563 /* BenchmarkMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7287ED176155B19A0F9F1467 /* BenchmarkMain.swift */; };
 		BD60A59C6D9F989014BAABDC /* LanguageModelBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBD82DC886D82EEE4B2933F3 /* LanguageModelBackend.swift */; };
+		C0913BC480AAEB19F66E2E81 /* QualityBenchmarkTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE58EAFAE92EEF18DD4EAAA1 /* QualityBenchmarkTests.swift */; };
 		C2B66D6A7881E01BBF012A86 /* SelectedTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42B4F6F93EDDD8445A60F533 /* SelectedTextService.swift */; };
 		C4E3EAD3D3F7D8DFBB52E8CC /* TextCorrectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE3DB361EC2D1D541183C090 /* TextCorrectorTests.swift */; };
 		CB83EAC35115E05CAC2C1A21 /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
+		D6B1FD1A79FDD271A95F67E0 /* LocalVoiceCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DBE047EA4279C7D80000614B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D3BC8A531458CE591A1BE903 /* Assets.xcassets */; };
 		DD08719BFAA69CA8FFD1C762 /* ProfileAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 899BE7B20A2355389078DB15 /* ProfileAnalysis.swift */; };
 		DF88C99B2CA90908F2E6DFCF /* ProfileEvidence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 88E9284EA27402CFAA0B1041 /* ProfileEvidence.swift */; };
 		EA9E2AF6C009FB6715C1BCEE /* LocalVoiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FD179A5E622E1C843E35529 /* LocalVoiceApp.swift */; };
+		EC5641F369BC850BCD766D4C /* LocalVoiceCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */; };
 		EFAECFF42507A4A8127C37F1 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C06B50C306BBAD18FADD8C4D /* AppDelegate.swift */; };
+		F093F2B41E839F3E4D0DED5F /* BenchmarkMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7E168EEAB84B9DA8002CB0D /* BenchmarkMain.swift */; };
 		F0FD7098A8DBD31C46F1C6E7 /* StableTextAssemblerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC69C8CEC186AF4BAB1BC64 /* StableTextAssemblerTests.swift */; };
 		F64A9DA25BF6EF807F897B10 /* LocalVoiceCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = D954E4DC6C8FA94B0EBCA617 /* LocalVoiceCore.swift */; };
 		F8FEEAB15F6F23337A6695DA /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = 772D59F5306615F7C912E27C /* Tokenizers */; };
@@ -78,6 +87,13 @@
 			remoteInfo = LocalVoiceCore;
 		};
 		28FC8A159D87014701618E94 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D3CA5733D85CDB0C7208BDC8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4B1FA8561C8A784DC07C5E44;
+			remoteInfo = LocalVoiceCore;
+		};
+		B5B5626E1D7DE2F92DF86374 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D3CA5733D85CDB0C7208BDC8 /* Project object */;
 			proxyType = 1;
@@ -105,6 +121,17 @@
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		624C8171D340F384915D2380 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				D6B1FD1A79FDD271A95F67E0 /* LocalVoiceCore.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D3E920D5D8F70A48E589F296 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -122,6 +149,9 @@
 		032DF10A4A1A73C20DA596A8 /* SpeechCaptureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechCaptureTests.swift; sourceTree = "<group>"; };
 		06A18E19F1B48EFEB20C22AE /* FoundationModels.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FoundationModels.framework; path = System/Library/Frameworks/FoundationModels.framework; sourceTree = SDKROOT; };
 		0B34313A420DCE90D7284EB6 /* FoundationModelBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationModelBackend.swift; sourceTree = "<group>"; };
+		101F6DEC31BA3A018E9F6504 /* Speech.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Speech.framework; path = System/Library/Frameworks/Speech.framework; sourceTree = SDKROOT; };
+		128F07C398171C839269521A /* QualityBenchmark.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualityBenchmark.swift; sourceTree = "<group>"; };
+		22E0DFCCC129529AC66F8BEC /* LocalVoiceQualityBench.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocalVoiceQualityBench.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B87DA56156CD2C77803C6B4 /* MLXLanguageModelService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MLXLanguageModelService.swift; sourceTree = "<group>"; };
 		2FD5E01F621E2042802939BB /* DraftProcessing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftProcessing.swift; sourceTree = "<group>"; };
 		3259A7A83FAC9D96EF3333DF /* UserProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileStore.swift; sourceTree = "<group>"; };
@@ -152,14 +182,17 @@
 		8A865102974E1D25950FC9AE /* CorrectionValidationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectionValidationTests.swift; sourceTree = "<group>"; };
 		8BF0F22FB9236E5D6F25E788 /* seed-glossary.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "seed-glossary.json"; sourceTree = "<group>"; };
 		8DA8F63D6B3E3FED5BB49192 /* SpeechSignals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSignals.swift; sourceTree = "<group>"; };
+		910820A7939AFC885A6212F5 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		9561C97B9EACC9A12BFEC5F2 /* SpeechSignalsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechSignalsTests.swift; sourceTree = "<group>"; };
 		A3D7370DB2EBE07647F38035 /* TextInsertionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextInsertionService.swift; sourceTree = "<group>"; };
 		A5B66BF2180840BD1E4590ED /* LocalVoice.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LocalVoice.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A7E168EEAB84B9DA8002CB0D /* BenchmarkMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenchmarkMain.swift; sourceTree = "<group>"; };
 		B12C957BF6C04450C0703E20 /* SigningConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigningConfigurationTests.swift; sourceTree = "<group>"; };
 		B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = LocalVoiceCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B59AAA38C0635A77A41118E7 /* DraftProcessingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DraftProcessingTests.swift; sourceTree = "<group>"; };
 		B6E07DE0E0F231FB1BD9C14C /* LocalVoice.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LocalVoice.entitlements; sourceTree = "<group>"; };
 		B8D0D38B1E4F374B8C158F35 /* CorrectionValidation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CorrectionValidation.swift; sourceTree = "<group>"; };
+		BE58EAFAE92EEF18DD4EAAA1 /* QualityBenchmarkTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QualityBenchmarkTests.swift; sourceTree = "<group>"; };
 		C06B50C306BBAD18FADD8C4D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C070E505E9D91EC26AA09A5A /* SessionStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionStateTests.swift; sourceTree = "<group>"; };
 		C36B46C39475A84F77192EF6 /* HotkeyController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeyController.swift; sourceTree = "<group>"; };
@@ -183,6 +216,17 @@
 				8D86D06E06D706496F7950EF /* MLXLMCommon in Frameworks */,
 				13D8B96945AC1F40585052EA /* HuggingFace in Frameworks */,
 				F8FEEAB15F6F23337A6695DA /* Tokenizers in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A275BA375DBBC9077963DC07 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				EC5641F369BC850BCD766D4C /* LocalVoiceCore.framework in Frameworks */,
+				34E8CA9186A5697D1B13F598 /* AVFoundation.framework in Frameworks */,
+				1E21DF22CD22954DF01D5F6A /* FoundationModels.framework in Frameworks */,
+				0001E0FC50DA8CF238DC9011 /* Speech.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,6 +254,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		265DFF62DA227A6E825BFD24 /* LocalVoiceQualityBench */ = {
+			isa = PBXGroup;
+			children = (
+				A7E168EEAB84B9DA8002CB0D /* BenchmarkMain.swift */,
+			);
+			name = LocalVoiceQualityBench;
+			path = Tools/LocalVoiceQualityBench;
+			sourceTree = "<group>";
+		};
 		43D998373E82DFAB4889791D = {
 			isa = PBXGroup;
 			children = (
@@ -217,6 +270,7 @@
 				BE2FD18443F46DFBA3282317 /* LocalVoiceBenchmark */,
 				EF5BDBCEDAD65A8CA9904B6D /* LocalVoiceCore */,
 				78D9ED98F33D1563F09487D4 /* LocalVoiceCoreTests */,
+				265DFF62DA227A6E825BFD24 /* LocalVoiceQualityBench */,
 				894841B1F65228C9E1BE9764 /* Frameworks */,
 				9E16A2525EE92FACAA2D1E68 /* Products */,
 			);
@@ -240,6 +294,7 @@
 				65A6004CB795EA8B957B1E5D /* MenuLayoutTests.swift */,
 				59D6FA198F800706E447467A /* PrivacyControlTests.swift */,
 				516D4F9F03E090DCEE8EC009 /* ProfileEvidenceTests.swift */,
+				BE58EAFAE92EEF18DD4EAAA1 /* QualityBenchmarkTests.swift */,
 				C070E505E9D91EC26AA09A5A /* SessionStateTests.swift */,
 				54794DAEC547E3494825ADE5 /* ShortcutTests.swift */,
 				B12C957BF6C04450C0703E20 /* SigningConfigurationTests.swift */,
@@ -257,7 +312,9 @@
 		894841B1F65228C9E1BE9764 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				910820A7939AFC885A6212F5 /* AVFoundation.framework */,
 				06A18E19F1B48EFEB20C22AE /* FoundationModels.framework */,
+				101F6DEC31BA3A018E9F6504 /* Speech.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -269,6 +326,7 @@
 				FF30C75CE3F7AD5DF220B42E /* LocalVoiceBenchmark */,
 				B3C5DFFBFC0338FB812D0E9B /* LocalVoiceCore.framework */,
 				EDFABD8B1C3AADFD00D96648 /* LocalVoiceCoreTests.xctest */,
+				22E0DFCCC129529AC66F8BEC /* LocalVoiceQualityBench.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -292,6 +350,7 @@
 				D954E4DC6C8FA94B0EBCA617 /* LocalVoiceCore.swift */,
 				899BE7B20A2355389078DB15 /* ProfileAnalysis.swift */,
 				88E9284EA27402CFAA0B1041 /* ProfileEvidence.swift */,
+				128F07C398171C839269521A /* QualityBenchmark.swift */,
 				88A29A4B0E616C3B21EB7817 /* SessionHistory.swift */,
 				8DA8F63D6B3E3FED5BB49192 /* SpeechSignals.swift */,
 				512413B56A7CA45450630DD3 /* UserProfile.swift */,
@@ -331,6 +390,26 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		1CCEA2CDCF604F90761DBA3F /* LocalVoiceQualityBench */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6AE41F66415D6531E849C6E7 /* Build configuration list for PBXNativeTarget "LocalVoiceQualityBench" */;
+			buildPhases = (
+				A553E90CA8F7EC4542ED5583 /* Sources */,
+				A275BA375DBBC9077963DC07 /* Frameworks */,
+				624C8171D340F384915D2380 /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				56D07731638AE03882396827 /* PBXTargetDependency */,
+			);
+			name = LocalVoiceQualityBench;
+			packageProductDependencies = (
+			);
+			productName = LocalVoiceQualityBench;
+			productReference = 22E0DFCCC129529AC66F8BEC /* LocalVoiceQualityBench.app */;
+			productType = "com.apple.product-type.application";
+		};
 		4B1FA8561C8A784DC07C5E44 /* LocalVoiceCore */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 149CBCC09D1080AA6A33E8D9 /* Build configuration list for PBXNativeTarget "LocalVoiceCore" */;
@@ -426,6 +505,10 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
+					1CCEA2CDCF604F90761DBA3F = {
+						DevelopmentTeam = FB4M276Q93;
+						ProvisioningStyle = Automatic;
+					};
 					4B1FA8561C8A784DC07C5E44 = {
 						DevelopmentTeam = FB4M276Q93;
 						ProvisioningStyle = Automatic;
@@ -467,6 +550,7 @@
 				CC9F78A182AFAF0182C828B0 /* LocalVoiceBenchmark */,
 				4B1FA8561C8A784DC07C5E44 /* LocalVoiceCore */,
 				7CD0F7D87299E7105FB661D3 /* LocalVoiceCoreTests */,
+				1CCEA2CDCF604F90761DBA3F /* LocalVoiceQualityBench */,
 			);
 		};
 /* End PBXProject section */
@@ -502,6 +586,7 @@
 				68C53F6306354D36976356A7 /* MenuLayoutTests.swift in Sources */,
 				72B8672C54A24A08887B8FD4 /* PrivacyControlTests.swift in Sources */,
 				1E108DF96C40C6EFC3FA3BA4 /* ProfileEvidenceTests.swift in Sources */,
+				C0913BC480AAEB19F66E2E81 /* QualityBenchmarkTests.swift in Sources */,
 				5232C9777A022AD3FBA9DACF /* SessionStateTests.swift in Sources */,
 				0F0E477A5495FABC84BF683A /* ShortcutTests.swift in Sources */,
 				811A80196A808CB546320105 /* SigningConfigurationTests.swift in Sources */,
@@ -545,6 +630,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A553E90CA8F7EC4542ED5583 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F093F2B41E839F3E4D0DED5F /* BenchmarkMain.swift in Sources */,
+				5930E93B4A9ED727F18A3D12 /* FoundationModelBackend.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		CF4AC9C75FEC590FF1D26238 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -556,6 +650,7 @@
 				F64A9DA25BF6EF807F897B10 /* LocalVoiceCore.swift in Sources */,
 				DD08719BFAA69CA8FFD1C762 /* ProfileAnalysis.swift in Sources */,
 				DF88C99B2CA90908F2E6DFCF /* ProfileEvidence.swift in Sources */,
+				038C43886756943116EEC43D /* QualityBenchmark.swift in Sources */,
 				6A8FAA1DD62E41F9337DA3E3 /* SessionHistory.swift in Sources */,
 				2F1A47BA1D6A8F9148C32751 /* SpeechSignals.swift in Sources */,
 				37DF5DC005186433880DA0C2 /* UserProfile.swift in Sources */,
@@ -570,6 +665,11 @@
 			isa = PBXTargetDependency;
 			target = 4B1FA8561C8A784DC07C5E44 /* LocalVoiceCore */;
 			targetProxy = 274B9FB3532CBF62417DF1CD /* PBXContainerItemProxy */;
+		};
+		56D07731638AE03882396827 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4B1FA8561C8A784DC07C5E44 /* LocalVoiceCore */;
+			targetProxy = B5B5626E1D7DE2F92DF86374 /* PBXContainerItemProxy */;
 		};
 		9B247BFEF6FADEA579207F0E /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -602,16 +702,32 @@
 		5689D11C45A1AA80C79F15A0 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.localvoice.LocalVoiceBenchmark;
 				PRODUCT_NAME = LocalVoiceBenchmark;
 				SDKROOT = macosx;
 			};
 			name = Release;
+		};
+		5DD859EC2D0CEE3C184FE678 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "LocalVoiceQualityBench reads local audio files for benchmark scoring.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "LocalVoiceQualityBench needs speech recognition access to score local audio fixtures.";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.localvoice.qualitybench;
+				PRODUCT_NAME = LocalVoiceQualityBench;
+				SDKROOT = macosx;
+			};
+			name = Debug;
 		};
 		619EF9289A7E0AE43937EE34 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -742,16 +858,32 @@
 		A80B9D3375EAF36029DB76E6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				COMBINE_HIDPI_IMAGES = YES;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/../Frameworks",
-				);
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)";
 				PRODUCT_BUNDLE_IDENTIFIER = com.localvoice.LocalVoiceBenchmark;
 				PRODUCT_NAME = LocalVoiceBenchmark;
 				SDKROOT = macosx;
 			};
 			name = Debug;
+		};
+		B3F2C5E16CEF1ED5C8C6178C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGNING_ALLOWED = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_HARDENED_RUNTIME = NO;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "LocalVoiceQualityBench reads local audio files for benchmark scoring.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "LocalVoiceQualityBench needs speech recognition access to score local audio fixtures.";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.localvoice.qualitybench;
+				PRODUCT_NAME = LocalVoiceQualityBench;
+				SDKROOT = macosx;
+			};
+			name = Release;
 		};
 		BCF30B75684F8DF9D2055355 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -877,6 +1009,15 @@
 			buildConfigurations = (
 				BCF30B75684F8DF9D2055355 /* Debug */,
 				74C2D4DFDB1BF14CFFDF642C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		6AE41F66415D6531E849C6E7 /* Build configuration list for PBXNativeTarget "LocalVoiceQualityBench" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5DD859EC2D0CEE3C184FE678 /* Debug */,
+				B3F2C5E16CEF1ED5C8C6178C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

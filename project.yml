@@ -98,7 +98,31 @@ targets:
         product: Tokenizers
     settings:
       base:
+        CODE_SIGNING_ALLOWED: NO
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)"
         PRODUCT_NAME: LocalVoiceBenchmark
+  LocalVoiceQualityBench:
+    type: application
+    platform: macOS
+    sources:
+      - Tools/LocalVoiceQualityBench
+      - Sources/LocalVoiceApp/FoundationModelBackend.swift
+    dependencies:
+      - target: LocalVoiceCore
+      - sdk: AVFoundation.framework
+      - sdk: FoundationModels.framework
+      - sdk: Speech.framework
+    settings:
+      base:
+        CODE_SIGNING_ALLOWED: YES
+        CODE_SIGN_IDENTITY: "-"
+        ENABLE_HARDENED_RUNTIME: NO
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: LocalVoiceQualityBench reads local audio files for benchmark scoring.
+        INFOPLIST_KEY_NSSpeechRecognitionUsageDescription: LocalVoiceQualityBench needs speech recognition access to score local audio fixtures.
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path @executable_path/../Frameworks $(BUILT_PRODUCTS_DIR)"
+        PRODUCT_BUNDLE_IDENTIFIER: com.localvoice.qualitybench
+        PRODUCT_NAME: LocalVoiceQualityBench
 schemes:
   LocalVoice:
     build:
@@ -112,5 +136,11 @@ schemes:
     build:
       targets:
         LocalVoiceBenchmark: all
+    run:
+      config: Release
+  LocalVoiceQualityBench:
+    build:
+      targets:
+        LocalVoiceQualityBench: all
     run:
       config: Release
