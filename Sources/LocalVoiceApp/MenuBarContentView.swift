@@ -28,8 +28,6 @@ struct MenuBarContentView: View {
                 shortcut: model.englishShortcut
             )
             separator
-            modelRow
-            separator
             settingsRow
             if showsSettings {
                 separator
@@ -86,37 +84,6 @@ struct MenuBarContentView: View {
         .frame(height: MenuLayout.nativeRowHeight)
     }
 
-    private var modelRow: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "cpu")
-                .font(.system(size: 13))
-                .foregroundStyle(.secondary)
-                .frame(width: 16)
-            Text("模型")
-                .font(.system(size: 13))
-            Spacer()
-            Picker(
-                "模型",
-                selection: Binding(
-                    get: { manager.selectedBackend },
-                    set: { model.selectLanguageModelBackend($0) }
-                )
-            ) {
-                ForEach(LanguageModelBackendKind.allCases, id: \.self) {
-                    backend in
-                    Text(backend.displayName).tag(backend)
-                }
-            }
-            .labelsHidden()
-            .pickerStyle(.menu)
-            .controlSize(.small)
-            .frame(maxWidth: 76)
-            .disabled(!model.canChangeLanguageModelBackend)
-        }
-        .padding(.horizontal, MenuLayout.horizontalPadding)
-        .frame(height: MenuLayout.nativeRowHeight)
-    }
-
     private var settingsRow: some View {
         Button {
             showsSettings.toggle()
@@ -164,7 +131,6 @@ private struct NativeSettingsView: View {
     @ObservedObject var model: AppModel
     @ObservedObject private var manager: LocalModelManager
     @State private var showsClearConfirmation = false
-    @State private var showsModelRemovalConfirmation = false
 
     init(model: AppModel) {
         self.model = model
@@ -183,7 +149,7 @@ private struct NativeSettingsView: View {
                         .lineLimit(1)
                 }
                 Spacer()
-                modelAction
+                modelStatusIcon
             }
 
             TextField("邮件签名，例如 Max", text: $model.signature)
@@ -255,58 +221,22 @@ private struct NativeSettingsView: View {
             }
             Button("取消", role: .cancel) {}
         } message: {
-            Text("画像、模型、邮件签名和快捷键设置都会被删除。系统权限需在系统设置中单独撤销。")
-        }
-        .confirmationDialog(
-            "移除 Qwen 模型？",
-            isPresented: $showsModelRemovalConfirmation,
-            titleVisibility: .visible
-        ) {
-            Button("移除模型", role: .destructive) {
-                manager.remove()
-            }
-            Button("取消", role: .cancel) {}
-        } message: {
-            Text("将释放约 2.3 GB 空间。之后可随时重新下载。")
+            Text("画像、邮件签名和快捷键设置都会被删除。系统权限需在系统设置中单独撤销。")
         }
     }
 
     @ViewBuilder
-    private var modelAction: some View {
-        if manager.managesDownload {
-            switch manager.state {
-            case .notInstalled, .failed, .unavailable:
-                Button("下载") {
-                    manager.download()
-                }
-                .buttonStyle(.bordered)
+    private var modelStatusIcon: some View {
+        switch manager.state {
+        case .loading:
+            ProgressView()
                 .controlSize(.small)
-            case .downloading, .loading:
-                ProgressView()
-                    .controlSize(.small)
-            case .ready:
-                Button("移除", role: .destructive) {
-                    showsModelRemovalConfirmation = true
-                }
-                .buttonStyle(.bordered)
-                .controlSize(.small)
-                .disabled(!model.canChangeLanguageModelBackend)
-            case .removing:
-                ProgressView()
-                    .controlSize(.small)
-            }
-        } else {
-            switch manager.state {
-            case .loading, .removing:
-                ProgressView()
-                    .controlSize(.small)
-            case .ready:
-                Image(systemName: "checkmark.circle.fill")
-                    .foregroundStyle(.green)
-            case .notInstalled, .downloading, .unavailable, .failed:
-                Image(systemName: "exclamationmark.circle")
-                    .foregroundStyle(.secondary)
-            }
+        case .ready:
+            Image(systemName: "checkmark.circle.fill")
+                .foregroundStyle(.green)
+        case .unavailable, .failed:
+            Image(systemName: "exclamationmark.circle")
+                .foregroundStyle(.secondary)
         }
     }
 }

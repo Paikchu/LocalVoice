@@ -11,10 +11,6 @@ actor FoundationModelBackend: LanguageModelBackend {
         )
     }
 
-    nonisolated var managedAsset: (any ManagedLanguageModelAsset)? {
-        nil
-    }
-
     func availability() async -> LanguageModelBackendAvailability {
         switch SystemLanguageModel.default.availability {
         case .available:

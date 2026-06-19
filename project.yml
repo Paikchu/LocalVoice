@@ -13,15 +13,9 @@ settings:
     DEVELOPMENT_TEAM: FB4M276Q93
     ENABLE_HARDENED_RUNTIME: YES
 packages:
-  MLXSwiftLM:
-    url: https://github.com/ml-explore/mlx-swift-lm
-    exactVersion: 3.31.3
-  HuggingFace:
-    url: https://github.com/huggingface/swift-huggingface
-    from: 0.9.0
-  SwiftTransformers:
-    url: https://github.com/huggingface/swift-transformers
-    from: 1.3.0
+  WhisperKit:
+    url: https://github.com/argmaxinc/WhisperKit
+    from: 0.18.0
 targets:
   LocalVoiceCore:
     type: framework
@@ -42,14 +36,8 @@ targets:
     dependencies:
       - target: LocalVoiceCore
       - sdk: FoundationModels.framework
-      - package: MLXSwiftLM
-        product: MLXLLM
-      - package: MLXSwiftLM
-        product: MLXLMCommon
-      - package: HuggingFace
-        product: HuggingFace
-      - package: SwiftTransformers
-        product: Tokenizers
+      - package: WhisperKit
+        product: WhisperKit
     info:
       path: Sources/LocalVoiceApp/Info.plist
       properties:
@@ -85,17 +73,10 @@ targets:
     platform: macOS
     sources:
       - Tools/LocalVoiceBenchmark
-      - Sources/LocalVoiceApp/MLXLanguageModelService.swift
+      - Sources/LocalVoiceApp/FoundationModelBackend.swift
     dependencies:
       - target: LocalVoiceCore
-      - package: MLXSwiftLM
-        product: MLXLLM
-      - package: MLXSwiftLM
-        product: MLXLMCommon
-      - package: HuggingFace
-        product: HuggingFace
-      - package: SwiftTransformers
-        product: Tokenizers
+      - sdk: FoundationModels.framework
     settings:
       base:
         CODE_SIGNING_ALLOWED: NO

@@ -45,7 +45,7 @@ final class AppModel: ObservableObject {
     private var projection = RealtimeTextProjection()
     private var recognitionAccumulator = RecognitionTranscriptAccumulator()
     private var draft = DictationDraft()
-    private let speechService = SpeechRecognitionService()
+    private let speechService: any SpeechRecognitionBackend
     private let hotkeyController = HotkeyController()
     private let insertionService = TextInsertionService()
     private let selectedTextService = SelectedTextService()
@@ -68,7 +68,8 @@ final class AppModel: ObservableObject {
         category: "session"
     )
 
-    init() {
+    init(speechService: any SpeechRecognitionBackend = SpeechRecognitionService()) {
+        self.speechService = speechService
         modelManager = LocalModelManager()
         processingService = DraftProcessingService(
             languageModel: modelManager.proxy
@@ -114,15 +115,6 @@ final class AppModel: ObservableObject {
         return false
     }
 
-    var canChangeLanguageModelBackend: Bool {
-        guard !modelManager.isBusy else { return false }
-        switch state {
-        case .ready, .failed:
-            return true
-        default:
-            return false
-        }
-    }
 
     func start() {
         hotkeyController.onShortcut = { [weak self] shortcut in
@@ -230,8 +222,9 @@ final class AppModel: ObservableObject {
         speechServiceStarted = false
         speechService.stop()
         pendingFinalizationTask?.cancel()
+        let grace = speechService.finalizationGrace
         pendingFinalizationTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(700))
+            try? await Task.sleep(for: grace)
             guard !Task.isCancelled else { return }
             self?.finalize(mode: mode)
         }
@@ -573,11 +566,6 @@ final class AppModel: ObservableObject {
         state = stateMachine.handle(.fail(message))
         statusMessage = message
         panelController.showError()
-    }
-
-    func selectLanguageModelBackend(_ backend: LanguageModelBackendKind) {
-        guard canChangeLanguageModelBackend else { return }
-        modelManager.select(backend)
     }
 
     func setActivationSoundEnabled(_ isEnabled: Bool) {

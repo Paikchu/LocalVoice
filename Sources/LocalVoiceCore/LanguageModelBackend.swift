@@ -7,45 +7,15 @@ public enum LanguageModelBackendKind:
     Hashable,
     Sendable
 {
-    case qwen
     case foundationModels
 
-    public static let defaultValue: Self = .qwen
+    public static let defaultValue: Self = .foundationModels
 
     public var displayName: String {
         switch self {
-        case .qwen:
-            return "Qwen"
         case .foundationModels:
             return "Foundation Models"
         }
-    }
-}
-
-public struct LanguageModelPreferenceStore {
-    public static let key = "languageModelBackend"
-
-    private let defaults: UserDefaults
-    private let key: String
-
-    public init(
-        defaults: UserDefaults = .standard,
-        key: String = Self.key
-    ) {
-        self.defaults = defaults
-        self.key = key
-    }
-
-    public func load() -> LanguageModelBackendKind {
-        guard let rawValue = defaults.string(forKey: key),
-              let backend = LanguageModelBackendKind(rawValue: rawValue) else {
-            return .defaultValue
-        }
-        return backend
-    }
-
-    public func save(_ backend: LanguageModelBackendKind) {
-        defaults.set(backend.rawValue, forKey: key)
     }
 }
 
@@ -71,88 +41,18 @@ public enum LanguageModelBackendAvailability: Equatable, Sendable {
 }
 
 public enum LanguageModelLifecycleState: Equatable, Sendable {
-    case notInstalled
-    case downloading(Double)
     case loading
     case ready
-    case removing
     case unavailable(String)
     case failed(String)
 
     public var isBusy: Bool {
-        switch self {
-        case .downloading, .loading, .removing:
-            return true
-        default:
-            return false
-        }
+        self == .loading
     }
-
-    public var allowsDownload: Bool {
-        switch self {
-        case .notInstalled, .unavailable, .failed:
-            return true
-        default:
-            return false
-        }
-    }
-
-    public var allowsRemoval: Bool {
-        self == .ready
-    }
-}
-
-public struct ManagedModelStorage: Sendable {
-    public let rootDirectory: URL
-    public let repositoryDirectoryName: String
-
-    public init(
-        rootDirectory: URL,
-        repositoryDirectoryName: String
-    ) {
-        self.rootDirectory = rootDirectory
-        self.repositoryDirectoryName = repositoryDirectoryName
-    }
-
-    public var artifactDirectories: [URL] {
-        [
-            rootDirectory.appendingPathComponent(
-                repositoryDirectoryName,
-                isDirectory: true
-            ),
-            rootDirectory
-                .appendingPathComponent(".metadata", isDirectory: true)
-                .appendingPathComponent(
-                    repositoryDirectoryName,
-                    isDirectory: true
-                ),
-            rootDirectory
-                .appendingPathComponent(".locks", isDirectory: true)
-                .appendingPathComponent(
-                    repositoryDirectoryName,
-                    isDirectory: true
-                )
-        ]
-    }
-
-    public func removeArtifacts(
-        fileManager: FileManager = .default
-    ) throws {
-        for directory in artifactDirectories
-        where fileManager.fileExists(atPath: directory.path) {
-            try fileManager.removeItem(at: directory)
-        }
-    }
-}
-
-public protocol ManagedLanguageModelAsset: Sendable {
-    func isInstalled() async -> Bool
-    func removeFiles() async throws
 }
 
 public protocol LanguageModelBackend: LocalLanguageModelService {
     nonisolated var descriptor: LanguageModelBackendDescriptor { get }
-    nonisolated var managedAsset: (any ManagedLanguageModelAsset)? { get }
 
     func availability() async -> LanguageModelBackendAvailability
     func prepare(
