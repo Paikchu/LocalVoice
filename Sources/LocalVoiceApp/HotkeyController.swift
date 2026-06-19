@@ -5,6 +5,7 @@ import LocalVoiceCore
 final class HotkeyController {
     var onShortcut: ((KeyboardShortcut) -> Bool)?
     var isRecordingShortcut: (() -> Bool)?
+    var activeMode: (() -> VoiceMode?)?
 
     private static let signature: OSType = 0x4C564F49
     private var shortcuts: ShortcutPair?
@@ -189,10 +190,15 @@ final class HotkeyController {
         }
 
         guard type == .keyDown,
-              let shortcuts,
-              let mode = shortcuts.sideSpecificMode(
-                  matching: shortcut(from: event)
-              ) else {
+              let shortcuts else {
+            return Unmanaged.passUnretained(event)
+        }
+
+        let eventShortcut = shortcut(from: event)
+        guard let mode = shortcuts.mode(
+            matching: eventShortcut,
+            activeMode: activeMode?()
+        ) else {
             return Unmanaged.passUnretained(event)
         }
 
@@ -298,17 +304,5 @@ final class HotkeyController {
 private extension ShortcutPair {
     var containsSideSpecificShortcut: Bool {
         !dictation.modifierSides.isEmpty || !english.modifierSides.isEmpty
-    }
-
-    func sideSpecificMode(matching shortcut: KeyboardShortcut) -> VoiceMode? {
-        if !dictation.modifierSides.isEmpty,
-           dictation.matches(shortcut) {
-            return .dictation
-        }
-        if !english.modifierSides.isEmpty,
-           english.matches(shortcut) {
-            return .english
-        }
-        return nil
     }
 }

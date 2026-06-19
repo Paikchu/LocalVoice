@@ -72,6 +72,57 @@ import Testing
     )
 }
 
+@Test func activeSideSpecificShortcutCanFinishFromEitherModifierSide() {
+    let pair = ShortcutPair(
+        dictation: KeyboardShortcut(
+            keyCode: 37,
+            modifiers: [.command]
+        ),
+        english: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command],
+            modifierSides: [.leftCommand]
+        )
+    )
+
+    #expect(
+        pair.mode(
+            matching: KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.rightCommand]
+            ),
+            activeMode: .english
+        ) == .english
+    )
+}
+
+@Test func exactSideSpecificShortcutWinsOverActiveModeFallback() {
+    let pair = ShortcutPair(
+        dictation: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command],
+            modifierSides: [.rightCommand]
+        ),
+        english: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command],
+            modifierSides: [.leftCommand]
+        )
+    )
+
+    #expect(
+        pair.mode(
+            matching: KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.rightCommand]
+            ),
+            activeMode: .english
+        ) == .dictation
+    )
+}
+
 @Test func legacyGenericModifierShortcutMatchesEitherSide() {
     let shortcut = KeyboardShortcut(keyCode: 14, modifiers: [.command])
 

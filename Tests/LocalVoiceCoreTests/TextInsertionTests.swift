@@ -56,6 +56,17 @@ import Testing
     )
 }
 
+@Test func unknownVoiceCursorStillAttemptsPasteboardInsertion() {
+    #expect(
+        TextInsertionPolicy.destination(
+            accessibilityGranted: true,
+            requiresCurrentSelection: false,
+            selectionIsCurrent: true,
+            cursorAvailability: .unknown
+        ) == .target
+    )
+}
+
 @Test func currentTargetUsesPasteboardInsertion() {
     #expect(
         TextInsertionPolicy.destination(

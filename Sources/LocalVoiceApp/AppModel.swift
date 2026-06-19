@@ -136,6 +136,11 @@ final class AppModel: ObservableObject {
                 self?.recordingShortcut != nil
             }
         }
+        hotkeyController.activeMode = { [weak self] in
+            MainActor.assumeIsolated {
+                self?.activeRecordingMode
+            }
+        }
         hotkeyController.setShortcuts(shortcutPair)
         hotkeyController.start()
         panelController.bind(to: self)
@@ -641,6 +646,13 @@ final class AppModel: ObservableObject {
             isEnabled: activationSoundEnabled,
             option: activationSoundOption
         )
+    }
+
+    private var activeRecordingMode: VoiceMode? {
+        if case .listening(let mode) = state {
+            return mode
+        }
+        return nil
     }
 
     private var canStartSelectedTextTranslation: Bool {

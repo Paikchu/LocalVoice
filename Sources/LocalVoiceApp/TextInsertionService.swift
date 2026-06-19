@@ -116,14 +116,18 @@ final class TextInsertionService {
             let selectionIsCurrent = selection?.isCurrent(
                 currentApplicationPID: currentPID
             ) ?? true
-            let cursorIsAvailable = selection != nil
-                || self.cursorIsAvailable(for: target.applicationPID)
+            let cursorAvailability: TextCursorAvailability = selection != nil
+                ? .available
+                : self.cursorAvailability(
+                    for: target.applicationPID,
+                    currentApplicationPID: currentPID
+                )
             let destination = TextInsertionPolicy.destination(
                 accessibilityGranted:
                     PermissionCoordinator.accessibilityGranted,
                 requiresCurrentSelection: selection != nil,
                 selectionIsCurrent: selectionIsCurrent,
-                cursorIsAvailable: cursorIsAvailable
+                cursorAvailability: cursorAvailability
             )
             if destination == .clipboard {
                 self.logger.notice(
@@ -152,7 +156,13 @@ final class TextInsertionService {
         }
     }
 
-    private func cursorIsAvailable(for applicationPID: Int32) -> Bool {
+    private func cursorAvailability(
+        for applicationPID: Int32,
+        currentApplicationPID: Int32?
+    ) -> TextCursorAvailability {
+        guard currentApplicationPID == applicationPID else {
+            return .unavailable
+        }
         let systemWide = AXUIElementCreateSystemWide()
         var focusedValue: CFTypeRef?
         guard AXUIElementCopyAttributeValue(
@@ -162,13 +172,13 @@ final class TextInsertionService {
         ) == .success,
               let focusedValue,
               CFGetTypeID(focusedValue) == AXUIElementGetTypeID() else {
-            return false
+            return .unknown
         }
         let element = unsafeDowncast(focusedValue, to: AXUIElement.self)
         var pid: pid_t = 0
         guard AXUIElementGetPid(element, &pid) == .success,
               pid == applicationPID else {
-            return false
+            return .unavailable
         }
 
         var selectedRangeValue: CFTypeRef?
@@ -179,11 +189,13 @@ final class TextInsertionService {
         ) == .success,
               let selectedRangeValue,
               CFGetTypeID(selectedRangeValue) == AXValueGetTypeID() else {
-            return false
+            return .unknown
         }
         let axRange = unsafeDowncast(selectedRangeValue, to: AXValue.self)
         var range = CFRange()
         return AXValueGetValue(axRange, .cfRange, &range)
+            ? .available
+            : .unknown
     }
 
     private func copyToClipboard(_ document: FormattedDocument) -> Bool {

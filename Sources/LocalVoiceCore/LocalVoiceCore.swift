@@ -471,6 +471,23 @@ public struct ShortcutPair: Equatable, Sendable {
         return nil
     }
 
+    public func mode(
+        matching shortcut: KeyboardShortcut,
+        activeMode: VoiceMode?
+    ) -> VoiceMode? {
+        if let exactMode = mode(matching: shortcut) {
+            return exactMode
+        }
+        guard let activeMode else { return nil }
+        let activeShortcut = self.shortcut(for: activeMode)
+        guard !activeShortcut.modifierSides.isEmpty,
+              activeShortcut.keyCode == shortcut.keyCode,
+              activeShortcut.modifiers == shortcut.modifiers else {
+            return nil
+        }
+        return activeMode
+    }
+
     public func shortcut(for mode: VoiceMode) -> KeyboardShortcut {
         switch mode {
         case .dictation:
@@ -626,6 +643,12 @@ public enum TextInsertionDestination: Equatable, Sendable {
     case clipboard
 }
 
+public enum TextCursorAvailability: Equatable, Sendable {
+    case available
+    case unavailable
+    case unknown
+}
+
 public enum TextInsertionPolicy {
     public static func destination(
         accessibilityGranted: Bool,
@@ -633,11 +656,25 @@ public enum TextInsertionPolicy {
         selectionIsCurrent: Bool,
         cursorIsAvailable: Bool
     ) -> TextInsertionDestination {
+        destination(
+            accessibilityGranted: accessibilityGranted,
+            requiresCurrentSelection: requiresCurrentSelection,
+            selectionIsCurrent: selectionIsCurrent,
+            cursorAvailability: cursorIsAvailable ? .available : .unavailable
+        )
+    }
+
+    public static func destination(
+        accessibilityGranted: Bool,
+        requiresCurrentSelection: Bool,
+        selectionIsCurrent: Bool,
+        cursorAvailability: TextCursorAvailability
+    ) -> TextInsertionDestination {
         guard accessibilityGranted else { return .clipboard }
         if requiresCurrentSelection {
             return selectionIsCurrent ? .target : .clipboard
         }
-        return cursorIsAvailable ? .target : .clipboard
+        return cursorAvailability == .unavailable ? .clipboard : .target
     }
 }
 
