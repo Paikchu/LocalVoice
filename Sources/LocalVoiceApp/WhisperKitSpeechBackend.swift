@@ -63,6 +63,11 @@ final class WhisperKitSpeechBackend: SpeechRecognitionBackend, @unchecked Sendab
         self.modelFolder = modelFolder
         self.language = language
         self.partialInterval = partialInterval
+        // Pre-warm: load model in background so it is ready by the time the
+        // user presses the shortcut, not during their first recording.
+        Task.detached(priority: .background) { [weak self] in
+            _ = try? await self?.ensureModel()
+        }
     }
 
     static func bundledModelFolder() -> String? {
@@ -165,14 +170,18 @@ final class WhisperKitSpeechBackend: SpeechRecognitionBackend, @unchecked Sendab
         if let kit = await store.whisperKit {
             return kit
         }
-        let variant = modelVariant
-        let folder = modelFolder
-        let config = WhisperKitConfig(
-            model: variant,
-            modelFolder: folder,
-            download: folder == nil
-        )
+        // When modelFolder is set (bundled model), do NOT also pass model —
+        // WhisperKit concatenates model name onto modelFolder as a sub-path,
+        // which breaks if we flattened the variant folder during packaging.
+        let config: WhisperKitConfig
+        if let folder = modelFolder {
+            config = WhisperKitConfig(modelFolder: folder, download: false)
+        } else {
+            config = WhisperKitConfig(model: modelVariant, download: true)
+        }
+        logger.info("WhisperKit loading from \(config.modelFolder ?? "HuggingFace", privacy: .public)")
         let kit = try await WhisperKit(config)
+        logger.info("WhisperKit ready")
         await store.setWhisperKit(kit)
         return kit
     }
