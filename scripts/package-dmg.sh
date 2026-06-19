@@ -8,6 +8,10 @@ STAGING="$ROOT/build/dmg-staging"
 APP="$STAGING/LocalVoice.app"
 
 cd "$ROOT"
+
+# Bundle the Whisper model into Resources/ before the build picks it up.
+zsh "$ROOT/scripts/download-whisper-model.sh"
+
 xcodegen generate
 xcodebuild \
   -project LocalVoice.xcodeproj \

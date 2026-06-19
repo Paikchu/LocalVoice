@@ -33,6 +33,12 @@ targets:
     platform: macOS
     sources:
       - Sources/LocalVoiceApp
+    resources:
+      # Bundled Whisper model — downloaded by scripts/download-whisper-model.sh
+      # at packaging time, never committed to git.
+      - path: Resources/WhisperModels
+        optional: true
+        type: folder
     dependencies:
       - target: LocalVoiceCore
       - sdk: FoundationModels.framework
