@@ -63,10 +63,12 @@ final class WhisperKitSpeechBackend: SpeechRecognitionBackend, @unchecked Sendab
         self.modelFolder = modelFolder
         self.language = language
         self.partialInterval = partialInterval
-        // Pre-warm: load model in background so it is ready by the time the
-        // user presses the shortcut, not during their first recording.
-        Task.detached(priority: .background) { [weak self] in
+    }
+
+    func preload(onReady: @escaping @MainActor @Sendable () -> Void) {
+        Task.detached(priority: .userInitiated) { [weak self] in
             _ = try? await self?.ensureModel()
+            await onReady()
         }
     }
 

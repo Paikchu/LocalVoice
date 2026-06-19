@@ -152,6 +152,24 @@ private struct NativeSettingsView: View {
                 modelStatusIcon
             }
 
+            HStack(spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Whisper ASR")
+                        .font(.system(size: 12, weight: .medium))
+                    Text(model.asrModelReady ? "已就绪" : "正在加载…")
+                        .font(.system(size: 11))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                if model.asrModelReady {
+                    Image(systemName: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+
             TextField("邮件签名，例如 Max", text: $model.signature)
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 12))

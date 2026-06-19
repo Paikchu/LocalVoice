@@ -7,6 +7,7 @@ import OSLog
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var state: SessionState = .ready
+    @Published private(set) var asrModelReady = false
     @Published private(set) var transcript = ""
     @Published private(set) var unstableTranscript = ""
     @Published private(set) var audioLevel: Float = 0
@@ -138,6 +139,9 @@ final class AppModel: ObservableObject {
         panelController.bind(to: self)
         _ = PermissionCoordinator.requestAccessibilityOnce()
         modelManager.preloadIfInstalled()
+        speechService.preload { [weak self] in
+            self?.asrModelReady = true
+        }
         Task {
             await profileStore.setEnabled(true)
             await profileStore.load()
@@ -292,6 +296,10 @@ final class AppModel: ObservableObject {
     }
 
     private func begin(_ mode: VoiceMode) {
+        guard asrModelReady else {
+            statusMessage = "语音模型正在加载，请稍候…"
+            return
+        }
         pendingStartTask?.cancel()
         let startup = recordingStartupGate.begin()
         speechServiceStarted = false

@@ -100,9 +100,19 @@ public protocol SpeechRecognitionBackend: AnyObject {
 
     /// Abort immediately; deliver no further partial, final, or error.
     func cancel()
+
+    /// Begin loading the underlying model in the background.
+    /// Call `onReady` on the main actor when the model is ready to transcribe.
+    /// Engines with no model to load call `onReady` immediately.
+    func preload(onReady: @escaping @MainActor @Sendable () -> Void)
 }
 
 public extension SpeechRecognitionBackend {
     /// Default grace tuned for streaming recognizers that finalize quickly.
     var finalizationGrace: Duration { .milliseconds(700) }
+
+    /// Default: no model to load — ready immediately.
+    func preload(onReady: @escaping @MainActor @Sendable () -> Void) {
+        Task { @MainActor in onReady() }
+    }
 }
