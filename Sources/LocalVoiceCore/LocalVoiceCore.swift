@@ -294,27 +294,148 @@ public struct ShortcutModifiers: OptionSet, Codable, Equatable, Sendable {
     public static let control = Self(rawValue: 1 << 3)
 }
 
+public struct ShortcutModifierSides: OptionSet, Codable, Equatable, Sendable {
+    public let rawValue: UInt
+
+    public init(rawValue: UInt) {
+        self.rawValue = rawValue
+    }
+
+    public static let leftCommand = Self(rawValue: 1 << 0)
+    public static let rightCommand = Self(rawValue: 1 << 1)
+    public static let leftShift = Self(rawValue: 1 << 2)
+    public static let rightShift = Self(rawValue: 1 << 3)
+    public static let leftOption = Self(rawValue: 1 << 4)
+    public static let rightOption = Self(rawValue: 1 << 5)
+    public static let leftControl = Self(rawValue: 1 << 6)
+    public static let rightControl = Self(rawValue: 1 << 7)
+}
+
 public struct KeyboardShortcut: Codable, Equatable, Sendable {
     public var keyCode: UInt16
     public var modifiers: ShortcutModifiers
+    public var modifierSides: ShortcutModifierSides
 
-    public init(keyCode: UInt16, modifiers: ShortcutModifiers) {
+    private enum CodingKeys: String, CodingKey {
+        case keyCode
+        case modifiers
+        case modifierSides
+    }
+
+    public init(
+        keyCode: UInt16,
+        modifiers: ShortcutModifiers,
+        modifierSides: ShortcutModifierSides = []
+    ) {
         self.keyCode = keyCode
         self.modifiers = modifiers
+        self.modifierSides = modifierSides.intersection(
+            Self.sidesMask(for: modifiers)
+        )
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let keyCode = try container.decode(UInt16.self, forKey: .keyCode)
+        let modifiers = try container.decode(
+            ShortcutModifiers.self,
+            forKey: .modifiers
+        )
+        let modifierSides = try container.decodeIfPresent(
+            ShortcutModifierSides.self,
+            forKey: .modifierSides
+        ) ?? []
+        self.init(
+            keyCode: keyCode,
+            modifiers: modifiers,
+            modifierSides: modifierSides
+        )
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(keyCode, forKey: .keyCode)
+        try container.encode(modifiers, forKey: .modifiers)
+        try container.encode(modifierSides, forKey: .modifierSides)
     }
 
     public var validationError: String? {
         modifiers.isEmpty ? "快捷键必须包含修饰键" : nil
     }
 
+    public func matches(_ event: KeyboardShortcut) -> Bool {
+        guard keyCode == event.keyCode,
+              modifiers == event.modifiers else {
+            return false
+        }
+        guard !modifierSides.isEmpty else { return true }
+        return modifierSides == event.modifierSides
+    }
+
+    public func conflicts(with other: KeyboardShortcut) -> Bool {
+        matches(other) || other.matches(self)
+    }
+
     public var displayString: String {
         var value = ""
-        if modifiers.contains(.control) { value += "⌃" }
-        if modifiers.contains(.option) { value += "⌥" }
-        if modifiers.contains(.command) { value += "⌘" }
-        if modifiers.contains(.shift) { value += "⇧" }
+        value += displayModifier(
+            .control,
+            left: .leftControl,
+            right: .rightControl,
+            symbol: "⌃"
+        )
+        value += displayModifier(
+            .option,
+            left: .leftOption,
+            right: .rightOption,
+            symbol: "⌥"
+        )
+        value += displayModifier(
+            .command,
+            left: .leftCommand,
+            right: .rightCommand,
+            symbol: "⌘"
+        )
+        value += displayModifier(
+            .shift,
+            left: .leftShift,
+            right: .rightShift,
+            symbol: "⇧"
+        )
         value += Self.keyNames[keyCode] ?? "Key \(keyCode)"
         return value
+    }
+
+    private func displayModifier(
+        _ modifier: ShortcutModifiers,
+        left: ShortcutModifierSides,
+        right: ShortcutModifierSides,
+        symbol: String
+    ) -> String {
+        guard modifiers.contains(modifier) else { return "" }
+        let sides = modifierSides.intersection([left, right])
+        if sides == left { return "左\(symbol)" }
+        if sides == right { return "右\(symbol)" }
+        return symbol
+    }
+
+    private static func sidesMask(
+        for modifiers: ShortcutModifiers
+    ) -> ShortcutModifierSides {
+        var mask: ShortcutModifierSides = []
+        if modifiers.contains(.command) {
+            mask.insert([.leftCommand, .rightCommand])
+        }
+        if modifiers.contains(.shift) {
+            mask.insert([.leftShift, .rightShift])
+        }
+        if modifiers.contains(.option) {
+            mask.insert([.leftOption, .rightOption])
+        }
+        if modifiers.contains(.control) {
+            mask.insert([.leftControl, .rightControl])
+        }
+        return mask
     }
 
     private static let keyNames: [UInt16: String] = [
@@ -339,12 +460,14 @@ public struct ShortcutPair: Equatable, Sendable {
         if let error = dictation.validationError ?? english.validationError {
             return error
         }
-        return dictation == english ? "两个功能不能使用相同快捷键" : nil
+        return dictation.conflicts(with: english)
+            ? "两个功能不能使用相同快捷键"
+            : nil
     }
 
     public func mode(matching shortcut: KeyboardShortcut) -> VoiceMode? {
-        if shortcut == dictation { return .dictation }
-        if shortcut == english { return .english }
+        if dictation.matches(shortcut) { return .dictation }
+        if english.matches(shortcut) { return .english }
         return nil
     }
 
@@ -991,7 +1114,10 @@ public struct SessionStateMachine: Sendable {
             pendingMode = nextMode
             state = .finalizing(mode)
         case (.listening(let mode), .finish):
+            pendingMode = nil
             state = .finalizing(mode)
+        case (.finalizing, .finish):
+            pendingMode = nil
         case (.finalizing(let mode), .finalTranscriptReady):
             state = .processing(mode)
         case (.processing(let mode), .processingSucceeded),
@@ -1012,6 +1138,7 @@ public struct SessionStateMachine: Sendable {
                 state = .ready
             }
         case (.processing, .completed), (.inserting, .completed):
+            pendingMode = nil
             state = .ready
         case (_, .cancel):
             pendingMode = nil

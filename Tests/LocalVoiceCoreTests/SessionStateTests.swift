@@ -24,6 +24,28 @@ import Testing
     #expect(machine.pendingMode == .english)
 }
 
+@Test func finishDuringModeSwitchCancelsPendingRestart() {
+    var machine = SessionStateMachine()
+    _ = machine.handle(.start(.dictation))
+    _ = machine.handle(.start(.english))
+
+    #expect(machine.handle(.finish) == .finalizing(.dictation))
+    #expect(machine.pendingMode == nil)
+    #expect(machine.handle(.completed) == .ready)
+}
+
+@Test func copiedFallbackCompletionCancelsPendingRestart() {
+    var machine = SessionStateMachine()
+    _ = machine.handle(.start(.dictation))
+    _ = machine.handle(.start(.english))
+    _ = machine.handle(.finalTranscriptReady)
+    _ = machine.handle(.processingSucceeded)
+
+    #expect(machine.pendingMode == .english)
+    #expect(machine.handle(.completed) == .ready)
+    #expect(machine.pendingMode == nil)
+}
+
 @Test func intentionalRecognitionStopKeepsFinalResultsAndSuppressesErrors() {
     let gate = RecognitionSessionGate()
     let session = gate.begin()

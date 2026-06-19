@@ -198,9 +198,15 @@ final class AppModel: ObservableObject {
     }
 
     func finish() {
-        guard case .listening(let mode) = state else { return }
-        state = stateMachine.handle(.finish)
-        requestFinalization(mode: mode)
+        switch state {
+        case .listening(let mode):
+            state = stateMachine.handle(.finish)
+            requestFinalization(mode: mode)
+        case .finalizing:
+            state = stateMachine.handle(.finish)
+        default:
+            return
+        }
     }
 
     private func requestFinalization(mode: VoiceMode) {
@@ -430,12 +436,15 @@ final class AppModel: ObservableObject {
 
     private func completeSession(
         message: String = "已完成",
-        hideAfter delay: TimeInterval = 0.35
+        hideAfter delay: TimeInterval = 0.35,
+        allowsPendingRestart: Bool = true
     ) {
         pendingFinalizationTask?.cancel()
         pendingProcessingTask?.cancel()
         unstableTranscript = ""
-        state = stateMachine.handle(.insertionCompleted)
+        state = stateMachine.handle(
+            allowsPendingRestart ? .insertionCompleted : .completed
+        )
         statusMessage = message
         isTranslatingSelectedText = false
         processingProgress = message == "已完成"
@@ -538,7 +547,8 @@ final class AppModel: ObservableObject {
                     } else {
                         completeSession(
                             message: "光标不可用，内容已复制",
-                            hideAfter: 1.4
+                            hideAfter: 1.4,
+                            allowsPendingRestart: false
                         )
                     }
                 case .failed:
@@ -705,7 +715,8 @@ final class AppModel: ObservableObject {
                 case .copiedToClipboard:
                     completeSession(
                         message: "选区已变化，英文已复制",
-                        hideAfter: 1.4
+                        hideAfter: 1.4,
+                        allowsPendingRestart: false
                     )
                 case .failed:
                     fail("无法替换选区，英文复制失败")
@@ -734,6 +745,9 @@ final class AppModel: ObservableObject {
     }
 
     private func setShortcut(_ shortcut: KeyboardShortcut, for mode: VoiceMode) {
+        if !shortcut.modifierSides.isEmpty {
+            PermissionCoordinator.requestAccessibilityOnce()
+        }
         switch mode {
         case .dictation:
             dictationShortcut = shortcut

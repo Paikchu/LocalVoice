@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 @testable import LocalVoiceCore
 
@@ -18,6 +19,90 @@ import Testing
     let shortcut = KeyboardShortcut(keyCode: 2, modifiers: [.command, .shift])
 
     #expect(shortcut.displayString == "⌘⇧D")
+}
+
+@Test func rendersLeftAndRightModifierShortcutsForMenu() {
+    let left = KeyboardShortcut(
+        keyCode: 14,
+        modifiers: [.command],
+        modifierSides: [.leftCommand]
+    )
+    let right = KeyboardShortcut(
+        keyCode: 14,
+        modifiers: [.command],
+        modifierSides: [.rightCommand]
+    )
+
+    #expect(left.displayString == "左⌘E")
+    #expect(right.displayString == "右⌘E")
+}
+
+@Test func distinguishesLeftAndRightModifierShortcuts() {
+    let pair = ShortcutPair(
+        dictation: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command],
+            modifierSides: [.leftCommand]
+        ),
+        english: KeyboardShortcut(
+            keyCode: 14,
+            modifiers: [.command],
+            modifierSides: [.rightCommand]
+        )
+    )
+
+    #expect(pair.validationError == nil)
+    #expect(
+        pair.mode(
+            matching: KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.leftCommand]
+            )
+        ) == .dictation
+    )
+    #expect(
+        pair.mode(
+            matching: KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.rightCommand]
+            )
+        ) == .english
+    )
+}
+
+@Test func legacyGenericModifierShortcutMatchesEitherSide() {
+    let shortcut = KeyboardShortcut(keyCode: 14, modifiers: [.command])
+
+    #expect(
+        shortcut.matches(
+            KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.leftCommand]
+            )
+        )
+    )
+    #expect(
+        shortcut.matches(
+            KeyboardShortcut(
+                keyCode: 14,
+                modifiers: [.command],
+                modifierSides: [.rightCommand]
+            )
+        )
+    )
+}
+
+@Test func decodesLegacyShortcutWithoutModifierSides() throws {
+    let data = Data(
+        #"{"keyCode":14,"modifiers":1}"#.utf8
+    )
+
+    let shortcut = try JSONDecoder().decode(KeyboardShortcut.self, from: data)
+
+    #expect(shortcut == KeyboardShortcut(keyCode: 14, modifiers: [.command]))
 }
 
 @Test func matchesOnlyConfiguredGlobalShortcuts() {
