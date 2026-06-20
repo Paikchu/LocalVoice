@@ -12,10 +12,6 @@ settings:
     CODE_SIGN_IDENTITY: Apple Development
     DEVELOPMENT_TEAM: FB4M276Q93
     ENABLE_HARDENED_RUNTIME: YES
-packages:
-  WhisperKit:
-    url: https://github.com/argmaxinc/WhisperKit
-    from: 0.18.0
 targets:
   LocalVoiceCore:
     type: framework
@@ -36,14 +32,12 @@ targets:
     dependencies:
       - target: LocalVoiceCore
       - sdk: FoundationModels.framework
-      - package: WhisperKit
-        product: WhisperKit
     info:
       path: Sources/LocalVoiceApp/Info.plist
       properties:
         CFBundleDisplayName: LocalVoice
-        CFBundleShortVersionString: "1.0.4"
-        CFBundleVersion: "5"
+        CFBundleShortVersionString: "1.0.5"
+        CFBundleVersion: "6"
         LSUIElement: true
         NSMicrophoneUsageDescription: LocalVoice 需要麦克风权限来进行本地语音识别。
         NSSpeechRecognitionUsageDescription: LocalVoice 需要语音识别权限来实时转换你的语音。

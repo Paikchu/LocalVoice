@@ -154,7 +154,7 @@ private struct NativeSettingsView: View {
 
             HStack(spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Whisper ASR")
+                    Text("OpenRouter ASR")
                         .font(.system(size: 12, weight: .medium))
                     Text(model.asrModelReady ? "已就绪" : "正在加载…")
                         .font(.system(size: 11))

@@ -69,7 +69,7 @@ final class AppModel: ObservableObject {
         category: "session"
     )
 
-    init(speechService: any SpeechRecognitionBackend = WhisperKitSpeechBackend()) {
+    init(speechService: any SpeechRecognitionBackend = OpenRouterSpeechBackend()) {
         self.speechService = speechService
         modelManager = LocalModelManager()
         processingService = DraftProcessingService(
@@ -685,10 +685,8 @@ final class AppModel: ObservableObject {
             let glossary = glossaryTerms.map {
                 GlossaryTerm(canonical: $0, occurrences: 1, sessionCount: 1)
             }
-            let outcome = await processingService.process(
+            let outcome = await processingService.translateSelection(
                 transcript: capture.request.sourceText,
-                mode: .english,
-                signature: "",
                 glossary: glossary,
                 onProgress: processingProgressHandler()
             )

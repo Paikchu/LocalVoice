@@ -2,10 +2,8 @@ import Foundation
 
 /// Identifies which speech-recognition implementation is active.
 ///
-/// `apple` is the OS-provided `SFSpeechRecognizer` (zero download, always
-/// available). `whisper` is the downloadable / bundled WhisperKit model, which
-/// handles Chinese–English code-switching far better than Apple's `zh-CN`
-/// on-device model. See the route-B design in `docs/plans`.
+/// `openRouter` is the cloud STT path. `apple` is the OS-provided
+/// `SFSpeechRecognizer` fallback.
 public enum SpeechRecognitionBackendKind:
     String,
     CaseIterable,
@@ -13,18 +11,209 @@ public enum SpeechRecognitionBackendKind:
     Hashable,
     Sendable
 {
+    case openRouter
     case apple
-    case whisper
 
-    public static let defaultValue: Self = .whisper
+    public static let defaultValue: Self = .openRouter
 
     public var displayName: String {
         switch self {
+        case .openRouter:
+            return "OpenRouter"
         case .apple:
             return "Apple 语音"
-        case .whisper:
-            return "Whisper"
         }
+    }
+}
+
+public struct OpenRouterTranscriptionRequest: Encodable, Sendable {
+    public struct InputAudio: Encodable, Equatable, Sendable {
+        public let data: String
+        public let format: String
+    }
+
+    public let model: String
+    public let inputAudio: InputAudio
+    public let language: String?
+    public let temperature: Double?
+
+    public init(
+        model: String,
+        audio: Data,
+        format: String,
+        language: String? = nil,
+        temperature: Double? = nil
+    ) {
+        self.model = model
+        inputAudio = InputAudio(
+            data: audio.base64EncodedString(),
+            format: format
+        )
+        self.language = language
+        self.temperature = temperature
+    }
+
+    private enum CodingKeys: String, CodingKey {
+        case model
+        case inputAudio = "input_audio"
+        case language
+        case temperature
+    }
+}
+
+public struct OpenRouterTranscriptionResponse: Decodable, Equatable, Sendable {
+    public struct Usage: Decodable, Equatable, Sendable {
+        public let seconds: Double?
+        public let totalTokens: Int?
+        public let inputTokens: Int?
+        public let outputTokens: Int?
+        public let cost: Double?
+
+        private enum CodingKeys: String, CodingKey {
+            case seconds
+            case totalTokens = "total_tokens"
+            case inputTokens = "input_tokens"
+            case outputTokens = "output_tokens"
+            case cost
+        }
+    }
+
+    public let text: String
+    public let usage: Usage?
+}
+
+public enum OpenRouterTranscriptionError: LocalizedError, Equatable {
+    case missingAPIKey
+    case invalidResponse
+    case requestFailed(Int, String)
+    case emptyTranscript
+
+    public var errorDescription: String? {
+        switch self {
+        case .missingAPIKey:
+            return "未配置 OpenRouter API key"
+        case .invalidResponse:
+            return "OpenRouter 返回格式无效"
+        case .requestFailed(let status, let message):
+            return "OpenRouter 转写失败（\(status)）：\(message)"
+        case .emptyTranscript:
+            return "OpenRouter 未返回文字"
+        }
+    }
+}
+
+public struct OpenRouterTranscriptionClient: Sendable {
+    public static let defaultEndpoint = URL(
+        string: "https://openrouter.ai/api/v1/audio/transcriptions"
+    )!
+
+    private let apiKey: String
+    private let endpoint: URL
+    private let session: URLSession
+
+    public init(
+        apiKey: String,
+        endpoint: URL = Self.defaultEndpoint,
+        session: URLSession = .shared
+    ) {
+        self.apiKey = apiKey
+        self.endpoint = endpoint
+        self.session = session
+    }
+
+    public func transcribe(
+        wavAudio: Data,
+        model: String,
+        language: String? = "zh"
+    ) async throws -> OpenRouterTranscriptionResponse {
+        var request = URLRequest(url: endpoint)
+        request.httpMethod = "POST"
+        request.setValue(
+            "Bearer \(apiKey)",
+            forHTTPHeaderField: "Authorization"
+        )
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try JSONEncoder().encode(
+            OpenRouterTranscriptionRequest(
+                model: model,
+                audio: wavAudio,
+                format: "wav",
+                language: language,
+                temperature: 0
+            )
+        )
+
+        let (data, response) = try await session.data(for: request)
+        guard let http = response as? HTTPURLResponse else {
+            throw OpenRouterTranscriptionError.invalidResponse
+        }
+        guard (200..<300).contains(http.statusCode) else {
+            let message = String(decoding: data, as: UTF8.self)
+            throw OpenRouterTranscriptionError.requestFailed(
+                http.statusCode,
+                message
+            )
+        }
+        let decoded = try JSONDecoder().decode(
+            OpenRouterTranscriptionResponse.self,
+            from: data
+        )
+        guard !decoded.text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw OpenRouterTranscriptionError.emptyTranscript
+        }
+        return decoded
+    }
+}
+
+public enum PCM16WAVEncoder {
+    public static func encode(samples: [Float], sampleRate: Int) -> Data {
+        var data = Data()
+        let byteRate = UInt32(sampleRate * 2)
+        let blockAlign: UInt16 = 2
+        let bitsPerSample: UInt16 = 16
+        let sampleBytes = UInt32(samples.count * 2)
+
+        data.appendASCII("RIFF")
+        data.appendLE(UInt32(36) + sampleBytes)
+        data.appendASCII("WAVE")
+        data.appendASCII("fmt ")
+        data.appendLE(UInt32(16))
+        data.appendLE(UInt16(1))
+        data.appendLE(UInt16(1))
+        data.appendLE(UInt32(sampleRate))
+        data.appendLE(byteRate)
+        data.appendLE(blockAlign)
+        data.appendLE(bitsPerSample)
+        data.appendASCII("data")
+        data.appendLE(sampleBytes)
+
+        for sample in samples {
+            let clipped = max(-1, min(1, sample))
+            let value = Int16(clipped * Float(Int16.max))
+            data.appendLE(value)
+        }
+        return data
+    }
+}
+
+private extension Data {
+    mutating func appendASCII(_ value: String) {
+        append(contentsOf: value.utf8)
+    }
+
+    mutating func appendLE(_ value: UInt16) {
+        var copy = value.littleEndian
+        Swift.withUnsafeBytes(of: &copy) { append(contentsOf: $0) }
+    }
+
+    mutating func appendLE(_ value: Int16) {
+        var copy = value.littleEndian
+        Swift.withUnsafeBytes(of: &copy) { append(contentsOf: $0) }
+    }
+
+    mutating func appendLE(_ value: UInt32) {
+        var copy = value.littleEndian
+        Swift.withUnsafeBytes(of: &copy) { append(contentsOf: $0) }
     }
 }
 
