@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import LocalVoiceCore
+import Security
 import Speech
 
 @main
@@ -21,16 +22,20 @@ enum LocalVoiceQualityBench {
         let environment = EnvironmentSnapshot.capture(root: options.rootURL)
         let model = FoundationModelBackend()
         let modelStatus = await prepareFoundationModel(model)
-        let speechStatus = await FileSpeechRecognizer.authorize()
-        let recognizer = FileSpeechRecognizer()
+        let speechStatus = options.asrProvider == .apple
+            ? await FileSpeechRecognizer.authorize()
+            : nil
+        let speechAuthorization = speechStatus?.description ?? "not used"
 
         var rows: [CaseResult] = []
         for (index, sample) in samples.enumerated() {
             print("[\(index + 1)/\(samples.count)] \(sample.id)")
             let audioURL = resolve(sample.audioPath, relativeTo: options.rootURL)
             let duration = audioDurationSeconds(audioURL)
-            let recognition = await recognizer.recognize(
+            let recognition = await recognize(
                 audioURL: audioURL,
+                provider: options.asrProvider,
+                openRouterModel: options.openRouterModel,
                 authorization: speechStatus
             )
             let asrScore = recognition.transcript.map {
@@ -69,7 +74,8 @@ enum LocalVoiceQualityBench {
         let report = BenchmarkReport(
             environment: environment,
             model: modelStatus,
-            speechAuthorization: speechStatus.description,
+            speechProvider: options.asrProvider.description,
+            speechAuthorization: speechAuthorization,
             rows: rows
         )
         let encoder = JSONEncoder()
@@ -181,6 +187,24 @@ enum LocalVoiceQualityBench {
         }
         return root.appendingPathComponent(path)
     }
+
+    private static func recognize(
+        audioURL: URL,
+        provider: ASRProvider,
+        openRouterModel: String,
+        authorization: SFSpeechRecognizerAuthorizationStatus?
+    ) async -> RecognitionResult {
+        switch provider {
+        case .apple:
+            return await FileSpeechRecognizer().recognize(
+                audioURL: audioURL,
+                authorization: authorization ?? .denied
+            )
+        case .openRouter:
+            return await OpenRouterFileRecognizer(model: openRouterModel)
+                .recognize(audioURL: audioURL)
+        }
+    }
 }
 
 private struct Options {
@@ -188,6 +212,8 @@ private struct Options {
     let manifestURL: URL
     let reportURL: URL
     let jsonURL: URL
+    let asrProvider: ASRProvider
+    let openRouterModel: String
 
     static func parse(root: URL) -> Self {
         let timestamp = Self.timestamp()
@@ -201,6 +227,8 @@ private struct Options {
         var json = root.appendingPathComponent(
             "benchmark-results/\(timestamp)-\(commandOutput("/usr/bin/git", ["rev-parse", "--short", "HEAD"])).json"
         )
+        var asrProvider = ASRProvider.apple
+        var openRouterModel = "openai/gpt-4o-mini-transcribe"
 
         var index = 1
         let args = CommandLine.arguments
@@ -217,6 +245,14 @@ private struct Options {
             case "--json":
                 if let value { json = root.appendingPathComponent(value) }
                 index += 2
+            case "--asr":
+                if let value, let provider = ASRProvider(rawValue: value) {
+                    asrProvider = provider
+                }
+                index += 2
+            case "--openrouter-model":
+                if let value { openRouterModel = value }
+                index += 2
             default:
                 index += 1
             }
@@ -225,7 +261,9 @@ private struct Options {
             rootURL: inferRoot(fromManifest: manifest) ?? root,
             manifestURL: manifest,
             reportURL: report,
-            jsonURL: json
+            jsonURL: json,
+            asrProvider: asrProvider,
+            openRouterModel: openRouterModel
         )
     }
 
@@ -240,6 +278,20 @@ private struct Options {
         formatter.formatOptions = [.withInternetDateTime]
         return formatter.string(from: Date())
             .replacingOccurrences(of: ":", with: "-")
+    }
+}
+
+private enum ASRProvider: String {
+    case apple
+    case openRouter = "openrouter"
+
+    var description: String {
+        switch self {
+        case .apple:
+            return "Apple Speech"
+        case .openRouter:
+            return "OpenRouter"
+        }
     }
 }
 
@@ -328,6 +380,79 @@ private final class FileSpeechRecognizer {
     }
 }
 
+private final class OpenRouterFileRecognizer {
+    private let model: String
+
+    init(model: String) {
+        self.model = model
+    }
+
+    func recognize(audioURL: URL) async -> RecognitionResult {
+        guard let apiKey = Self.loadAPIKey() else {
+            return RecognitionResult(
+                transcript: nil,
+                seconds: 0,
+                error: "Missing OPENROUTER_API_KEY"
+            )
+        }
+        guard FileManager.default.fileExists(atPath: audioURL.path) else {
+            return RecognitionResult(
+                transcript: nil,
+                seconds: 0,
+                error: "Audio file not found: \(audioURL.path)"
+            )
+        }
+
+        let clock = ContinuousClock()
+        let start = clock.now
+        do {
+            let wav = try Data(contentsOf: audioURL)
+            let response = try await OpenRouterTranscriptionClient(
+                apiKey: apiKey
+            ).transcribe(
+                wavAudio: wav,
+                model: model,
+                language: "zh"
+            )
+            return RecognitionResult(
+                transcript: response.text,
+                seconds: seconds(from: start, to: clock.now),
+                error: nil
+            )
+        } catch {
+            return RecognitionResult(
+                transcript: nil,
+                seconds: seconds(from: start, to: clock.now),
+                error: error.localizedDescription
+            )
+        }
+    }
+
+    private static func loadAPIKey() -> String? {
+        if let apiKey = ProcessInfo.processInfo.environment["OPENROUTER_API_KEY"]?
+            .trimmingCharacters(in: .whitespacesAndNewlines),
+            !apiKey.isEmpty {
+            return apiKey
+        }
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: "com.localvoice.openrouter",
+            kSecAttrAccount as String: "api-key",
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var item: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &item)
+        guard status == errSecSuccess,
+              let data = item as? Data,
+              let value = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? nil : trimmed
+    }
+}
+
 private final class SpeechAuthorizationContinuationBox: @unchecked Sendable {
     private let lock = NSLock()
     private var continuation:
@@ -372,6 +497,7 @@ private struct RecognitionResult {
 private struct BenchmarkReport: Codable {
     let environment: EnvironmentSnapshot
     let model: ModelStatus
+    let speechProvider: String
     let speechAuthorization: String
     let rows: [CaseResult]
     let summary: QualityBenchmarkSummary
@@ -379,11 +505,13 @@ private struct BenchmarkReport: Codable {
     init(
         environment: EnvironmentSnapshot,
         model: ModelStatus,
+        speechProvider: String,
         speechAuthorization: String,
         rows: [CaseResult]
     ) {
         self.environment = environment
         self.model = model
+        self.speechProvider = speechProvider
         self.speechAuthorization = speechAuthorization
         self.rows = rows
         summary = QualityBenchmarkSummary(
@@ -467,6 +595,7 @@ private func makeMarkdown(_ report: BenchmarkReport) -> String {
     - Model revision: `\(report.model.revision)`
     - Model load: \(format(report.model.loadSeconds))s
     - Model error: \(report.model.error ?? "none")
+    - Speech provider: \(report.speechProvider)
     - Speech authorization: \(report.speechAuthorization)
     - Source: `\(rows.first?.sample.sourceDataset ?? "unknown")`
     - Source license: `\(rows.first?.sample.sourceLicense ?? "unknown")`

@@ -3,10 +3,8 @@ import LocalVoiceCore
 import OSLog
 import Speech
 
-final class SpeechRecognitionService {
-    typealias PartialHandler = @Sendable (String, Bool, [SuspectSpan]) -> Void
-    typealias LevelHandler = @Sendable (Float) -> Void
-    typealias ErrorHandler = @Sendable (Error) -> Void
+final class SpeechRecognitionService: SpeechRecognitionBackend {
+    let kind: SpeechRecognitionBackendKind = .apple
 
     static var defaultInputName: String {
         AVCaptureDevice.default(for: .audio)?.localizedName ?? "系统默认麦克风"

@@ -7,6 +7,7 @@ import OSLog
 @MainActor
 final class AppModel: ObservableObject {
     @Published private(set) var state: SessionState = .ready
+    @Published private(set) var asrModelReady = false
     @Published private(set) var transcript = ""
     @Published private(set) var unstableTranscript = ""
     @Published private(set) var audioLevel: Float = 0
@@ -45,7 +46,7 @@ final class AppModel: ObservableObject {
     private var projection = RealtimeTextProjection()
     private var recognitionAccumulator = RecognitionTranscriptAccumulator()
     private var draft = DictationDraft()
-    private let speechService = SpeechRecognitionService()
+    private let speechService: any SpeechRecognitionBackend
     private let hotkeyController = HotkeyController()
     private let insertionService = TextInsertionService()
     private let selectedTextService = SelectedTextService()
@@ -68,7 +69,8 @@ final class AppModel: ObservableObject {
         category: "session"
     )
 
-    init() {
+    init(speechService: any SpeechRecognitionBackend = OpenRouterSpeechBackend()) {
+        self.speechService = speechService
         modelManager = LocalModelManager()
         processingService = DraftProcessingService(
             languageModel: modelManager.proxy
@@ -114,15 +116,6 @@ final class AppModel: ObservableObject {
         return false
     }
 
-    var canChangeLanguageModelBackend: Bool {
-        guard !modelManager.isBusy else { return false }
-        switch state {
-        case .ready, .failed:
-            return true
-        default:
-            return false
-        }
-    }
 
     func start() {
         hotkeyController.onShortcut = { [weak self] shortcut in
@@ -146,6 +139,9 @@ final class AppModel: ObservableObject {
         panelController.bind(to: self)
         _ = PermissionCoordinator.requestAccessibilityOnce()
         modelManager.preloadIfInstalled()
+        speechService.preload { [weak self] in
+            self?.asrModelReady = true
+        }
         Task {
             await profileStore.setEnabled(true)
             await profileStore.load()
@@ -230,8 +226,9 @@ final class AppModel: ObservableObject {
         speechServiceStarted = false
         speechService.stop()
         pendingFinalizationTask?.cancel()
+        let grace = speechService.finalizationGrace
         pendingFinalizationTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: .milliseconds(700))
+            try? await Task.sleep(for: grace)
             guard !Task.isCancelled else { return }
             self?.finalize(mode: mode)
         }
@@ -299,6 +296,10 @@ final class AppModel: ObservableObject {
     }
 
     private func begin(_ mode: VoiceMode) {
+        guard asrModelReady else {
+            statusMessage = "语音模型正在加载，请稍候…"
+            return
+        }
         pendingStartTask?.cancel()
         let startup = recordingStartupGate.begin()
         speechServiceStarted = false
@@ -575,11 +576,6 @@ final class AppModel: ObservableObject {
         panelController.showError()
     }
 
-    func selectLanguageModelBackend(_ backend: LanguageModelBackendKind) {
-        guard canChangeLanguageModelBackend else { return }
-        modelManager.select(backend)
-    }
-
     func setActivationSoundEnabled(_ isEnabled: Bool) {
         activationSoundEnabled = isEnabled
         if isEnabled {
@@ -689,10 +685,8 @@ final class AppModel: ObservableObject {
             let glossary = glossaryTerms.map {
                 GlossaryTerm(canonical: $0, occurrences: 1, sessionCount: 1)
             }
-            let outcome = await processingService.process(
+            let outcome = await processingService.translateSelection(
                 transcript: capture.request.sourceText,
-                mode: .english,
-                signature: "",
                 glossary: glossary,
                 onProgress: processingProgressHandler()
             )

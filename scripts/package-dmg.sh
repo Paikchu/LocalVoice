@@ -8,6 +8,7 @@ STAGING="$ROOT/build/dmg-staging"
 APP="$STAGING/LocalVoice.app"
 
 cd "$ROOT"
+
 xcodegen generate
 xcodebuild \
   -project LocalVoice.xcodeproj \

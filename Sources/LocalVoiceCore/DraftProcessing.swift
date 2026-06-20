@@ -869,6 +869,24 @@ public actor DraftProcessingService {
         return outcome
     }
 
+    public func translateSelection(
+        transcript: String,
+        glossary: [GlossaryTerm] = [],
+        onProgress: @escaping @Sendable (ProcessingProgress) -> Void = { _ in }
+    ) async -> DraftProcessingOutcome {
+        onProgress(.preparing)
+        let corrected = TextCorrector.correct(transcript, language: .chinese)
+        let normalized = SpokenStructureNormalizer.normalize(corrected)
+        let chunks = Self.translationChunks(normalized)
+        let outcome = await processEnglishChunks(
+            chunks,
+            glossary: glossary,
+            onProgress: onProgress
+        )
+        onProgress(.validating)
+        return Self.sanitizingEnglishOutput(outcome)
+    }
+
     /// English translation output must never carry the original Chinese. The
     /// model can echo the source, and per-chunk/whole-transcript fallbacks keep
     /// the untranslated text verbatim. Drop any residual Han-bearing sentence as

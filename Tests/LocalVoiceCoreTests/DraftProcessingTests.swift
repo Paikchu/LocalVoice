@@ -793,6 +793,28 @@ import Testing
     #expect(await model.requestCount == 3)
 }
 
+@Test func selectedTextTranslationUsesTranslationPromptForShortSelection() async {
+    let model = CapturingLanguageModelService(
+        response: ModelGenerationOutput(
+            text: "Start testing this afternoon."
+        )
+    )
+    let processor = DraftProcessingService(
+        languageModel: model,
+        timeout: .seconds(1)
+    )
+
+    let outcome = await processor.translateSelection(
+        transcript: "今天下午开始测试"
+    )
+
+    let prompt = await model.lastPrompt
+    #expect(!outcome.usedFallback)
+    #expect(outcome.result.outputText == "Start testing this afternoon.")
+    #expect(prompt?.contains("将下面的完整中文逐句翻译成自然英文") == true)
+    #expect(prompt?.contains("JSON schema") == false)
+}
+
 @Test func englishModeRetriesAnUntranslatedChineseResult() async {
     let untranslated = ModelGenerationOutput(
         text: """

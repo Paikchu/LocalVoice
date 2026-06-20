@@ -1,3 +1,5 @@
+# Whisper model — large binary, downloaded at packaging time by scripts/download-whisper-model.sh
+Resources/WhisperModels/
 .build/
 .derived/
 .derived-quality/
